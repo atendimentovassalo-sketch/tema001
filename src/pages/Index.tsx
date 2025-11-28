@@ -47,7 +47,7 @@ const Index = () => {
   }
 
   return (
-    <div className="w-full overflow-x-hidden">
+    <div className="w-full overflow-x-hidden bg-white">
       <SimulationModal
         open={isModalOpen}
         onOpenChange={setIsModalOpen}
@@ -55,34 +55,34 @@ const Index = () => {
       />
 
       {/* 1. Hero Section */}
-      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 px-4 overflow-hidden bg-gradient-to-b from-green-50/50 to-white">
-        <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-30">
+      <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 px-4 overflow-hidden bg-white">
+        <div className="absolute top-0 left-0 w-full h-full -z-10 opacity-20">
           <img
-            src="https://img.usecurling.com/p/1920/1080?q=abstract%20energy%20lines&color=green"
-            alt="Background"
+            src="https://img.usecurling.com/p/1920/1080?q=brazilian%20family%20dinner&color=white"
+            alt="Família brasileira jantando"
             className="w-full h-full object-cover"
           />
         </div>
 
         <div className="container mx-auto max-w-5xl text-center">
           <AnimatedSection>
-            <div className="inline-block bg-green-100 text-green-800 px-4 py-1.5 rounded-full text-sm font-bold mb-6 tracking-wide uppercase">
+            <div className="inline-block bg-green-50 text-primary px-4 py-1.5 rounded-full text-sm font-bold mb-6 tracking-wide uppercase border border-primary/20">
               Para contas de luz acima de R$ 150,00
             </div>
           </AnimatedSection>
 
           <AnimatedSection delay={100}>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-gray-900 mb-6 leading-tight tracking-tight">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-foreground mb-6 leading-tight tracking-tight font-heading">
               Corte até <span className="text-primary">20%</span> da sua conta
               de luz todos os meses.
-              <span className="block text-2xl md:text-4xl mt-2 font-bold text-gray-600">
+              <span className="block text-2xl md:text-4xl mt-4 font-bold text-gray-600">
                 Sem instalar painéis, sem obras e sem fidelidade.
               </span>
             </h1>
           </AnimatedSection>
 
           <AnimatedSection delay={200}>
-            <p className="text-lg md:text-xl text-gray-600 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg md:text-xl text-foreground/80 mb-10 max-w-3xl mx-auto leading-relaxed font-body">
               Pare de pagar tarifas abusivas. Receba energia limpa direto das
               usinas da COMERC (Grupo Vibra, dona dos Postos BR). Ativamos seu
               desconto remotamente e a rede de distribuição continua a mesma.
@@ -93,7 +93,7 @@ const Index = () => {
             <div className="flex flex-col items-center gap-4">
               <Button
                 size="lg"
-                className="text-lg px-8 py-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-primary hover:bg-primary/90"
+                className="w-full md:w-auto text-lg px-8 py-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-cta hover:bg-cta/90 text-cta-foreground font-bold"
                 onClick={() => openModal()}
               >
                 SIMULAR MEU DESCONTO AGORA
@@ -109,14 +109,14 @@ const Index = () => {
             <p className="text-sm text-gray-400 mb-4 uppercase tracking-widest font-semibold">
               Parceiros e Garantia
             </p>
-            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 opacity-70 grayscale hover:grayscale-0 transition-all duration-500">
+            <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 grayscale opacity-80 hover:grayscale-0 transition-all duration-500">
               <div className="flex items-center gap-2">
                 <img
                   src="https://img.usecurling.com/i?q=energy&color=black"
                   className="h-8 w-auto"
                   alt="Comerc"
                 />
-                <span className="font-bold text-xl">COMERC</span>
+                <span className="font-bold text-xl text-gray-600">COMERC</span>
               </div>
               <div className="flex items-center gap-2">
                 <img
@@ -124,7 +124,7 @@ const Index = () => {
                   className="h-8 w-auto"
                   alt="Vibra"
                 />
-                <span className="font-bold text-xl">VIBRA</span>
+                <span className="font-bold text-xl text-gray-600">VIBRA</span>
               </div>
               <div className="flex items-center gap-2">
                 <img
@@ -132,7 +132,7 @@ const Index = () => {
                   className="h-8 w-auto"
                   alt="B3"
                 />
-                <span className="font-bold text-xl">B3</span>
+                <span className="font-bold text-xl text-gray-600">B3</span>
               </div>
             </div>
           </AnimatedSection>
@@ -143,15 +143,15 @@ const Index = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto max-w-4xl px-4">
           <AnimatedSection>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-gray-900">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-8 text-foreground font-heading">
               O dinheiro que a distribuidora leva é a qualidade que falta no seu
               carrinho de compras.
             </h2>
           </AnimatedSection>
 
           <AnimatedSection delay={100}>
-            <div className="prose prose-lg mx-auto text-gray-600 mb-12 text-center">
-              <p>
+            <div className="prose prose-lg mx-auto text-foreground/80 mb-12 text-center font-body">
+              <p className="text-base md:text-lg">
                 Você já parou para pensar que a conta de luz é uma das poucas
                 coisas que você paga sem ter escolha? Todo mês ela chega, cara,
                 e você paga porque não tem opção. Isso afeta diretamente o seu
@@ -161,17 +161,17 @@ const Index = () => {
           </AnimatedSection>
 
           <AnimatedSection delay={200}>
-            <Card className="bg-green-50 border-green-100 shadow-sm">
+            <Card className="bg-green-50/30 border-primary/20 shadow-sm">
               <CardContent className="p-8 md:p-12">
                 <div className="flex flex-col md:flex-row items-center gap-8">
-                  <div className="flex-shrink-0 bg-white p-4 rounded-full shadow-sm">
+                  <div className="flex-shrink-0 bg-white p-4 rounded-full shadow-sm border border-primary/10">
                     <ShoppingCart className="h-12 w-12 text-primary" />
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold text-green-900 mb-4">
+                    <h3 className="text-2xl font-bold text-foreground mb-4 font-heading">
                       Faça as contas:
                     </h3>
-                    <p className="text-lg text-green-800 mb-4">
+                    <p className="text-base md:text-lg text-foreground/90 mb-4 font-body">
                       Uma economia de 20% na sua conta de luz pode significar R$
                       50, R$ 100 ou até R$ 200 a mais todo mês no seu bolso.
                     </p>
@@ -183,7 +183,7 @@ const Index = () => {
                       ].map((item, i) => (
                         <li key={i} className="flex items-start gap-3">
                           <CheckCircle2 className="h-6 w-6 text-primary flex-shrink-0" />
-                          <span className="text-green-900 font-medium">
+                          <span className="text-foreground font-medium text-base md:text-lg">
                             {item}
                           </span>
                         </li>
@@ -198,14 +198,14 @@ const Index = () => {
       </section>
 
       {/* 3. A Solução e o Mecanismo */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-[#F9F9F9]">
         <div className="container mx-auto max-w-6xl px-4">
           <AnimatedSection>
             <div className="text-center mb-16">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-heading text-foreground">
                 A Lei mudou. Agora a escolha é sua.
               </h2>
-              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              <p className="text-lg md:text-xl text-foreground/70 max-w-3xl mx-auto font-body">
                 Como conseguimos te dar 20% de desconto sem cobrar nada?
               </p>
             </div>
@@ -230,13 +230,17 @@ const Index = () => {
               },
             ].map((item, i) => (
               <AnimatedSection key={i} delay={i * 150} className="h-full">
-                <Card className="h-full hover:shadow-md transition-shadow duration-300 border-none shadow-sm">
+                <Card className="h-full hover:shadow-md transition-shadow duration-300 border border-gray-100 shadow-sm bg-white">
                   <CardContent className="p-8 flex flex-col items-center text-center h-full">
                     <div className="bg-primary/10 p-4 rounded-full mb-6">
                       <item.icon className="h-10 w-10 text-primary" />
                     </div>
-                    <h3 className="text-xl font-bold mb-4">{item.title}</h3>
-                    <p className="text-gray-600 leading-relaxed">{item.desc}</p>
+                    <h3 className="text-xl font-bold mb-4 font-heading text-foreground">
+                      {item.title}
+                    </h3>
+                    <p className="text-foreground/70 leading-relaxed font-body text-base md:text-lg">
+                      {item.desc}
+                    </p>
                   </CardContent>
                 </Card>
               </AnimatedSection>
@@ -245,7 +249,7 @@ const Index = () => {
 
           <AnimatedSection delay={400}>
             <div className="mt-12 text-center bg-white p-6 rounded-xl shadow-sm border border-gray-100 max-w-3xl mx-auto">
-              <p className="text-lg font-medium text-gray-800">
+              <p className="text-lg font-medium text-foreground">
                 O resultado? A mesma luz, na mesma tomada, chegando pela mesma
                 rede. A única coisa que muda é o valor final que você paga.
               </p>
@@ -258,7 +262,7 @@ const Index = () => {
       <section className="py-20 bg-white">
         <div className="container mx-auto max-w-5xl px-4">
           <AnimatedSection>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 font-heading text-foreground">
               A energia é nossa. A rede de distribuição continua sendo da
               concessionária local.
             </h2>
@@ -266,44 +270,44 @@ const Index = () => {
 
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <AnimatedSection className="space-y-6">
-              <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
-                <h3 className="font-bold text-xl mb-4 flex items-center gap-2">
+              <div className="bg-[#F9F9F9] p-6 rounded-xl border border-gray-100">
+                <h3 className="font-bold text-xl mb-4 flex items-center gap-2 font-heading text-foreground">
                   <ShieldCheck className="text-primary h-6 w-6" />
                   Segurança Garantida
                 </h3>
                 <ul className="space-y-4">
                   <li className="flex items-center gap-3">
-                    <div className="bg-white p-2 rounded-full shadow-sm">
+                    <div className="bg-white p-2 rounded-full shadow-sm border border-gray-100">
                       <Lightbulb className="h-5 w-5 text-gray-600" />
                     </div>
-                    <span className="text-gray-700">
+                    <span className="text-foreground/80 font-body text-base md:text-lg">
                       <strong>Quem entrega a luz?</strong> A sua distribuidora
                       atual.
                     </span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="bg-white p-2 rounded-full shadow-sm">
+                    <div className="bg-white p-2 rounded-full shadow-sm border border-gray-100">
                       <Wrench className="h-5 w-5 text-gray-600" />
                     </div>
-                    <span className="text-gray-700">
+                    <span className="text-foreground/80 font-body text-base md:text-lg">
                       <strong>Quem faz a manutenção?</strong> A sua
                       distribuidora atual.
                     </span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="bg-white p-2 rounded-full shadow-sm">
+                    <div className="bg-white p-2 rounded-full shadow-sm border border-gray-100">
                       <Phone className="h-5 w-5 text-gray-600" />
                     </div>
-                    <span className="text-gray-700">
+                    <span className="text-foreground/80 font-body text-base md:text-lg">
                       <strong>Se faltar luz?</strong> Você liga para a sua
                       distribuidora.
                     </span>
                   </li>
                   <li className="flex items-center gap-3">
-                    <div className="bg-white p-2 rounded-full shadow-sm">
+                    <div className="bg-white p-2 rounded-full shadow-sm border border-gray-100">
                       <PiggyBank className="h-5 w-5 text-primary" />
                     </div>
-                    <span className="text-gray-700">
+                    <span className="text-foreground/80 font-body text-base md:text-lg">
                       <strong>Quem gera a economia?</strong> Nós.
                     </span>
                   </li>
@@ -313,10 +317,10 @@ const Index = () => {
 
             <AnimatedSection delay={200}>
               <div className="bg-primary/5 p-8 rounded-xl border border-primary/10">
-                <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                <h3 className="text-2xl font-bold text-foreground mb-4 font-heading">
                   Operação 100% regulamentada pela Lei 14.300/2022
                 </h3>
-                <p className="text-gray-600 mb-6 leading-relaxed">
+                <p className="text-foreground/70 mb-6 leading-relaxed font-body text-base md:text-lg">
                   Nossa modalidade é conhecida como Geração Compartilhada. O
                   Marco Legal da Geração Distribuída (Lei 14.300) garante seu
                   direito de escolher sua fonte de energia e receber os créditos
@@ -333,36 +337,40 @@ const Index = () => {
       </section>
 
       {/* 5. Autoridade */}
-      <section className="py-16 bg-gray-900 text-white">
+      <section className="py-16 bg-[#F9F9F9] border-y border-gray-200">
         <div className="container mx-auto max-w-4xl px-4 text-center">
           <AnimatedSection>
-            <h2 className="text-3xl font-bold mb-8">
+            <h2 className="text-3xl font-bold mb-8 font-heading text-foreground">
               Garantido por quem abastece o Brasil há décadas.
             </h2>
-            <p className="text-gray-300 text-lg mb-12 max-w-2xl mx-auto">
+            <p className="text-foreground/70 text-lg mb-12 max-w-2xl mx-auto font-body">
               Somos parte do grupo que você já confia. A solidez da Vibra (dona
               dos Postos BR) e a transparência de uma empresa listada na B3.
             </p>
           </AnimatedSection>
 
           <AnimatedSection delay={200}>
-            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24">
+            <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 grayscale">
               <div className="flex flex-col items-center gap-3">
                 <img
-                  src="https://img.usecurling.com/i?q=gas%20station&color=white"
-                  className="h-16 w-auto opacity-90"
+                  src="https://img.usecurling.com/i?q=gas%20station&color=black"
+                  className="h-16 w-auto opacity-80"
                   alt="Vibra"
                 />
-                <span className="font-bold text-xl tracking-wider">VIBRA</span>
+                <span className="font-bold text-xl tracking-wider text-gray-600">
+                  VIBRA
+                </span>
               </div>
-              <div className="w-px h-16 bg-gray-700 hidden md:block"></div>
+              <div className="w-px h-16 bg-gray-300 hidden md:block"></div>
               <div className="flex flex-col items-center gap-3">
                 <img
-                  src="https://img.usecurling.com/i?q=stock%20market&color=white"
-                  className="h-16 w-auto opacity-90"
+                  src="https://img.usecurling.com/i?q=stock%20market&color=black"
+                  className="h-16 w-auto opacity-80"
                   alt="B3"
                 />
-                <span className="font-bold text-xl tracking-wider">B3</span>
+                <span className="font-bold text-xl tracking-wider text-gray-600">
+                  B3
+                </span>
               </div>
             </div>
           </AnimatedSection>
@@ -370,17 +378,17 @@ const Index = () => {
       </section>
 
       {/* 6. Bônus e App */}
-      <section className="py-20 bg-gradient-to-br from-white to-green-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <AnimatedSection>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              <h2 className="text-3xl md:text-4xl font-bold mb-6 font-heading text-foreground">
                 Não economize apenas na Luz. Economize na Vida.
               </h2>
-              <p className="text-xl text-gray-600 mb-8">
+              <p className="text-xl text-foreground/80 mb-8 font-body">
                 Acesso Gratuito ao nosso Clube de Vantagens e App Exclusivo.
               </p>
-              <p className="text-gray-600 mb-8">
+              <p className="text-foreground/70 mb-8 font-body text-base md:text-lg">
                 Mais de 60.000 estabelecimentos e 500.000 produtos. Tudo
                 controlado pelo nosso App, onde você acessa suas faturas
                 digitais e resgata descontos reais:
@@ -406,9 +414,9 @@ const Index = () => {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+                    className="flex items-start gap-4 bg-[#F9F9F9] p-4 rounded-lg shadow-sm border border-gray-100"
                   >
-                    <div className="bg-green-100 p-3 rounded-full">
+                    <div className="bg-green-50 p-3 rounded-full">
                       <img
                         src={`https://img.usecurling.com/i?q=${item.icon}&color=green&shape=fill`}
                         className="h-6 w-6"
@@ -416,8 +424,12 @@ const Index = () => {
                       />
                     </div>
                     <div>
-                      <h4 className="font-bold text-gray-900">{item.title}</h4>
-                      <p className="text-sm text-gray-600">{item.desc}</p>
+                      <h4 className="font-bold text-foreground font-heading">
+                        {item.title}
+                      </h4>
+                      <p className="text-sm text-foreground/70 font-body">
+                        {item.desc}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -433,9 +445,9 @@ const Index = () => {
               <div className="relative">
                 <div className="absolute inset-0 bg-primary/20 blur-3xl rounded-full transform scale-90"></div>
                 <img
-                  src="https://img.usecurling.com/p/350/700?q=mobile%20app%20interface%20energy%20savings&dpr=2"
-                  alt="App Mockup"
-                  className="relative z-10 rounded-[2.5rem] shadow-2xl border-8 border-gray-900 w-[300px]"
+                  src="https://img.usecurling.com/p/800/600?q=full%20shopping%20cart&color=white"
+                  alt="Carrinho de compras cheio"
+                  className="relative z-10 rounded-xl shadow-2xl border-4 border-white w-full max-w-[400px] object-cover"
                 />
               </div>
             </AnimatedSection>
@@ -444,26 +456,27 @@ const Index = () => {
       </section>
 
       {/* 7. O Comparativo */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-[#F9F9F9]">
         <div className="container mx-auto max-w-5xl px-4">
           <AnimatedSection>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 font-heading text-foreground">
               O que muda e o que NÃO muda na sua rotina:
             </h2>
           </AnimatedSection>
 
           <AnimatedSection delay={100}>
-            <div className="overflow-hidden rounded-xl border border-gray-200 shadow-sm">
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-hidden rounded-xl border border-gray-200 shadow-sm bg-white">
               <Table>
                 <TableHeader className="bg-gray-50">
                   <TableRow>
-                    <TableHead className="w-[30%] font-bold text-gray-900 text-lg py-6">
+                    <TableHead className="w-[30%] font-bold text-foreground text-lg py-6 font-heading">
                       Item
                     </TableHead>
-                    <TableHead className="w-[35%] font-bold text-gray-500 text-lg py-6">
+                    <TableHead className="w-[35%] font-bold text-gray-500 text-lg py-6 font-heading">
                       Como é hoje
                     </TableHead>
-                    <TableHead className="w-[35%] font-bold text-primary text-lg py-6 bg-green-50/50">
+                    <TableHead className="w-[35%] font-bold text-primary text-lg py-6 bg-green-50/50 font-heading">
                       Como fica com a gente
                     </TableHead>
                   </TableRow>
@@ -509,10 +522,10 @@ const Index = () => {
                         i % 2 === 0 ? 'bg-white' : 'bg-gray-50/50',
                       )}
                     >
-                      <TableCell className="font-medium py-4">
+                      <TableCell className="font-medium py-4 text-foreground font-body">
                         {row.item}
                       </TableCell>
-                      <TableCell className="text-gray-500 py-4">
+                      <TableCell className="text-gray-500 py-4 font-body">
                         <div className="flex items-center gap-2">
                           {row.highlight && (
                             <XCircle className="h-4 w-4 text-gray-400" />
@@ -522,10 +535,10 @@ const Index = () => {
                       </TableCell>
                       <TableCell
                         className={cn(
-                          'py-4 bg-green-50/30',
+                          'py-4 bg-green-50/30 font-body',
                           row.boldAfter
                             ? 'font-bold text-primary'
-                            : 'text-gray-900',
+                            : 'text-foreground',
                         )}
                       >
                         <div className="flex items-center gap-2">
@@ -538,6 +551,69 @@ const Index = () => {
                 </TableBody>
               </Table>
             </div>
+
+            {/* Mobile Cards */}
+            <div className="md:hidden space-y-4">
+              {[
+                {
+                  item: 'A qualidade da luz',
+                  before: 'Padrão',
+                  after: 'Idêntica (mesma voltagem e estabilidade)',
+                },
+                {
+                  item: 'Se acabar a luz',
+                  before: 'Você liga p/ a Distribuidora',
+                  after: 'Você liga p/ a Distribuidora (nada muda)',
+                },
+                {
+                  item: 'Manutenção da rede',
+                  before: 'Distribuidora',
+                  after: 'Distribuidora (nada muda)',
+                },
+                {
+                  item: 'Faturas/Papelada',
+                  before: 'Correio/Papel',
+                  after: '100% Digital via App',
+                },
+                {
+                  item: 'O preço',
+                  before: 'Caro e imprevisível',
+                  after: 'Até 20% mais barato',
+                  isHighlight: true,
+                },
+              ].map((card, i) => (
+                <Card
+                  key={i}
+                  className={cn(
+                    'border-gray-200 shadow-sm',
+                    card.isHighlight ? 'border-primary/30 bg-green-50/30' : '',
+                  )}
+                >
+                  <CardContent className="p-5">
+                    <h3 className="font-bold text-lg mb-3 text-foreground font-heading">
+                      {card.item}
+                    </h3>
+                    <div className="space-y-3">
+                      <div className="flex items-start gap-2 text-gray-500">
+                        <XCircle className="h-5 w-5 text-gray-400 shrink-0 mt-0.5" />
+                        <span className="text-sm font-body">{card.before}</span>
+                      </div>
+                      <div className="flex items-start gap-2 text-foreground">
+                        <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
+                        <span
+                          className={cn(
+                            'text-sm font-body',
+                            card.isHighlight ? 'font-bold text-primary' : '',
+                          )}
+                        >
+                          {card.after}
+                        </span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           </AnimatedSection>
         </div>
       </section>
@@ -546,10 +622,10 @@ const Index = () => {
       <Simulator onRegister={openModal} />
 
       {/* 9. FAQ */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto max-w-3xl px-4">
           <AnimatedSection>
-            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 font-heading text-foreground">
               Sem letras miúdas. Entenda a cobrança.
             </h2>
           </AnimatedSection>
@@ -577,12 +653,12 @@ const Index = () => {
                 <AccordionItem
                   key={i}
                   value={`item-${i}`}
-                  className="bg-white border border-gray-200 rounded-lg px-4"
+                  className="bg-[#F9F9F9] border border-gray-200 rounded-lg px-4"
                 >
-                  <AccordionTrigger className="text-left font-semibold text-lg py-4 hover:no-underline hover:text-primary transition-colors">
+                  <AccordionTrigger className="text-left font-semibold text-lg py-4 hover:no-underline hover:text-primary transition-colors font-heading text-foreground">
                     {item.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600 text-base pb-4">
+                  <AccordionContent className="text-foreground/70 text-base pb-4 font-body">
                     {item.a}
                   </AccordionContent>
                 </AccordionItem>
@@ -593,16 +669,16 @@ const Index = () => {
       </section>
 
       {/* 10. Chamada Final / CTA */}
-      <section className="py-24 bg-primary text-white text-center">
+      <section className="py-24 bg-[#F9F9F9] text-center border-t border-gray-200">
         <div className="container mx-auto max-w-4xl px-4">
           <AnimatedSection>
-            <h2 className="text-3xl md:text-5xl font-bold mb-8">
+            <h2 className="text-3xl md:text-5xl font-bold mb-8 font-heading text-foreground">
               Troque uma conta cara por um carrinho mais cheio.
             </h2>
           </AnimatedSection>
 
           <AnimatedSection delay={100}>
-            <p className="text-xl text-green-50 mb-12 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl text-foreground/70 mb-12 max-w-3xl mx-auto leading-relaxed font-body">
               A Lei 14.300 te dá o direito de pagar menos. A Vibra te dá a
               segurança de que vai funcionar. O App coloca o controle na palma
               da sua mão. Junte-se a milhares de brasileiros que já estão usando
@@ -615,13 +691,12 @@ const Index = () => {
             <div className="flex flex-col items-center gap-4">
               <Button
                 size="lg"
-                variant="secondary"
-                className="text-lg md:text-xl px-10 py-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-bold text-primary"
+                className="w-full md:w-auto text-lg md:text-xl px-10 py-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-bold bg-cta hover:bg-cta/90 text-cta-foreground"
                 onClick={() => openModal()}
               >
                 QUERO ATIVAR MEU DESCONTO + CLUBE DE VANTAGENS
               </Button>
-              <span className="text-sm text-green-100 font-medium opacity-90">
+              <span className="text-sm text-gray-500 font-medium opacity-90">
                 (Necessário conta de luz acima de R$ 150 • Simulação Gratuita)
               </span>
             </div>

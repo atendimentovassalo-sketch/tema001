@@ -30,7 +30,7 @@ export default function Layout() {
   }
 
   return (
-    <main className="flex flex-col min-h-screen font-sans text-foreground bg-background">
+    <main className="flex flex-col min-h-screen font-body text-foreground bg-background">
       {/* Header */}
       <header
         className={cn(
@@ -51,7 +51,7 @@ export default function Layout() {
               alt="Logo Energia"
               className="h-8 w-8 md:h-10 md:w-10 transition-transform duration-300 group-hover:scale-105"
             />
-            <span className="text-xl font-bold tracking-tight text-primary">
+            <span className="text-xl font-bold tracking-tight text-primary font-heading">
               Economia<span className="text-foreground">Luz</span>
             </span>
           </button>
@@ -64,7 +64,7 @@ export default function Layout() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-gray-50 border-t border-gray-200 py-12 px-4">
+      <footer className="bg-[#F9F9F9] border-t border-gray-200 py-12 px-4">
         <div className="container mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-2">
             <img
@@ -72,11 +72,11 @@ export default function Layout() {
               alt="Logo Energia Footer"
               className="h-6 w-6 grayscale opacity-50"
             />
-            <span className="text-sm font-semibold text-gray-500">
+            <span className="text-sm font-semibold text-gray-500 font-body">
               EconomiaLuz &copy; {new Date().getFullYear()}
             </span>
           </div>
-          <div className="flex gap-6 text-sm text-gray-500">
+          <div className="flex gap-6 text-sm text-gray-500 font-body">
             <a href="#" className="hover:text-primary transition-colors">
               Termos de Uso
             </a>

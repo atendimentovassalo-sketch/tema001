@@ -103,12 +103,12 @@ export function SimulationModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-white">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-bold text-primary">
+          <DialogTitle className="text-2xl font-bold text-primary font-heading">
             Simule seu Desconto Agora!
           </DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="font-body">
             Preencha os dados abaixo para descobrir quanto você pode economizar.
           </DialogDescription>
         </DialogHeader>
@@ -123,12 +123,13 @@ export function SimulationModal({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome Completo</FormLabel>
+                  <FormLabel className="font-heading">Nome Completo</FormLabel>
                   <FormControl>
                     <Input
                       placeholder="Seu nome"
                       {...field}
                       disabled={isLoading}
+                      className="font-body"
                     />
                   </FormControl>
                   <FormMessage />
@@ -142,13 +143,14 @@ export function SimulationModal({
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>E-mail</FormLabel>
+                    <FormLabel className="font-heading">E-mail</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="seu@email.com"
                         type="email"
                         {...field}
                         disabled={isLoading}
+                        className="font-body"
                       />
                     </FormControl>
                     <FormMessage />
@@ -161,12 +163,15 @@ export function SimulationModal({
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Telefone (com DDD)</FormLabel>
+                    <FormLabel className="font-heading">
+                      Telefone (com DDD)
+                    </FormLabel>
                     <FormControl>
                       <Input
                         placeholder="(11) 99999-9999"
                         {...field}
                         disabled={isLoading}
+                        className="font-body"
                       />
                     </FormControl>
                     <FormMessage />
@@ -180,7 +185,9 @@ export function SimulationModal({
               name="billValue"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Valor médio da conta (R$)</FormLabel>
+                  <FormLabel className="font-heading">
+                    Valor médio da conta (R$)
+                  </FormLabel>
                   <FormControl>
                     <Input
                       type="number"
@@ -188,6 +195,7 @@ export function SimulationModal({
                       step="0.01"
                       {...field}
                       disabled={isLoading}
+                      className="font-body"
                     />
                   </FormControl>
                   <FormMessage />
@@ -200,14 +208,16 @@ export function SimulationModal({
               name="distributor"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Sua distribuidora</FormLabel>
+                  <FormLabel className="font-heading">
+                    Sua distribuidora
+                  </FormLabel>
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
                     disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger>
+                      <SelectTrigger className="font-body">
                         <SelectValue placeholder="Selecione..." />
                       </SelectTrigger>
                     </FormControl>
@@ -240,7 +250,7 @@ export function SimulationModal({
                     />
                   </FormControl>
                   <div className="space-y-1 leading-none">
-                    <FormLabel>
+                    <FormLabel className="font-body">
                       Concordo com os Termos de Uso e Política de Privacidade
                     </FormLabel>
                   </div>
@@ -255,7 +265,7 @@ export function SimulationModal({
 
             <Button
               type="submit"
-              className="w-full text-lg font-bold py-6"
+              className="w-full text-lg font-bold py-6 bg-cta hover:bg-cta/90 text-cta-foreground"
               disabled={isLoading}
             >
               {isLoading ? (
