@@ -11,6 +11,8 @@ import {
   Phone,
   FileText,
   XCircle,
+  Star,
+  Quote,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import {
@@ -32,6 +34,7 @@ import { SimulationModal } from '@/components/SimulationModal'
 import { Simulator } from '@/components/Simulator'
 import { AnimatedSection } from '@/components/AnimatedSection'
 import { cn } from '@/lib/utils'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 
 const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -93,7 +96,7 @@ const Index = () => {
             <div className="flex flex-col items-center gap-4">
               <Button
                 size="lg"
-                className="w-full md:w-auto text-lg px-8 py-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-cta hover:bg-cta/90 text-cta-foreground font-bold"
+                className="w-full md:w-auto text-lg px-8 py-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-cta hover:bg-cta/90 text-white font-bold"
                 onClick={() => openModal()}
               >
                 SIMULAR MEU DESCONTO AGORA
@@ -377,8 +380,129 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 6. Bônus e App */}
+      {/* NEW SECTION: Social Proof (Google Reviews) */}
       <section className="py-20 bg-white">
+        <div className="container mx-auto max-w-6xl px-4">
+          <AnimatedSection>
+            <div className="text-center mb-16">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4 font-heading text-foreground leading-tight">
+                Eles também duvidaram no início.
+                <br />
+                Hoje, a única reclamação é não ter começado antes.
+              </h2>
+              <p className="text-lg md:text-xl text-foreground/70 max-w-3xl mx-auto font-body">
+                Veja o que nossos clientes estão falando publicamente no Google
+                Avaliações. Sem filtro, sem edição.
+              </p>
+            </div>
+          </AnimatedSection>
+
+          <div className="grid md:grid-cols-3 gap-8 mb-12">
+            {[
+              {
+                title: 'O FIM DO MEDO DO BOLETO',
+                quote:
+                  'O desconto veio certinho, meu boleto chegou e sempre que preciso o suporte me atende.',
+                explanation:
+                  'A Adriana tinha medo da bagunça administrativa. Ela prova que o processo funciona como um relógio.',
+                author: 'Adriana S.',
+                avatar: 'female',
+              },
+              {
+                title: 'O CUSTO ZERO',
+                quote:
+                  'Melhor ainda, não paguei nada pra receber os descontos... Muita tecnologia envolvida.',
+                explanation:
+                  "Ele reforça que a entrada é gratuita. Mata a objeção da 'taxa escondida'.",
+                author: 'Daniel M.',
+                avatar: 'male',
+              },
+              {
+                title: 'A CONSISTÊNCIA',
+                quote: 'Ótima! O desconto está vindo certinho!',
+                explanation:
+                  'Curto e grosso. O desconto não falha. É dinheiro no bolso todo mês.',
+                author: 'Cliente Verificado',
+                avatar: 'male',
+              },
+            ].map((testimonial, i) => (
+              <AnimatedSection key={i} delay={i * 150} className="h-full">
+                <Card className="h-full border border-gray-100 shadow-sm hover:shadow-md transition-all duration-300 bg-[#F9F9F9]">
+                  <CardContent className="p-8 flex flex-col h-full">
+                    <div className="flex items-center gap-1 mb-4">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Star
+                          key={star}
+                          className="h-4 w-4 text-yellow-400 fill-yellow-400"
+                        />
+                      ))}
+                    </div>
+                    <h3 className="text-sm font-bold text-primary uppercase tracking-wider mb-4 font-heading">
+                      {testimonial.title}
+                    </h3>
+                    <div className="relative mb-6 flex-grow">
+                      <Quote className="absolute -top-2 -left-2 h-6 w-6 text-gray-200 transform -scale-x-100" />
+                      <p className="text-lg font-medium text-foreground italic relative z-10 pl-4 font-body">
+                        "{testimonial.quote}"
+                      </p>
+                    </div>
+                    <div className="bg-white p-4 rounded-lg border border-gray-100 mb-6">
+                      <p className="text-sm text-gray-500 font-body">
+                        <span className="font-bold text-primary">
+                          Por que importa:
+                        </span>{' '}
+                        {testimonial.explanation}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 mt-auto pt-4 border-t border-gray-200">
+                      <Avatar className="h-10 w-10">
+                        <AvatarImage
+                          src={`https://img.usecurling.com/ppl/thumbnail?gender=${testimonial.avatar}&seed=${i}`}
+                          alt={testimonial.author}
+                        />
+                        <AvatarFallback>
+                          {testimonial.author.charAt(0)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <p className="font-bold text-sm text-foreground font-heading">
+                          {testimonial.author}
+                        </p>
+                        <p className="text-xs text-gray-400 font-body">
+                          Cliente via Google
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </AnimatedSection>
+            ))}
+          </div>
+
+          <AnimatedSection delay={400}>
+            <div className="text-center bg-green-50/50 p-6 rounded-xl border border-primary/10 max-w-2xl mx-auto">
+              <div className="flex justify-center items-center gap-2 mb-2">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <Star
+                    key={star}
+                    className="h-6 w-6 text-yellow-400 fill-yellow-400"
+                  />
+                ))}
+              </div>
+              <p className="text-lg font-bold text-foreground font-heading">
+                4.9/5 Estrelas em Satisfação dos Clientes.
+              </p>
+              <p className="text-foreground/70 font-body">
+                Junte-se ao Daniel, à Adriana e a milhares de brasileiros
+                inteligentes.
+              </p>
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* 6. Bônus e App */}
+      <section className="py-20 bg-[#F9F9F9]">
         <div className="container mx-auto max-w-6xl px-4">
           <div className="grid md:grid-cols-2 gap-12 items-center">
             <AnimatedSection>
@@ -414,7 +538,7 @@ const Index = () => {
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-4 bg-[#F9F9F9] p-4 rounded-lg shadow-sm border border-gray-100"
+                    className="flex items-start gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100"
                   >
                     <div className="bg-green-50 p-3 rounded-full">
                       <img
@@ -456,7 +580,7 @@ const Index = () => {
       </section>
 
       {/* 7. O Comparativo */}
-      <section className="py-20 bg-[#F9F9F9]">
+      <section className="py-20 bg-white">
         <div className="container mx-auto max-w-5xl px-4">
           <AnimatedSection>
             <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 font-heading text-foreground">
@@ -619,7 +743,9 @@ const Index = () => {
       </section>
 
       {/* 8. O Simulador */}
-      <Simulator onRegister={openModal} />
+      <div id="simulator">
+        <Simulator onRegister={openModal} />
+      </div>
 
       {/* 9. FAQ */}
       <section className="py-20 bg-white">
@@ -691,7 +817,7 @@ const Index = () => {
             <div className="flex flex-col items-center gap-4">
               <Button
                 size="lg"
-                className="w-full md:w-auto text-lg md:text-xl px-10 py-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-bold bg-cta hover:bg-cta/90 text-cta-foreground"
+                className="w-full md:w-auto text-lg md:text-xl px-10 py-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-bold bg-cta hover:bg-cta/90 text-white"
                 onClick={() => openModal()}
               >
                 QUERO ATIVAR MEU DESCONTO + CLUBE DE VANTAGENS

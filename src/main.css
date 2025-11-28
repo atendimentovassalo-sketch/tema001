@@ -24,9 +24,9 @@
     --primary-foreground: 0 0% 100%;
 
     /* Burnt Orange - Used for CTA Buttons */
-    /* Using a vibrant orange that supports dark text for contrast */
-    --cta: 25 95% 53%; /* #F97316 approx */
-    --cta-foreground: 0 0% 20%; /* Dark text on CTA */
+    /* Updated to a "Burnt Orange" for better contrast and design requirement */
+    --cta: 20 90% 45%; /* Approx #DA4A0C */
+    --cta-foreground: 0 0% 100%; /* White text on CTA as requested in header specs */
 
     --secondary: 150 30% 96%;
     --secondary-foreground: 145 80% 39%;
@@ -76,8 +76,8 @@
     --primary: 145 80% 39%;
     --primary-foreground: 0 0% 100%;
 
-    --cta: 25 95% 53%;
-    --cta-foreground: 0 0% 20%;
+    --cta: 20 90% 45%;
+    --cta-foreground: 0 0% 100%;
 
     --secondary: 217.2 32.6% 17.5%;
     --secondary-foreground: 210 40% 98%;

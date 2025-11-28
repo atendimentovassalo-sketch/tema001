@@ -142,7 +142,7 @@ export function Simulator({ onRegister }: SimulatorProps) {
                     <Button
                       type="submit"
                       size="lg"
-                      className="w-full md:w-auto px-8 py-6 text-lg font-bold shadow-md hover:shadow-lg transition-all bg-cta hover:bg-cta/90 text-cta-foreground"
+                      className="w-full md:w-auto px-8 py-6 text-lg font-bold shadow-md hover:shadow-lg transition-all bg-cta hover:bg-cta/90 text-white"
                     >
                       CALCULAR MEU DESCONTO AGORA
                     </Button>
@@ -218,7 +218,7 @@ export function Simulator({ onRegister }: SimulatorProps) {
                     <Button
                       onClick={() => onRegister(form.getValues('billValue'))}
                       size="lg"
-                      className="w-full md:w-auto px-10 py-8 text-xl font-bold rounded-full shadow-xl hover:scale-105 transition-all bg-cta hover:bg-cta/90 text-cta-foreground animate-pulse"
+                      className="w-full md:w-auto px-10 py-8 text-xl font-bold rounded-full shadow-xl hover:scale-105 transition-all bg-cta hover:bg-cta/90 text-white animate-pulse"
                     >
                       QUERO GARANTIR ESSES R${' '}
                       {results.annual.toFixed(2).replace('.', ',')} AGORA
