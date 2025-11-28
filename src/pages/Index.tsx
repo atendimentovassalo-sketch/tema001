@@ -6,8 +6,6 @@ import {
   ShoppingCart,
   PiggyBank,
   ShieldCheck,
-  Smartphone,
-  ChevronDown,
   Lightbulb,
   Wrench,
   Phone,
@@ -31,43 +29,30 @@ import {
 } from '@/components/ui/table'
 import { Card, CardContent } from '@/components/ui/card'
 import { SimulationModal } from '@/components/SimulationModal'
-import { useIntersectionObserver } from '@/hooks/use-intersection-observer'
+import { Simulator } from '@/components/Simulator'
+import { AnimatedSection } from '@/components/AnimatedSection'
 import { cn } from '@/lib/utils'
-
-// Helper component for animated sections
-const AnimatedSection = ({
-  children,
-  className,
-  delay = 0,
-}: {
-  children: React.ReactNode
-  className?: string
-  delay?: number
-}) => {
-  const { ref, isVisible } = useIntersectionObserver()
-  return (
-    <div
-      ref={ref as any}
-      className={cn(
-        'opacity-0 translate-y-8 transition-all duration-700 ease-out',
-        isVisible && 'opacity-100 translate-y-0',
-        className,
-      )}
-      style={{ transitionDelay: `${delay}ms` }}
-    >
-      {children}
-    </div>
-  )
-}
 
 const Index = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [simulatedBillValue, setSimulatedBillValue] = useState<
+    number | undefined
+  >(undefined)
 
-  const openModal = () => setIsModalOpen(true)
+  const openModal = (billValue?: number) => {
+    if (billValue) {
+      setSimulatedBillValue(billValue)
+    }
+    setIsModalOpen(true)
+  }
 
   return (
     <div className="w-full overflow-x-hidden">
-      <SimulationModal open={isModalOpen} onOpenChange={setIsModalOpen} />
+      <SimulationModal
+        open={isModalOpen}
+        onOpenChange={setIsModalOpen}
+        initialBillValue={simulatedBillValue}
+      />
 
       {/* 1. Hero Section */}
       <section className="relative pt-32 pb-20 md:pt-40 md:pb-32 px-4 overflow-hidden bg-gradient-to-b from-green-50/50 to-white">
@@ -109,7 +94,7 @@ const Index = () => {
               <Button
                 size="lg"
                 className="text-lg px-8 py-8 rounded-full shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 bg-primary hover:bg-primary/90"
-                onClick={openModal}
+                onClick={() => openModal()}
               >
                 SIMULAR MEU DESCONTO AGORA
                 <ArrowRight className="ml-2 h-5 w-5" />
@@ -557,7 +542,10 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 8. FAQ */}
+      {/* 8. O Simulador */}
+      <Simulator onRegister={openModal} />
+
+      {/* 9. FAQ */}
       <section className="py-20 bg-gray-50">
         <div className="container mx-auto max-w-3xl px-4">
           <AnimatedSection>
@@ -604,7 +592,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* 9. Chamada Final / CTA */}
+      {/* 10. Chamada Final / CTA */}
       <section className="py-24 bg-primary text-white text-center">
         <div className="container mx-auto max-w-4xl px-4">
           <AnimatedSection>
@@ -629,7 +617,7 @@ const Index = () => {
                 size="lg"
                 variant="secondary"
                 className="text-lg md:text-xl px-10 py-8 rounded-full shadow-xl hover:shadow-2xl hover:scale-105 transition-all duration-300 font-bold text-primary"
-                onClick={openModal}
+                onClick={() => openModal()}
               >
                 QUERO ATIVAR MEU DESCONTO + CLUBE DE VANTAGENS
               </Button>

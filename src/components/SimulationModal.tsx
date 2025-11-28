@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -55,9 +55,14 @@ const formSchema = z.object({
 interface SimulationModalProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  initialBillValue?: number
 }
 
-export function SimulationModal({ open, onOpenChange }: SimulationModalProps) {
+export function SimulationModal({
+  open,
+  onOpenChange,
+  initialBillValue,
+}: SimulationModalProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -71,6 +76,13 @@ export function SimulationModal({ open, onOpenChange }: SimulationModalProps) {
       terms: false,
     },
   })
+
+  // Update form value when initialBillValue changes
+  useEffect(() => {
+    if (initialBillValue) {
+      form.setValue('billValue', initialBillValue)
+    }
+  }, [initialBillValue, form])
 
   function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
