@@ -115,7 +115,7 @@ const Index = () => {
             <div className="flex flex-wrap justify-center items-center gap-8 md:gap-16 grayscale opacity-80 hover:grayscale-0 transition-all duration-500">
               <div className="flex items-center gap-2">
                 <img
-                  src="https://img.usecurling.com/i?q=energy&color=black"
+                  src="https://img.usecurling.com/i?q=comerc&color=green"
                   className="h-8 w-auto"
                   alt="Comerc"
                 />
@@ -123,7 +123,7 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-2">
                 <img
-                  src="https://img.usecurling.com/i?q=gas%20station&color=black"
+                  src="https://img.usecurling.com/i?q=vibra&color=green"
                   className="h-8 w-auto"
                   alt="Vibra"
                 />
@@ -131,7 +131,7 @@ const Index = () => {
               </div>
               <div className="flex items-center gap-2">
                 <img
-                  src="https://img.usecurling.com/i?q=stock%20market&color=black"
+                  src="https://img.usecurling.com/i?q=b3&color=black"
                   className="h-8 w-auto"
                   alt="B3"
                 />
@@ -366,7 +366,18 @@ const Index = () => {
             <div className="flex flex-wrap justify-center items-center gap-12 md:gap-24 grayscale">
               <div className="flex flex-col items-center gap-3">
                 <img
-                  src="https://img.usecurling.com/i?q=gas%20station&color=black"
+                  src="https://img.usecurling.com/i?q=comerc&color=green"
+                  className="h-16 w-auto opacity-80"
+                  alt="Comerc"
+                />
+                <span className="font-bold text-xl tracking-wider text-gray-600">
+                  COMERC
+                </span>
+              </div>
+              <div className="w-px h-16 bg-gray-300 hidden md:block"></div>
+              <div className="flex flex-col items-center gap-3">
+                <img
+                  src="https://img.usecurling.com/i?q=vibra&color=green"
                   className="h-16 w-auto opacity-80"
                   alt="Vibra"
                 />
@@ -377,7 +388,7 @@ const Index = () => {
               <div className="w-px h-16 bg-gray-300 hidden md:block"></div>
               <div className="flex flex-col items-center gap-3">
                 <img
-                  src="https://img.usecurling.com/i?q=stock%20market&color=black"
+                  src="https://img.usecurling.com/i?q=b3&color=black"
                   className="h-16 w-auto opacity-80"
                   alt="B3"
                 />

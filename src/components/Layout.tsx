@@ -90,9 +90,9 @@ export default function Layout() {
             aria-label="Voltar ao topo"
           >
             <img
-              src="https://img.usecurling.com/i?q=energy%20bolt&color=green&shape=fill"
-              alt="Logo Energia"
-              className="h-8 w-8 md:h-10 md:w-10 transition-transform duration-300 group-hover:scale-105"
+              src="https://img.usecurling.com/i?q=igreen&color=green"
+              alt="Logo iGreen Energy"
+              className="h-8 w-auto md:h-10 transition-transform duration-300 group-hover:scale-105"
             />
             <span className="text-xl md:text-2xl font-bold tracking-tight text-primary font-heading">
               iGreen<span className="text-foreground">Energy</span>
@@ -132,8 +132,8 @@ export default function Layout() {
                 <SheetHeader className="mb-8 text-left">
                   <SheetTitle className="flex items-center gap-2">
                     <img
-                      src="https://img.usecurling.com/i?q=energy%20bolt&color=green&shape=fill"
-                      alt="Logo Energia"
+                      src="https://img.usecurling.com/i?q=igreen&color=green"
+                      alt="Logo iGreen Energy"
                       className="h-6 w-6"
                     />
                     <span className="font-bold text-primary">
