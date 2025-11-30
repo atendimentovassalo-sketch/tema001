@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Card, CardContent } from '@/components/ui/card'
 import { AnimatedSection } from '@/components/AnimatedSection'
+import { cn } from '@/lib/utils'
 
 const simulatorSchema = z.object({
   cep: z
@@ -30,9 +31,10 @@ const simulatorSchema = z.object({
 
 interface SimulatorProps {
   onRegister: (billValue: number) => void
+  className?: string
 }
 
-export function Simulator({ onRegister }: SimulatorProps) {
+export function Simulator({ onRegister, className }: SimulatorProps) {
   const [results, setResults] = useState<{
     monthly: number
     annual: number
@@ -62,7 +64,7 @@ export function Simulator({ onRegister }: SimulatorProps) {
   }
 
   return (
-    <section className="py-20 bg-white">
+    <div className={cn('py-10 bg-white', className)}>
       <div className="container mx-auto max-w-4xl px-4">
         <AnimatedSection>
           <div className="text-center mb-10">
@@ -231,6 +233,6 @@ export function Simulator({ onRegister }: SimulatorProps) {
           </Card>
         </AnimatedSection>
       </div>
-    </section>
+    </div>
   )
 }

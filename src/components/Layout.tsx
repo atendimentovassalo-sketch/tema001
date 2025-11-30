@@ -53,7 +53,7 @@ export default function Layout() {
         to="#"
         className="text-gray-700 hover:text-primary font-medium transition-colors"
       >
-        Sobre Nós
+        Sobre a iGreen
       </Link>
       <Link
         to="#"
@@ -65,7 +65,7 @@ export default function Layout() {
         to="#"
         className="text-gray-700 hover:text-primary font-medium transition-colors"
       >
-        Ajuda
+        Contato
       </Link>
     </>
   )
@@ -83,7 +83,8 @@ export default function Layout() {
       >
         <div className="container mx-auto max-w-7xl flex items-center justify-between w-full">
           {/* Logo (Left) */}
-          <button
+          <Link
+            to="/"
             onClick={scrollToTop}
             className="flex items-center gap-2 focus:outline-none group"
             aria-label="Voltar ao topo"
@@ -96,7 +97,7 @@ export default function Layout() {
             <span className="text-xl md:text-2xl font-bold tracking-tight text-primary font-heading">
               iGreen<span className="text-foreground">Energy</span>
             </span>
-          </button>
+          </Link>
 
           {/* Desktop Navigation (Center) */}
           <nav className="hidden md:flex items-center gap-8">

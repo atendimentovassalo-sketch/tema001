@@ -153,15 +153,25 @@ const Index = () => {
           </AnimatedSection>
 
           <AnimatedSection delay={100}>
-            <div className="prose prose-lg mx-auto text-foreground/80 mb-12 text-center font-body">
-              <p className="text-base md:text-lg">
+            <div className="prose prose-lg mx-auto text-[#333333] mb-12 text-center font-body">
+              <p className="text-base md:text-lg mb-4">
                 Você já parou para pensar que a conta de luz é uma das poucas
-                coisas que você paga sem ter escolha? Todo mês ela chega, cara,
-                e você paga porque não tem opção. Isso afeta diretamente o seu
-                orçamento familiar.
+                coisas que você paga sem ter escolha?
+              </p>
+              <p className="text-base md:text-lg">
+                Todo mês ela chega, cara, e você paga porque não tem opção. Isso{' '}
+                <span className="font-bold">
+                  afeta diretamente o seu orçamento familiar
+                </span>
+                .
               </p>
             </div>
           </AnimatedSection>
+
+          {/* Simulator Moved Here */}
+          <div id="simulator" className="mb-16">
+            <Simulator onRegister={openModal} className="py-0 bg-transparent" />
+          </div>
 
           <AnimatedSection delay={200}>
             <Card className="bg-green-50/30 border-primary/20 shadow-sm">
@@ -403,8 +413,6 @@ const Index = () => {
                 title: 'O FIM DO MEDO DO BOLETO',
                 quote:
                   'O desconto veio certinho, meu boleto chegou e sempre que preciso o suporte me atende.',
-                explanation:
-                  'A Adriana tinha medo da bagunça administrativa. Ela prova que o processo funciona como um relógio.',
                 author: 'Adriana S.',
                 avatar: 'female',
               },
@@ -412,16 +420,12 @@ const Index = () => {
                 title: 'O CUSTO ZERO',
                 quote:
                   'Melhor ainda, não paguei nada pra receber os descontos... Muita tecnologia envolvida.',
-                explanation:
-                  "Ele reforça que a entrada é gratuita. Mata a objeção da 'taxa escondida'.",
                 author: 'Daniel M.',
                 avatar: 'male',
               },
               {
                 title: 'A CONSISTÊNCIA',
                 quote: 'Ótima! O desconto está vindo certinho!',
-                explanation:
-                  'Curto e grosso. O desconto não falha. É dinheiro no bolso todo mês.',
                 author: 'Cliente Verificado',
                 avatar: 'male',
               },
@@ -444,14 +448,6 @@ const Index = () => {
                       <Quote className="absolute -top-2 -left-2 h-6 w-6 text-gray-200 transform -scale-x-100" />
                       <p className="text-lg font-medium text-foreground italic relative z-10 pl-4 font-body">
                         "{testimonial.quote}"
-                      </p>
-                    </div>
-                    <div className="bg-white p-4 rounded-lg border border-gray-100 mb-6">
-                      <p className="text-sm text-gray-500 font-body">
-                        <span className="font-bold text-primary">
-                          Por que importa:
-                        </span>{' '}
-                        {testimonial.explanation}
                       </p>
                     </div>
                     <div className="flex items-center gap-3 mt-auto pt-4 border-t border-gray-200">
@@ -518,42 +514,66 @@ const Index = () => {
                 digitais e resgata descontos reais:
               </p>
 
-              <div className="space-y-4 mb-8">
+              <div className="space-y-6 mb-8">
                 {[
                   {
                     title: 'Farmácia',
                     desc: 'Até 70% de desconto em genéricos na Droga Raia e grandes redes.',
                     icon: 'pill',
+                    logos: [
+                      { name: 'Droga Raia', query: 'droga raia' },
+                      { name: 'Pague Menos', query: 'pague menos' },
+                    ],
                   },
                   {
                     title: 'Compras Online',
                     desc: 'Descontos exclusivos na Amazon e grandes varejistas.',
                     icon: 'shopping cart',
+                    logos: [
+                      { name: 'Amazon', query: 'amazon' },
+                      { name: 'Magalu', query: 'magalu' },
+                    ],
                   },
                   {
                     title: 'Lazer',
                     desc: 'Pague menos no cinema e em entretenimento.',
                     icon: 'popcorn',
+                    logos: [
+                      { name: 'Cinemark', query: 'cinemark' },
+                      { name: 'Spotify', query: 'spotify' },
+                    ],
                   },
                 ].map((item, i) => (
                   <div
                     key={i}
-                    className="flex items-start gap-4 bg-white p-4 rounded-lg shadow-sm border border-gray-100"
+                    className="bg-white p-4 rounded-lg shadow-sm border border-gray-100"
                   >
-                    <div className="bg-green-50 p-3 rounded-full">
-                      <img
-                        src={`https://img.usecurling.com/i?q=${item.icon}&color=green&shape=fill`}
-                        className="h-6 w-6"
-                        alt={item.title}
-                      />
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="bg-green-50 p-3 rounded-full">
+                        <img
+                          src={`https://img.usecurling.com/i?q=${item.icon}&color=green&shape=fill`}
+                          className="h-6 w-6"
+                          alt={item.title}
+                        />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-foreground font-heading">
+                          {item.title}
+                        </h4>
+                        <p className="text-sm text-foreground/70 font-body">
+                          {item.desc}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <h4 className="font-bold text-foreground font-heading">
-                        {item.title}
-                      </h4>
-                      <p className="text-sm text-foreground/70 font-body">
-                        {item.desc}
-                      </p>
+                    <div className="flex gap-4 pl-[3.5rem]">
+                      {item.logos.map((logo, idx) => (
+                        <img
+                          key={idx}
+                          src={`https://img.usecurling.com/i?q=${logo.query}&color=gradient`}
+                          alt={logo.name}
+                          className="h-6 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
+                        />
+                      ))}
                     </div>
                   </div>
                 ))}
@@ -676,76 +696,107 @@ const Index = () => {
               </Table>
             </div>
 
-            {/* Mobile Cards */}
-            <div className="md:hidden space-y-4">
-              {[
-                {
-                  item: 'A qualidade da luz',
-                  before: 'Padrão',
-                  after: 'Idêntica (mesma voltagem e estabilidade)',
-                },
-                {
-                  item: 'Se acabar a luz',
-                  before: 'Você liga p/ a Distribuidora',
-                  after: 'Você liga p/ a Distribuidora (nada muda)',
-                },
-                {
-                  item: 'Manutenção da rede',
-                  before: 'Distribuidora',
-                  after: 'Distribuidora (nada muda)',
-                },
-                {
-                  item: 'Faturas/Papelada',
-                  before: 'Correio/Papel',
-                  after: '100% Digital via App',
-                },
-                {
-                  item: 'O preço',
-                  before: 'Caro e imprevisível',
-                  after: 'Até 20% mais barato',
-                  isHighlight: true,
-                },
-              ].map((card, i) => (
-                <Card
-                  key={i}
-                  className={cn(
-                    'border-gray-200 shadow-sm',
-                    card.isHighlight ? 'border-primary/30 bg-green-50/30' : '',
-                  )}
-                >
-                  <CardContent className="p-5">
-                    <h3 className="font-bold text-lg mb-3 text-foreground font-heading">
-                      {card.item}
-                    </h3>
-                    <div className="space-y-3">
-                      <div className="flex items-start gap-2 text-gray-500">
-                        <XCircle className="h-5 w-5 text-gray-400 shrink-0 mt-0.5" />
-                        <span className="text-sm font-body">{card.before}</span>
+            {/* Mobile Cards - Stacked View */}
+            <div className="md:hidden space-y-6">
+              {/* Card 1: Como é hoje */}
+              <Card className="border-gray-200 shadow-sm bg-gray-50/50">
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-xl mb-6 text-gray-500 font-heading flex items-center gap-2">
+                    <XCircle className="h-6 w-6" />
+                    Como é hoje
+                  </h3>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        label: 'A qualidade da luz',
+                        value: 'Padrão',
+                      },
+                      {
+                        label: 'Se acabar a luz',
+                        value: 'Você liga p/ a Distribuidora',
+                      },
+                      {
+                        label: 'Manutenção da rede',
+                        value: 'Distribuidora',
+                      },
+                      {
+                        label: 'Faturas/Papelada',
+                        value: 'Correio/Papel',
+                      },
+                      {
+                        label: 'O preço',
+                        value: 'Caro e imprevisível',
+                      },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="border-b border-gray-200 pb-3 last:border-0 last:pb-0"
+                      >
+                        <p className="text-xs text-gray-400 uppercase font-bold mb-1">
+                          {item.label}
+                        </p>
+                        <p className="text-gray-600 font-body">{item.value}</p>
                       </div>
-                      <div className="flex items-start gap-2 text-foreground">
-                        <CheckCircle2 className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                        <span
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Card 2: Como fica com a gente */}
+              <Card className="border-primary/30 shadow-md bg-green-50/30">
+                <CardContent className="p-6">
+                  <h3 className="font-bold text-xl mb-6 text-primary font-heading flex items-center gap-2">
+                    <CheckCircle2 className="h-6 w-6" />
+                    Como fica com a gente
+                  </h3>
+                  <div className="space-y-4">
+                    {[
+                      {
+                        label: 'A qualidade da luz',
+                        value: 'Idêntica (mesma voltagem)',
+                      },
+                      {
+                        label: 'Se acabar a luz',
+                        value: 'Você liga p/ a Distribuidora',
+                      },
+                      {
+                        label: 'Manutenção da rede',
+                        value: 'Distribuidora (nada muda)',
+                      },
+                      {
+                        label: 'Faturas/Papelada',
+                        value: '100% Digital via App',
+                      },
+                      {
+                        label: 'O preço',
+                        value: 'Até 20% mais barato',
+                        isBold: true,
+                      },
+                    ].map((item, i) => (
+                      <div
+                        key={i}
+                        className="border-b border-primary/10 pb-3 last:border-0 last:pb-0"
+                      >
+                        <p className="text-xs text-primary/60 uppercase font-bold mb-1">
+                          {item.label}
+                        </p>
+                        <p
                           className={cn(
-                            'text-sm font-body',
-                            card.isHighlight ? 'font-bold text-primary' : '',
+                            'text-foreground font-body',
+                            item.isBold && 'font-bold text-primary',
                           )}
                         >
-                          {card.after}
-                        </span>
+                          {item.value}
+                        </p>
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </AnimatedSection>
         </div>
       </section>
-
-      {/* 8. O Simulador */}
-      <div id="simulator">
-        <Simulator onRegister={openModal} />
-      </div>
 
       {/* 9. FAQ */}
       <section className="py-20 bg-white">
