@@ -8,12 +8,55 @@ import {
   Zap,
   ShieldCheck,
   ArrowDown,
+  ArrowRight,
 } from 'lucide-react'
 
+const STEPS = [
+  {
+    step: '01',
+    title: 'Faça seu cadastro',
+    desc: 'Preencha seus dados e envie uma foto da sua conta de luz atual.',
+  },
+  {
+    step: '02',
+    title: 'Nós fazemos a conexão',
+    desc: 'Conectamos sua unidade consumidora a uma de nossas usinas de energia renovável.',
+  },
+  {
+    step: '03',
+    title: 'Comece a economizar',
+    desc: 'Você recebe a conta com o desconto aplicado e paga menos todo mês.',
+  },
+]
+
+const TESTIMONIALS = [
+  {
+    name: 'Carlos Mendes',
+    role: 'Proprietário de Padaria',
+    text: 'Minha conta reduziu cerca de R$ 400 por mês. No final do ano, isso paga o 13º de um funcionário. Recomendo demais!',
+    img: 'https://img.usecurling.com/ppl/medium?gender=male&seed=1',
+  },
+  {
+    name: 'Ana Paula Souza',
+    role: 'Residencial',
+    text: 'Achei que fosse complicado, mas foi super rápido. O atendimento é excelente e a economia é real. Já estou usando há 6 meses.',
+    img: 'https://img.usecurling.com/ppl/medium?gender=female&seed=2',
+  },
+  {
+    name: 'Roberto Ferreira',
+    role: 'Síndico',
+    text: 'Implantamos no condomínio e a economia nas áreas comuns foi surpreendente. Os moradores adoraram a iniciativa sustentável.',
+    img: 'https://img.usecurling.com/ppl/medium?gender=male&seed=3',
+  },
+]
+
 export default function Index() {
+  const scrollTo = (id: string) => {
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
+  }
+
   return (
     <div className="flex flex-col min-h-screen w-full overflow-x-hidden">
-      {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center justify-center bg-gradient-to-b from-green-50 to-white pt-16">
         <div className="container px-4 md:px-6 grid lg:grid-cols-2 gap-12 items-center">
           <div className="space-y-8 text-center lg:text-left">
@@ -32,15 +75,16 @@ export default function Index() {
               <Button
                 size="lg"
                 className="h-14 text-lg px-8 font-bold shadow-lg"
-                onClick={() =>
-                  document
-                    .getElementById('simulador')
-                    ?.scrollIntoView({ behavior: 'smooth' })
-                }
+                onClick={() => scrollTo('simulador')}
               >
                 Simular minha economia
               </Button>
-              <Button size="lg" variant="outline" className="h-14 text-lg px-8">
+              <Button
+                size="lg"
+                variant="outline"
+                className="h-14 text-lg px-8"
+                onClick={() => scrollTo('como-funciona')}
+              >
                 Como funciona?
               </Button>
             </div>
@@ -70,7 +114,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="como-funciona" className="py-24 bg-white">
         <div className="container px-4 md:px-6">
           <AnimatedSection className="text-center mb-16">
@@ -130,7 +173,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Simulator Section */}
       <section id="simulador" className="py-24 bg-slate-50">
         <div className="container px-4 md:px-6">
           <AnimatedSection className="text-center mb-12">
@@ -148,7 +190,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* How it works Steps */}
       <section className="py-24 bg-white">
         <div className="container px-4 md:px-6">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
@@ -167,23 +208,7 @@ export default function Index() {
               </AnimatedSection>
 
               <div className="space-y-8">
-                {[
-                  {
-                    step: '01',
-                    title: 'Faça seu cadastro',
-                    desc: 'Preencha seus dados e envie uma foto da sua conta de luz atual.',
-                  },
-                  {
-                    step: '02',
-                    title: 'Nós fazemos a conexão',
-                    desc: 'Conectamos sua unidade consumidora a uma de nossas usinas de energia renovável.',
-                  },
-                  {
-                    step: '03',
-                    title: 'Comece a economizar',
-                    desc: 'Você recebe a conta com o desconto aplicado e paga menos todo mês.',
-                  },
-                ].map((item, index) => (
+                {STEPS.map((item, index) => (
                   <AnimatedSection
                     key={index}
                     delay={index * 100}
@@ -204,7 +229,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* Testimonials */}
       <section id="depoimentos" className="py-24 bg-primary/5">
         <div className="container px-4 md:px-6">
           <AnimatedSection className="text-center mb-16">
@@ -213,26 +237,7 @@ export default function Index() {
             </h2>
           </AnimatedSection>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {[
-              {
-                name: 'Carlos Mendes',
-                role: 'Proprietário de Padaria',
-                text: 'Minha conta reduziu cerca de R$ 400 por mês. No final do ano, isso paga o 13º de um funcionário. Recomendo demais!',
-                img: 'https://img.usecurling.com/ppl/medium?gender=male&seed=1',
-              },
-              {
-                name: 'Ana Paula Souza',
-                role: 'Residencial',
-                text: 'Achei que fosse complicado, mas foi super rápido. O atendimento é excelente e a economia é real. Já estou usando há 6 meses.',
-                img: 'https://img.usecurling.com/ppl/medium?gender=female&seed=2',
-              },
-              {
-                name: 'Roberto Ferreira',
-                role: 'Síndico',
-                text: 'Implantamos no condomínio e a economia nas áreas comuns foi surpreendente. Os moradores adoraram a iniciativa sustentável.',
-                img: 'https://img.usecurling.com/ppl/medium?gender=male&seed=3',
-              },
-            ].map((testimonial, i) => (
+            {TESTIMONIALS.map((testimonial, i) => (
               <AnimatedSection
                 key={i}
                 delay={i * 150}
@@ -268,7 +273,6 @@ export default function Index() {
         </div>
       </section>
 
-      {/* CTA */}
       <section className="py-24 bg-primary text-primary-foreground">
         <div className="container px-4 md:px-6 text-center">
           <AnimatedSection>
@@ -283,11 +287,7 @@ export default function Index() {
               size="lg"
               variant="secondary"
               className="h-16 text-lg px-10 font-bold shadow-xl"
-              onClick={() =>
-                document
-                  .getElementById('simulador')
-                  ?.scrollIntoView({ behavior: 'smooth' })
-              }
+              onClick={() => scrollTo('simulador')}
             >
               Quero meu desconto agora
               <ArrowRight className="ml-2" />
