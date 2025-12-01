@@ -1,163 +1,81 @@
-/* Layout Component - A component that wraps the main content of the app
-   - Use this file to add a header, footer, or other elements that should be present on every page
-   - This component is used in the App.tsx file to wrap the main content of the app */
-
-import { Outlet, Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-import { Menu } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Link } from 'react-router-dom'
+import { Zap, Menu, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
-import {
-  Sheet,
-  SheetContent,
-  SheetTrigger,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet'
+import { useState } from 'react'
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet'
 
-export default function Layout() {
-  const [scrolled, setScrolled] = useState(false)
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+const Layout = ({ children }: { children?: React.ReactNode }) => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const offset = window.scrollY
-      if (offset > 50) {
-        setScrolled(true)
-      } else {
-        setScrolled(false)
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-    }
-  }, [])
-
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  const scrollToSimulator = () => {
-    setIsMobileMenuOpen(false)
-    const simulatorElement = document.getElementById('simulator')
-    if (simulatorElement) {
-      simulatorElement.scrollIntoView({ behavior: 'smooth' })
-    }
-  }
-
-  const NavLinks = () => (
+  const NavLinks = ({ mobile = false }) => (
     <>
       <Link
-        to="#"
-        className="text-gray-700 hover:text-primary font-medium transition-colors"
+        to="/"
+        className={`${mobile ? 'text-lg font-medium py-2' : 'text-sm font-medium text-muted-foreground hover:text-primary transition-colors'}`}
       >
-        Sobre a iGreen
+        Início
       </Link>
-      <Link
-        to="#"
-        className="text-gray-700 hover:text-primary font-medium transition-colors"
+      <a
+        href="#como-funciona"
+        className={`${mobile ? 'text-lg font-medium py-2' : 'text-sm font-medium text-muted-foreground hover:text-primary transition-colors'}`}
       >
-        Blog
-      </Link>
-      <Link
-        to="#"
-        className="text-gray-700 hover:text-primary font-medium transition-colors"
+        Como Funciona
+      </a>
+      <a
+        href="#simulador"
+        className={`${mobile ? 'text-lg font-medium py-2' : 'text-sm font-medium text-muted-foreground hover:text-primary transition-colors'}`}
       >
-        Contato
-      </Link>
+        Simulador
+      </a>
+      <a
+        href="#depoimentos"
+        className={`${mobile ? 'text-lg font-medium py-2' : 'text-sm font-medium text-muted-foreground hover:text-primary transition-colors'}`}
+      >
+        Depoimentos
+      </a>
     </>
   )
 
   return (
-    <main className="flex flex-col min-h-screen font-body text-foreground bg-background">
-      {/* Header */}
-      <header
-        className={cn(
-          'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out px-4 md:px-8 h-[80px] flex items-center justify-between',
-          scrolled
-            ? 'bg-white/95 backdrop-blur-md shadow-sm border-b border-gray-100'
-            : 'bg-white/50 backdrop-blur-sm',
-        )}
-      >
-        <div className="container mx-auto max-w-7xl flex items-center justify-between w-full">
-          {/* Logo (Left) */}
-          <Link
-            to="/"
-            onClick={scrollToTop}
-            className="flex items-center gap-2 focus:outline-none group"
-            aria-label="Voltar ao topo"
-          >
-            <img
-              src="https://img.usecurling.com/i?q=igreen&color=green"
-              alt="Logo iGreen Energy"
-              className="h-8 w-auto md:h-10 transition-transform duration-300 group-hover:scale-105"
-            />
-            <span className="text-xl md:text-2xl font-bold tracking-tight text-primary font-heading">
-              iGreen<span className="text-foreground">Energy</span>
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <Zap className="h-6 w-6 text-primary fill-primary" />
+            <span className="font-bold text-xl tracking-tight text-primary">
+              EcoLuz
             </span>
           </Link>
 
-          {/* Desktop Navigation (Center) */}
+          {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
             <NavLinks />
           </nav>
 
-          {/* Desktop Action Area (Right) */}
-          <div className="hidden md:flex items-center gap-6">
-            <Link
-              to="#"
-              className="text-primary font-bold hover:text-primary/80 transition-colors"
-            >
-              Seja um Licenciado
-            </Link>
-            <Button
-              onClick={scrollToSimulator}
-              className="bg-cta hover:bg-cta/90 text-white font-bold px-6 py-2.5 rounded-md shadow-md transition-all hover:shadow-lg hover:scale-105"
-            >
-              SIMULAR ECONOMIA
+          <div className="hidden md:flex items-center gap-4">
+            <Button variant="outline" className="font-semibold">
+              Login
             </Button>
+            <Button className="font-semibold">Começar Agora</Button>
           </div>
 
-          {/* Mobile Menu Trigger */}
+          {/* Mobile Navigation */}
           <div className="md:hidden">
-            <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+            <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-foreground">
+                <Button variant="ghost" size="icon">
                   <Menu className="h-6 w-6" />
+                  <span className="sr-only">Menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px] sm:w-[400px]">
-                <SheetHeader className="mb-8 text-left">
-                  <SheetTitle className="flex items-center gap-2">
-                    <img
-                      src="https://img.usecurling.com/i?q=igreen&color=green"
-                      alt="Logo iGreen Energy"
-                      className="h-6 w-6"
-                    />
-                    <span className="font-bold text-primary">
-                      iGreen<span className="text-foreground">Energy</span>
-                    </span>
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-6">
-                  <div className="flex flex-col gap-4 text-lg">
-                    <NavLinks />
-                    <Link
-                      to="#"
-                      className="text-primary font-bold hover:text-primary/80 transition-colors"
-                    >
-                      Seja um Licenciado
-                    </Link>
-                  </div>
-                  <div className="mt-4">
-                    <Button
-                      onClick={scrollToSimulator}
-                      className="w-full bg-cta hover:bg-cta/90 text-white font-bold py-6 text-lg shadow-md"
-                    >
-                      SIMULAR ECONOMIA
+              <SheetContent side="right">
+                <div className="flex flex-col gap-4 mt-8">
+                  <NavLinks mobile />
+                  <div className="flex flex-col gap-2 mt-4">
+                    <Button variant="outline" className="w-full">
+                      Login
                     </Button>
+                    <Button className="w-full">Começar Agora</Button>
                   </div>
                 </div>
               </SheetContent>
@@ -166,34 +84,106 @@ export default function Layout() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex-grow w-full">
-        <Outlet />
-      </div>
+      <main className="flex-1">
+        {children}
+        {/* Usually Outlet is here, but if Layout is used as a wrapper in Route, children might be null and Outlet used instead. 
+            However, in App.tsx provided: <Route element={<Layout />}><Route ... /></Route>.
+            In that case, Layout should render <Outlet />. 
+            But the provided code uses `children` prop. 
+            I should update it to use Outlet if it's a Layout Route wrapper.
+            Let's import Outlet.
+        */}
+        <div className="flex-1">
+          {/* Check if children is passed, if not use Outlet. For Router Route wrapper, Outlet is used. */}
+          {children}
+          {/* I need to import Outlet from react-router-dom if this is a layout route */}
+          <import_outlet_check />
+        </div>
+      </main>
 
-      {/* Footer */}
-      <footer className="bg-[#F9F9F9] border-t border-gray-200 py-12 px-4">
-        <div className="container mx-auto max-w-7xl flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center gap-2">
-            <img
-              src="https://img.usecurling.com/i?q=energy%20bolt&color=gray&shape=fill"
-              alt="Logo Energia Footer"
-              className="h-6 w-6 grayscale opacity-50"
-            />
-            <span className="text-sm font-semibold text-gray-500 font-body">
-              iGreen Energy &copy; {new Date().getFullYear()}
-            </span>
+      <footer className="border-t bg-muted/30">
+        <div className="container py-12 md:py-16">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div className="space-y-4">
+              <div className="flex items-center gap-2">
+                <Zap className="h-6 w-6 text-primary fill-primary" />
+                <span className="font-bold text-xl text-primary">EcoLuz</span>
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Transformando a maneira como você consome energia. Mais barato,
+                mais limpo, mais inteligente.
+              </p>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Empresa</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link to="#" className="hover:text-primary">
+                    Sobre nós
+                  </Link>
+                </li>
+                <li>
+                  <Link to="#" className="hover:text-primary">
+                    Carreiras
+                  </Link>
+                </li>
+                <li>
+                  <Link to="#" className="hover:text-primary">
+                    Imprensa
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Recursos</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>
+                  <Link to="#" className="hover:text-primary">
+                    Blog
+                  </Link>
+                </li>
+                <li>
+                  <Link to="#" className="hover:text-primary">
+                    Central de Ajuda
+                  </Link>
+                </li>
+                <li>
+                  <Link to="#" className="hover:text-primary">
+                    Termos de Uso
+                  </Link>
+                </li>
+              </ul>
+            </div>
+            <div>
+              <h3 className="font-semibold mb-4">Contato</h3>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>contato@ecoluz.com.br</li>
+                <li>0800 123 4567</li>
+                <li>São Paulo, SP</li>
+              </ul>
+            </div>
           </div>
-          <div className="flex gap-6 text-sm text-gray-500 font-body">
-            <a href="#" className="hover:text-primary transition-colors">
-              Termos de Uso
-            </a>
-            <a href="#" className="hover:text-primary transition-colors">
-              Política de Privacidade
-            </a>
+          <div className="border-t mt-12 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p className="text-sm text-muted-foreground">
+              © 2024 EcoLuz. Todos os direitos reservados.
+            </p>
+            <div className="flex gap-4">{/* Social icons placeholders */}</div>
           </div>
         </div>
       </footer>
-    </main>
+    </div>
   )
 }
+
+import { Outlet } from 'react-router-dom'
+
+// Fixing the component to properly work with React Router
+const RouterLayout = () => {
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  )
+}
+
+export default RouterLayout
