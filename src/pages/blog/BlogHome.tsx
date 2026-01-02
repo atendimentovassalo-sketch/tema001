@@ -62,7 +62,6 @@ export default function BlogHome() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {visiblePosts.map((post, index) => {
             // Logic to insert Conversion Blocks at specific slots
-            // Slot 7 (index 6) and Slot 14 (index 13)
             const elements = []
 
             // Render the post card
@@ -72,7 +71,7 @@ export default function BlogHome() {
               </AnimatedSection>,
             )
 
-            // Insert Conversion Block 1 after the 6th item (index 5) - Wait, prompt says slot 7. So at index 6 (0-based)
+            // Insert Conversion Block 1 after the 6th item
             if (index === 5) {
               elements.push(
                 <AnimatedSection key="conversion-1" className="md:col-span-1">
@@ -81,7 +80,7 @@ export default function BlogHome() {
               )
             }
 
-            // Insert Conversion Block 2 after the 13th item (index 12)
+            // Insert Conversion Block 2 after the 13th item
             if (index === 12) {
               elements.push(
                 <AnimatedSection key="conversion-2" className="md:col-span-1">

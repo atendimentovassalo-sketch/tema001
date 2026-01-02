@@ -22,185 +22,205 @@ export type ContentBlock =
   | { type: 'quote'; text: string; author?: string }
   | { type: 'list'; items: string[] }
   | { type: 'banner'; title: string; buttonText: string }
+  | { type: 'image-grid'; items: { src: string; alt: string }[] }
 
 export const categories = [
   'Todos',
-  'Iniciantes',
-  'Economia Residencial',
-  'Negócios & Renda',
-  'Mitos & Verdades',
+  'Economia Doméstica',
+  'Notícias iGreen',
+  'Clube de Vantagens',
+  'Sustentabilidade',
 ]
 
 export const blogPosts: BlogPost[] = [
   {
     id: '1',
-    slug: 'aumento-da-conta-de-luz-2025',
-    title: 'Aumento de Tarifa: O que esperar da conta de luz em 2025?',
+    slug: 'economizar-conta-luz-sem-paineis',
+    title:
+      'Como economizar até 15% na sua conta de luz sem investir em painéis solares',
     subtitle:
-      'Prepare-se para as mudanças nas bandeiras tarifárias e saiba como proteger seu orçamento familiar.',
-    category: 'Economia Residencial',
+      'Descubra como o modelo de assinatura de energia solar permite reduzir seus custos mensais sem obras ou investimentos.',
+    category: 'Economia Doméstica',
     author: {
       name: 'Carlos Mendes',
       role: 'Especialista em Energia',
       avatar: 'male',
     },
-    date: '2024-10-15',
+    date: '2024-11-28',
     readTime: '5 min',
     image:
-      'https://img.usecurling.com/p/800/450?q=electricity%20bill%20shock&color=white',
-    tags: ['Tarifas', 'Economia', '2025'],
+      'https://img.usecurling.com/p/800/450?q=happy%20family%20saving%20money&color=green',
+    tags: ['Economia', 'Sem Obras', 'Assinatura'],
     content: [
       {
         type: 'paragraph',
-        text: 'Com a previsão de escassez hídrica e o aumento dos custos de transmissão, as tarifas de energia elétrica devem sofrer novos reajustes em 2025. Para as famílias brasileiras, isso significa um peso ainda maior no orçamento mensal.',
-      },
-      {
-        type: 'quote',
-        text: 'A melhor forma de economizar não é desligar a geladeira, mas sim mudar a origem da sua energia.',
-        author: 'Carlos Mendes',
+        text: 'Você sabia que é possível ter os benefícios da energia solar sem precisar instalar nenhum equipamento no seu telhado? O modelo de assinatura de energia, também conhecido como geração compartilhada, está revolucionando a forma como os brasileiros consomem eletricidade.',
       },
       {
         type: 'heading',
-        text: 'Como as bandeiras tarifárias funcionam?',
+        text: 'Como funciona a energia por assinatura?',
         level: 2,
       },
       {
         type: 'paragraph',
-        text: 'O sistema de bandeiras tarifárias foi criado para repassar ao consumidor os custos extras da geração de energia. Quando chove menos, acionamos as termelétricas, que são mais caras e poluentes.',
+        text: 'O conceito é simples: grandes usinas solares, eólicas ou de biogás geram energia e a injetam na rede da distribuidora local. Essa energia é transformada em créditos que são abatidos diretamente na sua conta de luz.',
       },
       {
-        type: 'banner',
-        title: 'Quer fugir das bandeiras vermelhas?',
-        buttonText: 'SIMULAR DESCONTO AGORA',
+        type: 'paragraph',
+        text: 'Ao aderir à iGreen Energy, nós conectamos sua unidade consumidora a uma dessas usinas. Você passa a receber sua conta de luz com um desconto garantido, que pode chegar a 15% todos os meses.',
+      },
+      {
+        type: 'quote',
+        text: 'Não existe custo de adesão, não existe fidelidade e, principalmente, não existe obra. É 100% digital.',
+        author: 'iGreen Energy',
       },
       {
         type: 'heading',
-        text: '3 Dicas para Blindar sua Conta',
+        text: 'Vantagens do modelo iGreen',
         level: 2,
       },
       {
         type: 'list',
         items: [
-          'Revise a vedação de janelas e portas para otimizar o ar condicionado.',
-          'Troque lâmpadas antigas por LED.',
-          'Adote a portabilidade de energia através da Geração Compartilhada.',
+          'Zero Investimento: Não precisa comprar painéis nem fazer reformas.',
+          'Economia Imediata: O desconto já vem na próxima fatura.',
+          'Sustentabilidade: Você consome energia 100% limpa e renovável.',
+          'Liberdade: Cancele quando quiser, sem multas.',
         ],
+      },
+      {
+        type: 'banner',
+        title: 'Quer começar a economizar agora?',
+        buttonText: 'SIMULAR ECONOMIA',
       },
     ],
   },
   {
     id: '2',
-    slug: 'energia-solar-sem-obras',
-    title: 'Energia Solar sem telhado? Entenda como funciona.',
+    slug: 'lei-14300-energia-solar',
+    title: 'Lei 14.300: O que muda para o consumidor de energia solar em 2024',
     subtitle:
-      'Você não precisa gastar R$ 20.000 em painéis para ter energia limpa e barata.',
-    category: 'Iniciantes',
+      'Entenda o marco legal da geração própria de energia e por que o momento de aderir à energia solar por assinatura é agora.',
+    category: 'Notícias iGreen',
     author: {
       name: 'Ana Souza',
-      role: 'Engenheira Ambiental',
+      role: 'Consultora Jurídica',
       avatar: 'female',
     },
-    date: '2024-10-10',
-    readTime: '4 min',
+    date: '2024-11-15',
+    readTime: '6 min',
     image:
-      'https://img.usecurling.com/p/800/450?q=solar%20panels%20farm&color=green',
-    tags: ['Solar', 'Inovação', 'Sem Obras'],
+      'https://img.usecurling.com/p/800/450?q=law%20justice%20energy&color=blue',
+    tags: ['Legislação', 'Lei 14.300', 'Solar'],
     content: [
       {
         type: 'paragraph',
-        text: 'Muitas pessoas desistem da energia solar pelo alto custo de investimento inicial ou por morarem em apartamentos. Mas a tecnologia evoluiu.',
+        text: 'A Lei 14.300, sancionada em 2022, estabeleceu o Marco Legal da Micro e Minigeração Distribuída no Brasil. Ela trouxe mais segurança jurídica para o setor, mas também introduziu novas regras de tarifação pelo uso da rede de distribuição (fio B).',
       },
       {
         type: 'heading',
-        text: 'O conceito de Fazendas Solares',
+        text: 'O que mudou na prática?',
         level: 2,
       },
       {
         type: 'paragraph',
-        text: 'Grandes usinas são construídas em áreas com alta incidência solar. Essa energia é injetada na rede da distribuidora e transformada em créditos para o seu CPF ou CNPJ.',
+        text: 'Para quem instala painéis solares em casa agora, existe um período de transição onde se paga uma taxa gradual pelo uso da rede. Isso aumentou o tempo de retorno do investimento (payback) para sistemas residenciais próprios.',
+      },
+      {
+        type: 'heading',
+        text: 'A vantagem da Geração Compartilhada',
+        level: 2,
+      },
+      {
+        type: 'paragraph',
+        text: 'A boa notícia é que o modelo de geração compartilhada (assinatura) da iGreen Energy continua sendo extremamente vantajoso. Como operamos com usinas de grande porte e otimizadas, conseguimos absorver custos e repassar descontos significativos para o consumidor final, mantendo a atratividade econômica.',
       },
       {
         type: 'quote',
-        text: 'Democratizar a energia é permitir que quem mora de aluguel também pague menos luz.',
+        text: 'A assinatura de energia blinda o consumidor das complexidades da instalação própria e garante economia simplificada.',
+        author: 'Especialista iGreen',
+      },
+      {
+        type: 'paragraph',
+        text: 'Portanto, 2024 é o ano ideal para migrar para o modelo de assinatura, evitando os altos custos de capital (CAPEX) de um sistema próprio e aproveitando a economia imediata (OPEX).',
+      },
+      {
+        type: 'banner',
+        title: 'Garanta sua economia com a nova lei',
+        buttonText: 'SIMULAR ECONOMIA',
       },
     ],
   },
   {
     id: '3',
-    slug: 'mitos-sobre-portabilidade',
-    title: '5 Mitos sobre trocar de fornecedor de energia',
+    slug: 'clube-de-vantagens-igreen',
+    title:
+      'Muito além da energia: Maximize seus descontos com o Clube de Vantagens iGreen',
     subtitle:
-      'Ainda tem medo de ficar sem luz? Vamos desmistificar a portabilidade.',
-    category: 'Mitos & Verdades',
-    author: {
-      name: 'Roberto Lima',
-      role: 'Consultor Jurídico',
-      avatar: 'male',
-    },
-    date: '2024-10-05',
-    readTime: '6 min',
-    image:
-      'https://img.usecurling.com/p/800/450?q=light%20bulb%20idea&color=yellow',
-    tags: ['Mitos', 'Segurança', 'Lei 14.300'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'Muita gente acha que trocar de fornecedor significa trocar a fiação da rua. Isso é um grande mito.',
-      },
-      { type: 'heading', text: 'Mito 1: A luz vai cair mais', level: 2 },
-      {
-        type: 'paragraph',
-        text: 'A distribuição continua sendo responsabilidade da concessionária local. A estabilidade é a mesma.',
-      },
-    ],
-  },
-  {
-    id: '4',
-    slug: 'renda-extra-com-energia',
-    title: 'Como transformar contatos em renda recorrente',
-    subtitle:
-      'O mercado de energia é trilionário e agora você pode morder uma fatia.',
-    category: 'Negócios & Renda',
+      'Economize em farmácias, lojas de varejo e serviços de streaming com seu Clube de Vantagens exclusivo.',
+    category: 'Clube de Vantagens',
     author: {
       name: 'Fernanda Torres',
-      role: 'Diretora de Expansão',
+      role: 'Gerente de Parcerias',
       avatar: 'female',
     },
-    date: '2024-10-01',
-    readTime: '7 min',
+    date: '2024-11-01',
+    readTime: '4 min',
     image:
-      'https://img.usecurling.com/p/800/450?q=business%20meeting%20growth&color=blue',
-    tags: ['Empreendedorismo', 'Licenciamento', 'Renda'],
+      'https://img.usecurling.com/p/800/450?q=shopping%20bags%20happy&color=orange',
+    tags: ['Benefícios', 'Descontos', 'Parceiros'],
     content: [
       {
         type: 'paragraph',
-        text: 'Imagine ganhar uma comissão toda vez que alguém paga a conta de luz. Isso é possível através do nosso modelo de licenciamento.',
+        text: 'Ser cliente iGreen Energy não é apenas sobre pagar menos na conta de luz. É sobre fazer parte de um ecossistema de economia inteligente. Todos os nossos clientes têm acesso exclusivo ao Clube de Vantagens iGreen.',
+      },
+      {
+        type: 'heading',
+        text: 'Descontos em grandes marcas',
+        level: 2,
+      },
+      {
+        type: 'paragraph',
+        text: 'Nós fechamos parcerias com as maiores redes de varejo e serviços do Brasil para que você economize em todas as áreas da sua vida. Confira alguns de nossos parceiros:',
+      },
+      {
+        type: 'image-grid',
+        items: [
+          { src: 'https://img.usecurling.com/i?q=amazon', alt: 'Amazon' },
+          { src: 'https://img.usecurling.com/i?q=magalu', alt: 'Magalu' },
+          {
+            src: 'https://img.usecurling.com/i?q=droga%20raia',
+            alt: 'Droga Raia',
+          },
+          { src: 'https://img.usecurling.com/i?q=spotify', alt: 'Spotify' },
+        ],
+      },
+      {
+        type: 'heading',
+        text: 'Como acessar?',
+        level: 2,
+      },
+      {
+        type: 'paragraph',
+        text: 'O acesso é simples e digital. Basta entrar na sua área do cliente e gerar os cupons de desconto para usar nas lojas online ou apresentar o código nas lojas físicas parceiras (como farmácias).',
+      },
+      {
+        type: 'list',
+        items: [
+          'Até 70% de desconto em farmácias.',
+          'Cupons exclusivos em e-commerce.',
+          'Descontos em entretenimento e lazer.',
+        ],
+      },
+      {
+        type: 'paragraph',
+        text: 'Somando a economia na conta de luz com os descontos do Clube, o valor que sobra no seu bolso no final do mês é surpreendente.',
       },
       {
         type: 'banner',
-        title: 'Seja um Licenciado iGreen',
-        buttonText: 'SAIBA MAIS',
+        title: 'Faça parte do Clube iGreen',
+        buttonText: 'SIMULAR ECONOMIA',
       },
     ],
   },
-  // Generating more placeholder posts to fill the grid and test "Load More"
-  ...Array.from({ length: 12 }).map((_, i) => ({
-    id: `mock-${i}`,
-    slug: `artigo-exemplo-${i}`,
-    title: `Dica de Economia #${i + 1}: Como reduzir gastos supérfluos`,
-    subtitle:
-      'Pequenas mudanças de hábito que geram grandes resultados no final do mês.',
-    category: i % 2 === 0 ? 'Economia Residencial' : 'Iniciantes',
-    author: { name: 'Equipe iGreen', role: 'Redação', avatar: 'male' },
-    date: '2024-09-20',
-    readTime: '3 min',
-    image: `https://img.usecurling.com/p/800/450?q=money%20savings%20${i}&color=green`,
-    tags: ['Dicas', 'Economia'],
-    content: [
-      {
-        type: 'paragraph',
-        text: 'Conteúdo demonstrativo para preencher a grade de posts.',
-      } as ContentBlock,
-    ],
-  })),
 ]

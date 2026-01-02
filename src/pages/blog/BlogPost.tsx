@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { blogPosts } from '@/data/blog-data'
 import { ReadingProgressBar } from '@/components/blog/ReadingProgressBar'
 import { BlogSidebar } from '@/components/blog/BlogSidebar'
@@ -22,6 +22,10 @@ export default function BlogPost() {
   }
 
   const relatedPosts = blogPosts.filter((p) => p.id !== post.id).slice(0, 3)
+
+  const handleSimular = () => {
+    window.location.href = '/#simulador'
+  }
 
   return (
     <div className="min-h-screen bg-white font-body">
@@ -80,7 +84,7 @@ export default function BlogPost() {
             </div>
 
             {/* Article Body */}
-            <article className="prose prose-lg prose-gray max-w-none mx-auto lg:mx-0 font-body">
+            <article className="prose prose-lg prose-stone max-w-none mx-auto lg:mx-0 font-body">
               <div className="bg-gray-50 p-6 rounded-lg border border-gray-100 mb-10 not-prose">
                 <h3 className="text-lg font-bold mb-4 font-heading text-foreground">
                   Neste artigo:
@@ -111,7 +115,7 @@ export default function BlogPost() {
                     return (
                       <p
                         key={index}
-                        className="text-gray-700 leading-relaxed mb-6 text-lg"
+                        className="text-[#333333] leading-relaxed mb-6 text-base md:text-[18px]"
                       >
                         {block.text}
                       </p>
@@ -139,8 +143,8 @@ export default function BlogPost() {
                       <ul key={index} className="space-y-3 mb-8 list-none pl-0">
                         {block.items.map((item, i) => (
                           <li key={i} className="flex items-start gap-3">
-                            <div className="mt-1.5 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
-                            <span className="text-gray-700 text-lg">
+                            <div className="mt-2 h-2 w-2 rounded-full bg-primary flex-shrink-0" />
+                            <span className="text-[#333333] text-base md:text-[18px]">
                               {item}
                             </span>
                           </li>
@@ -161,9 +165,32 @@ export default function BlogPost() {
                             Simulação gratuita e sem compromisso.
                           </p>
                         </div>
-                        <Button className="bg-primary hover:bg-primary/90 text-white font-bold whitespace-nowrap">
+                        <Button
+                          onClick={handleSimular}
+                          className="bg-primary hover:bg-primary/90 text-white font-bold whitespace-nowrap"
+                        >
                           {block.buttonText}
                         </Button>
+                      </div>
+                    )
+                  case 'image-grid':
+                    return (
+                      <div
+                        key={index}
+                        className="grid grid-cols-2 md:grid-cols-4 gap-8 my-12 items-center justify-items-center"
+                      >
+                        {block.items.map((item, i) => (
+                          <div
+                            key={i}
+                            className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 flex items-center justify-center w-full aspect-square hover:shadow-md transition-shadow"
+                          >
+                            <img
+                              src={item.src}
+                              alt={item.alt}
+                              className="max-w-full max-h-full object-contain filter hover:brightness-110 transition-all"
+                            />
+                          </div>
+                        ))}
                       </div>
                     )
                   default:
@@ -209,9 +236,10 @@ export default function BlogPost() {
                 </p>
                 <Button
                   size="lg"
+                  onClick={handleSimular}
                   className="bg-white text-cta hover:bg-gray-100 font-bold text-lg px-10 py-6 rounded-full shadow-lg"
                 >
-                  QUERO ECONOMIZAR AGORA
+                  SIMULAR ECONOMIA
                 </Button>
               </div>
               <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
