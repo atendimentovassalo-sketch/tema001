@@ -1,7 +1,7 @@
 import { BlogPost } from '@/data/blog-data'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Clock, MessageCircle, Share2 } from 'lucide-react'
+import { Clock, MessageCircle } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import {
@@ -17,6 +17,7 @@ interface ArticleCardProps {
 export function ArticleCard({ post }: ArticleCardProps) {
   const shareOnWhatsApp = (e: React.MouseEvent) => {
     e.preventDefault()
+    e.stopPropagation() // Prevent navigation when clicking share
     const text = `Olha esse artigo legal que eu vi na iGreen: ${post.title}`
     const url = window.location.origin + `/blog/${post.slug}`
     window.open(
@@ -27,15 +28,16 @@ export function ArticleCard({ post }: ArticleCardProps) {
 
   return (
     <Link to={`/blog/${post.slug}`} className="group h-full block">
-      <Card className="h-full overflow-hidden border-gray-100 shadow-sm hover:shadow-lg transition-all duration-300 bg-white flex flex-col">
+      <Card className="h-full overflow-hidden border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 bg-white flex flex-col transform hover:-translate-y-1">
         <div className="relative aspect-video overflow-hidden bg-gray-100">
           <img
             src={post.image}
             alt={post.title}
             className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+            loading="lazy"
           />
           <div className="absolute top-4 left-4">
-            <Badge className="bg-primary hover:bg-primary/90 text-white font-bold px-3 py-1 shadow-sm">
+            <Badge className="bg-primary hover:bg-primary/90 text-white font-bold px-3 py-1 shadow-sm uppercase text-[10px] tracking-wider">
               {post.category}
             </Badge>
           </div>
@@ -47,7 +49,7 @@ export function ArticleCard({ post }: ArticleCardProps) {
             <Clock className="h-3 w-3" />
             <span>{post.readTime} de leitura</span>
           </div>
-          <h3 className="text-xl font-bold text-foreground mb-3 leading-tight line-clamp-3 group-hover:text-primary transition-colors font-heading">
+          <h3 className="text-xl font-bold text-foreground mb-3 leading-tight line-clamp-2 group-hover:text-primary transition-colors font-heading">
             {post.title}
           </h3>
           <p className="text-gray-500 text-sm line-clamp-3 font-body">
@@ -55,9 +57,9 @@ export function ArticleCard({ post }: ArticleCardProps) {
           </p>
         </CardContent>
 
-        <CardFooter className="p-6 pt-0 flex justify-between items-center mt-auto">
+        <CardFooter className="p-6 pt-0 flex justify-between items-center mt-auto border-t border-gray-50 pt-4">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-bold text-gray-400 group-hover:text-primary transition-colors">
+            <span className="text-xs font-bold text-primary group-hover:underline transition-all">
               Ler artigo completo
             </span>
           </div>

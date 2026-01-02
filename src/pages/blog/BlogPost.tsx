@@ -12,6 +12,8 @@ import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import NotFound from '@/pages/NotFound'
 import { ArticleCard } from '@/components/blog/ArticleCard'
+import { SEO } from '@/components/SEO'
+import { NewsletterSignup } from '@/components/blog/NewsletterSignup'
 
 export default function BlogPost() {
   const { slug } = useParams()
@@ -21,7 +23,23 @@ export default function BlogPost() {
     return <NotFound />
   }
 
-  const relatedPosts = blogPosts.filter((p) => p.id !== post.id).slice(0, 3)
+  // Identify related posts based on category or just exclude current
+  const relatedPosts = blogPosts
+    .filter((p) => p.id !== post.id && p.category === post.category)
+    .slice(0, 3)
+
+  // Fallback if not enough related posts in same category
+  if (relatedPosts.length < 3) {
+    const remaining = 3 - relatedPosts.length
+    const others = blogPosts
+      .filter(
+        (p) =>
+          p.id !== post.id &&
+          !relatedPosts.find((related) => related.id === p.id),
+      )
+      .slice(0, remaining)
+    relatedPosts.push(...others)
+  }
 
   const handleSimular = () => {
     window.location.href = '/#simulador'
@@ -29,6 +47,7 @@ export default function BlogPost() {
 
   return (
     <div className="min-h-screen bg-white font-body">
+      <SEO title={post.title} description={post.subtitle} />
       <ReadingProgressBar />
 
       {/* Header */}
@@ -47,6 +66,7 @@ export default function BlogPost() {
               <Avatar className="h-8 w-8">
                 <AvatarImage
                   src={`https://img.usecurling.com/ppl/thumbnail?gender=${post.author.avatar}&seed=${post.id}`}
+                  alt={post.author.name}
                 />
                 <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -75,7 +95,7 @@ export default function BlogPost() {
           {/* Main Content Column */}
           <div className="lg:w-[70%]">
             {/* Featured Image */}
-            <div className="rounded-2xl overflow-hidden mb-12 shadow-lg">
+            <div className="rounded-2xl overflow-hidden mb-12 shadow-lg bg-gray-100">
               <img
                 src={post.image}
                 alt={post.title}
@@ -206,6 +226,7 @@ export default function BlogPost() {
               <Avatar className="h-20 w-20 border-4 border-white shadow-sm">
                 <AvatarImage
                   src={`https://img.usecurling.com/ppl/thumbnail?gender=${post.author.avatar}&seed=${post.id}`}
+                  alt={post.author.name}
                 />
                 <AvatarFallback>{post.author.name.charAt(0)}</AvatarFallback>
               </Avatar>
@@ -256,9 +277,22 @@ export default function BlogPost() {
 
         {/* Related Articles */}
         <section className="mt-24 pt-12 border-t border-gray-200">
-          <h3 className="text-2xl font-bold mb-8 font-heading text-foreground">
-            Continue Lendo
-          </h3>
+          <div className="flex flex-col md:flex-row justify-between items-end mb-8 gap-4">
+            <div>
+              <h3 className="text-2xl font-bold font-heading text-foreground mb-2">
+                Recomendados para você
+              </h3>
+              <p className="text-gray-500">
+                Continue sua jornada de economia com estes artigos.
+              </p>
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => (window.location.href = '/blog')}
+            >
+              Ver todos os artigos
+            </Button>
+          </div>
           <div className="grid md:grid-cols-3 gap-8">
             {relatedPosts.map((related) => (
               <ArticleCard key={related.id} post={related} />
@@ -266,6 +300,9 @@ export default function BlogPost() {
           </div>
         </section>
       </div>
+
+      {/* Newsletter at bottom of post */}
+      <NewsletterSignup />
     </div>
   )
 }
