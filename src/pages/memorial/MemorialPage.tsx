@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { getMemorial } from './memorial-data'
-import type { Memorial, Mensagem, Vela } from './types'
+import type { Homenagem, Memorial } from './types'
 import {
   anoBR,
   dataHoraBR,
@@ -55,10 +55,9 @@ export default function MemorialPage({
   const navigate = useNavigate()
   const memorial = memorialOverride ?? getMemorial(slug)
 
-  const [mensagens, setMensagens] = useState<Mensagem[]>(
-    memorial?.mensagens ?? [],
+  const [homenagens, setHomenagens] = useState<Homenagem[]>(
+    memorial?.homenagens ?? [],
   )
-  const [velas, setVelas] = useState<Vela[]>(memorial?.velas ?? [])
   const [historiaAberta, setHistoriaAberta] = useState(false)
 
   useEffect(() => {
@@ -77,9 +76,18 @@ export default function MemorialPage({
     defaultValues: { nome: '', texto: '', vela: true, website: '' },
   })
 
-  const aprovadas = useMemo(
-    () => mensagens.filter((m) => m.status === 'aprovada'),
-    [mensagens],
+  // Feed visível: toda homenagem com vela, e mensagens já aprovadas.
+  const visiveis = useMemo(
+    () => homenagens.filter((h) => h.vela || h.status === 'aprovada'),
+    [homenagens],
+  )
+  const totalVelas = useMemo(
+    () => homenagens.filter((h) => h.vela).length,
+    [homenagens],
+  )
+  const totalMensagens = useMemo(
+    () => homenagens.filter((h) => h.texto && h.status === 'aprovada').length,
+    [homenagens],
   )
 
   if (!memorial) {
@@ -111,31 +119,22 @@ export default function MemorialPage({
     const nome = data.nome.trim()
     const texto = (data.texto ?? '').trim()
 
-    if (data.vela) {
-      setVelas((prev) => [
-        {
-          id: `v-${Date.now()}`,
-          nome,
-          texto: texto || null,
-          criadoEmISO: agora,
-        },
-        ...prev,
-      ])
-    }
     // Aprovação é opcional: quando a família não modera, a mensagem entra na hora.
+    // A vela nunca depende de aprovação.
     const moderar = memorial.moderarMensagens
-    if (texto) {
-      setMensagens((prev) => [
-        {
-          id: `m-${Date.now()}`,
-          nome,
-          texto,
-          criadoEmISO: agora,
-          status: moderar ? 'pendente' : 'aprovada',
-        },
-        ...prev,
-      ])
-    }
+    const status: Homenagem['status'] =
+      texto && moderar ? 'pendente' : 'aprovada'
+    setHomenagens((prev) => [
+      {
+        id: `h-${Date.now()}`,
+        nome,
+        texto: texto || null,
+        vela: data.vela,
+        criadoEmISO: agora,
+        status,
+      },
+      ...prev,
+    ])
 
     if (texto && data.vela) {
       toast.success('Vela acesa e mensagem publicada', {
@@ -224,11 +223,11 @@ export default function MemorialPage({
         {/* contador */}
         <div className="contador">
           <div>
-            <b className="num">{velas.length}</b>
+            <b className="num">{totalVelas}</b>
             <span>Velas acesas</span>
           </div>
           <div>
-            <b className="num">{aprovadas.length}</b>
+            <b className="num">{totalMensagens}</b>
             <span>Mensagens</span>
           </div>
           <div>
@@ -338,50 +337,40 @@ export default function MemorialPage({
           )}
         </section>
 
-        {/* comunidade — exibição em duas colunas */}
+        {/* comunidade — feed único de homenagens.
+            Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
+            Homenagem só-vela (sem mensagem) fica diferenciada. */}
         <section className="sec">
           <h2 className="eti">Quem ama, lembra · Comunidade</h2>
-          <div className="com">
-            <div className="col">
-              <h3>
-                Mensagens recentes{' '}
-                {aprovadas.length > 3 && <a href="#homenagear">ver todas</a>}
-              </h3>
-              {aprovadas.length === 0 && (
-                <p className="vazio">
-                  Ainda não há mensagens. Seja o primeiro a deixar uma palavra.
-                </p>
-              )}
-              {aprovadas.slice(0, 6).map((m) => (
-                <div className="item" key={m.id}>
-                  <div className="av">{iniciais(m.nome) || '·'}</div>
+          <div className="feed">
+            {visiveis.length === 0 && (
+              <p className="vazio">
+                Ainda não há homenagens. Seja o primeiro a deixar uma palavra ou
+                acender uma vela.
+              </p>
+            )}
+            {visiveis.slice(0, 12).map((h) => {
+              const soVela = h.vela && !h.texto
+              return (
+                <div
+                  className={`item${h.vela ? ' vela' : ''}${soVela ? ' so-vela' : ''}`}
+                  key={h.id}
+                >
+                  <div className="av">
+                    {h.vela ? '🕯️' : iniciais(h.nome) || '·'}
+                  </div>
                   <div>
-                    <span className="quem">{m.nome}</span>
-                    <span className="qd">{tempoRelativo(m.criadoEmISO)}</span>
-                    <p className="tx">{m.texto}</p>
+                    <span className="quem">{h.nome}</span>
+                    <span className="qd">{tempoRelativo(h.criadoEmISO)}</span>
+                    {h.texto ? (
+                      <p className="tx">{h.texto}</p>
+                    ) : (
+                      <p className="tx acendeu">acendeu uma vela</p>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="col">
-              <h3>
-                Velas acesas{' '}
-                {velas.length > 3 && <a href="#homenagear">ver todas</a>}
-              </h3>
-              {velas.length === 0 && (
-                <p className="vazio">Acenda a primeira vela em memória.</p>
-              )}
-              {velas.slice(0, 6).map((v) => (
-                <div className="item vela" key={v.id}>
-                  <div className="av">🕯️</div>
-                  <div>
-                    <span className="quem">{v.nome}</span>
-                    <span className="qd">{tempoRelativo(v.criadoEmISO)}</span>
-                    {v.texto && <p className="tx">{v.texto}</p>}
-                  </div>
-                </div>
-              ))}
-            </div>
+              )
+            })}
           </div>
         </section>
 

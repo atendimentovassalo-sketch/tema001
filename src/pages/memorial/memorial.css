@@ -562,11 +562,28 @@
   text-decoration: none;
   letter-spacing: 0.12em;
 }
+.memorial-root .feed {
+  display: flex;
+  flex-direction: column;
+  margin-top: 6px;
+}
 .memorial-root .item {
   display: flex;
   gap: 14px;
   padding: 18px 0;
   border-bottom: 1px solid var(--linha);
+}
+/* homenagem só-vela (sem mensagem): mesmo campo visual, tom mais leve */
+.memorial-root .item.so-vela .tx.acendeu {
+  font-family: var(--a);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  font-style: italic;
+  opacity: 0.6;
+  color: var(--brass-e);
+}
+.memorial-root .item.vela .av {
+  box-shadow: 0 0 0 1px var(--brass-e);
 }
 .memorial-root .item:last-child {
   border-bottom: 0;

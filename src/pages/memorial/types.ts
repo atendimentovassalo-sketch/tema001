@@ -30,21 +30,19 @@ export interface Foto {
   alt?: string
 }
 
-/** Mensagem passa por conferência da família (aprovada) antes de aparecer. */
-export interface Mensagem {
-  id: string
-  nome: string
-  texto: string
-  criadoEmISO: string
-  status: 'pendente' | 'aprovada' | 'recusada'
-}
-
-/** Vela é gratuita e imediata — sem aprovação. */
-export interface Vela {
+/**
+ * Uma homenagem: pode trazer mensagem, uma vela acesa, ou ambas.
+ * - `vela`: a pessoa acendeu uma vela (gratuita, imediata).
+ * - `texto`: a mensagem escrita (opcional). Passa por conferência quando a
+ *   família modera; `status` se aplica ao texto — a vela nunca depende dele.
+ */
+export interface Homenagem {
   id: string
   nome: string
   texto: string | null
+  vela: boolean
   criadoEmISO: string
+  status: 'pendente' | 'aprovada' | 'recusada'
 }
 
 export interface Memorial {
@@ -65,8 +63,7 @@ export interface Memorial {
   historia: string | null
   eventos: Evento[]
   fotos: Foto[]
-  mensagens: Mensagem[]
-  velas: Vela[]
+  homenagens: Homenagem[]
   visitas: number
   /** Nome de quem autorizou a publicação — exibido no rodapé. */
   autorizadoPor: string | null
