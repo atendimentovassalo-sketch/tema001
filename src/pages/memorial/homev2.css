@@ -204,14 +204,17 @@
   }
 }
 .homev2 .hero-txt {
-  padding: 76px 30px 84px;
-  max-width: 640px;
-  margin-left: auto;
+  padding: clamp(52px, 7vw, 96px) clamp(26px, 4vw, 60px);
   align-self: center;
 }
+/* mede o texto do herói para não estrangular nem esticar demais */
+.homev2 .hero-txt > * {
+  max-width: 30rem;
+}
+/* em telas largas, alinha o texto à margem esquerda do container (bate com a barra) */
 @media (min-width: 900px) {
   .homev2 .hero-txt {
-    padding-left: max(30px, calc((100vw - 1120px) / 2));
+    padding-left: max(60px, calc((100vw - 1120px) / 2));
   }
 }
 .homev2 .hero .kicker {
@@ -222,8 +225,8 @@
   color: var(--sage-mid);
 }
 .homev2 .hero h1 {
-  font-size: clamp(2.5rem, 5.4vw, 4rem);
-  line-height: 1.04;
+  font-size: clamp(2rem, 2.7vw, 3.05rem);
+  line-height: 1.08;
   margin-top: 22px;
   max-width: 15ch;
   font-weight: 400;
@@ -265,6 +268,13 @@
 .homev2 .hero-img {
   position: relative;
   min-height: 340px;
+}
+@media (max-width: 899px) {
+  .homev2 .hero-img {
+    display: none;
+  }
+}
+.homev2 .hero-img {
   background:
     linear-gradient(180deg, rgba(33, 29, 23, 0.06), rgba(33, 29, 23, 0.18)),
     linear-gradient(150deg, #e7e0d3, #cfc6b6 60%, #b9ae99);
