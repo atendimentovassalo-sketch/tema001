@@ -1,12 +1,12 @@
 /* Página pública do memorial. Front-end apenas: estado local + mock, sem backend. */
 import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { getMemorial } from './memorial-data'
-import type { Mensagem, Vela } from './types'
+import type { Memorial, Mensagem, Vela } from './types'
 import {
   anoBR,
   dataHoraBR,
@@ -42,9 +42,18 @@ const homenagemSchema = z
 
 type HomenagemForm = z.input<typeof homenagemSchema>
 
-export default function MemorialPage() {
+export default function MemorialPage({
+  memorialOverride,
+  preview = false,
+}: {
+  /** Quando presente, renderiza este memorial em vez de buscar pela rota (usado na prévia). */
+  memorialOverride?: Memorial
+  /** Mostra a barra "Confirmar e publicar / Corrigir" no fim. */
+  preview?: boolean
+} = {}) {
   const { slug } = useParams()
-  const memorial = getMemorial(slug)
+  const navigate = useNavigate()
+  const memorial = memorialOverride ?? getMemorial(slug)
 
   const [mensagens, setMensagens] = useState<Mensagem[]>(
     memorial?.mensagens ?? [],
@@ -495,6 +504,35 @@ export default function MemorialPage() {
           </p>
         )}
       </footer>
+
+      {preview && (
+        <div className="form" style={{ maxWidth: 640 }}>
+          <div className="aviso">
+            <b>Confira o nome, os textos e os horários.</b> Depois de publicar,
+            o endereço da página não muda — mas o conteúdo continua editável.
+          </div>
+          <button
+            className="acao"
+            type="button"
+            onClick={() =>
+              toast.success('Pronto para publicar', {
+                description:
+                  'A publicação de verdade (com geração do card do WhatsApp) entra com o backend.',
+              })
+            }
+          >
+            Confirmar e publicar
+          </button>
+          <button
+            className="acao vazia"
+            type="button"
+            style={{ marginTop: 12 }}
+            onClick={() => navigate('/memorial/novo')}
+          >
+            Corrigir
+          </button>
+        </div>
+      )}
     </div>
   )
 }

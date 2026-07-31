@@ -52,6 +52,20 @@ export function dataLongaBR(iso: string | null): string {
   return `${g('day')} de ${MESES[Number(g('month')) - 1]} de ${g('year')}`
 }
 
+export function idadeEm(
+  nascimento: string | null,
+  falecimento: string | null,
+): number | null {
+  if (!nascimento || !falecimento) return null
+  const n = new Date(nascimento)
+  const f = new Date(falecimento)
+  if (isNaN(n.getTime()) || isNaN(f.getTime())) return null
+  let a = f.getFullYear() - n.getFullYear()
+  const m = f.getMonth() - n.getMonth()
+  if (m < 0 || (m === 0 && f.getDate() < n.getDate())) a -= 1
+  return a >= 0 && a < 130 ? a : null
+}
+
 export function anoBR(iso: string | null): string {
   if (!iso) return ''
   const d = new Date(iso)

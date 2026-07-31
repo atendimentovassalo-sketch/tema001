@@ -3,9 +3,22 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { toast } from 'sonner'
+import { useNavigate } from 'react-router-dom'
 import { getMemorial } from './memorial-data'
+import { saveDraft } from './draft'
+import { idadeEm } from './format'
+import type { Evento, Memorial } from './types'
 import './memorial.css'
+
+function slugify(nome: string): string {
+  return nome
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 72)
+}
 
 const schema = z
   .object({
@@ -60,6 +73,7 @@ type NovoForm = z.input<typeof schema>
 
 export default function NovoMemorial() {
   const f = getMemorial()!.funeraria
+  const navigate = useNavigate()
 
   const {
     register,
@@ -74,12 +88,53 @@ export default function NovoMemorial() {
   const moderar = watch('moderarMensagens')
 
   const onSubmit = (data: NovoForm) => {
-    // Sem backend ainda: em produção isto grava o rascunho e leva para a prévia.
-    console.info('nova nota (rascunho)', data)
-    toast.success('Rascunho pronto', {
-      description:
-        'No próximo passo você confere a página exata antes de publicar.',
-    })
+    const eventos: Evento[] = []
+    if (data.velorioLocal) {
+      eventos.push({
+        id: 'ev-velorio',
+        tipo: 'velorio',
+        localNome: data.velorioLocal,
+        endereco: data.velorioEndereco || null,
+        inicioISO: data.velorioInicio || null,
+        horarioConfirmado: Boolean(data.velorioInicio),
+      })
+    }
+    if (data.sepLocal) {
+      eventos.push({
+        id: 'ev-sep',
+        tipo: 'sepultamento',
+        localNome: data.sepLocal,
+        endereco: null,
+        inicioISO: data.sepInicio || null,
+        horarioConfirmado: Boolean(data.sepInicio),
+      })
+    }
+
+    const draft: Memorial = {
+      id: 'rascunho',
+      slug: slugify(data.nomeCompleto) || 'rascunho',
+      funeraria: f,
+      nomeCompleto: data.nomeCompleto,
+      apelido: data.apelido || null,
+      fotoUrl: null,
+      nascimentoISO: data.nascimento || null,
+      cidadeNascimento: data.cidadeNascimento || null,
+      falecimentoISO: data.falecimento,
+      cidadeFalecimento: data.cidadeFalecimento || null,
+      idade: idadeEm(data.nascimento || null, data.falecimento),
+      epitafio: data.epitafio || null,
+      historia: data.historia || null,
+      eventos,
+      fotos: [],
+      mensagens: [],
+      velas: [],
+      visitas: 0,
+      autorizadoPor: data.autorizadoPor || null,
+      moderarMensagens: data.moderarMensagens ?? false,
+    }
+
+    saveDraft(draft)
+    navigate('/memorial/previa')
   }
 
   return (

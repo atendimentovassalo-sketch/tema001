@@ -10,6 +10,7 @@ import BlogHome from './pages/blog/BlogHome'
 import BlogPost from './pages/blog/BlogPost'
 import MemorialPage from './pages/memorial/MemorialPage'
 import NovoMemorial from './pages/memorial/NovoMemorial'
+import PreviewMemorial from './pages/memorial/PreviewMemorial'
 
 // ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
 // AVOID REMOVING ANY CONTEXT PROVIDERS FROM THIS FILE (e.g. TooltipProvider, Toaster, Sonner)
@@ -31,6 +32,7 @@ const App = () => (
         {/* Memorial (tema próprio, fora do Layout iGreen) */}
         <Route path="/m/:slug" element={<MemorialPage />} />
         <Route path="/memorial/novo" element={<NovoMemorial />} />
+        <Route path="/memorial/previa" element={<PreviewMemorial />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
