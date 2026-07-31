@@ -81,7 +81,7 @@ export default function HomeV2() {
       {/* barra */}
       <header className="bar">
         <div className="bar-in">
-          <Link to="/funeraria-v2" className="brand">
+          <Link to="/funeraria" className="brand">
             {f.nome}
             <small>
               {f.cidade} · {f.uf}

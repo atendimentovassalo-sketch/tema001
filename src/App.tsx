@@ -11,7 +11,6 @@ import BlogPost from './pages/blog/BlogPost'
 import MemorialPage from './pages/memorial/MemorialPage'
 import NovoMemorial from './pages/memorial/NovoMemorial'
 import PreviewMemorial from './pages/memorial/PreviewMemorial'
-import ObituarioHome from './pages/memorial/ObituarioHome'
 import Obituario from './pages/memorial/Obituario'
 import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
 import HomeV2 from './pages/memorial/HomeV2'
@@ -34,8 +33,7 @@ const App = () => (
           <Route path="/blog/:slug" element={<BlogPost />} />
         </Route>
         {/* Memorial (tema próprio, fora do Layout iGreen) */}
-        <Route path="/funeraria" element={<ObituarioHome />} />
-        <Route path="/funeraria-v2" element={<HomeV2 />} />
+        <Route path="/funeraria" element={<HomeV2 />} />
         <Route path="/obituario" element={<Obituario />} />
         <Route path="/m/:slug" element={<MemorialPage />} />
         <Route path="/memorial/novo" element={<NovoMemorial />} />

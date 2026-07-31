@@ -3,17 +3,18 @@
  * Tudo escopado sob .memorial-root para não colidir com o app iGreen/blog.
  * A cor da marca (--marca) é definida por inquilino via style inline no root.
  */
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Archivo:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Archivo:wght@400;500;600&display=swap');
 
+/* Paleta "dignidade calma" — mesma linguagem da home oficial (creme + verde + âmbar). */
 .memorial-root {
-  --ink: #131a15;
-  --papel: #e6e5df;
-  --vellum: #f2f1ec;
-  --linha: #c4c5bc;
-  --brass: #c9ae79;
-  --brass-e: #755e32;
-  --marca: #1f3a2e;
-  --g: 'EB Garamond', Georgia, serif;
+  --ink: #211d17; /* fundo escuro quente (herói, topo, rodapé) + texto */
+  --papel: #f4f0e8; /* creme base */
+  --vellum: #fbf9f5; /* cartões */
+  --linha: #ddd5c7;
+  --brass: #b99a6b; /* dourado suave (acento em fundo escuro) */
+  --brass-e: #4b5e4c; /* verde abeto (rótulos e detalhes em fundo claro) */
+  --marca: #b5623f; /* âmbar (cor de marca/hover por inquilino) */
+  --g: 'Fraunces', Georgia, 'Times New Roman', serif;
   --a: 'Archivo', system-ui, sans-serif;
   --t: 170ms cubic-bezier(0.2, 0.6, 0.3, 1);
 

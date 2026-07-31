@@ -18,7 +18,7 @@ export const funeraria: Funeraria = {
   desde: '1987',
   sobre:
     'Há mais de três décadas cuidamos das famílias de Catanduvas e região com respeito, discrição e atendimento a qualquer hora. Um só telefone, uma equipe que conhece a cidade e acompanha cada detalhe.',
-  corMarca: '#1F3A2E',
+  corMarca: '#B5623F',
 }
 
 const donaNair: Memorial = {
