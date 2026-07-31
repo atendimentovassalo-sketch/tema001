@@ -31,6 +31,9 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      // @hookform/resolvers/zod importa "zod/v4/core"; sob pnpm o rolldown não
+      // resolve esse subpath a partir do store. Apontamos para o arquivo real.
+      'zod/v4/core': path.resolve(__dirname, './node_modules/zod/v4/core/index.js'),
     },
   },
 }))

@@ -1,0 +1,823 @@
+/*
+ * Tema "luto" do memorial — portado do esqueleto (design preview v4).
+ * Tudo escopado sob .memorial-root para não colidir com o app iGreen/blog.
+ * A cor da marca (--marca) é definida por inquilino via style inline no root.
+ */
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=Archivo:wght@400;500;600&display=swap');
+
+.memorial-root {
+  --ink: #131a15;
+  --papel: #e6e5df;
+  --vellum: #f2f1ec;
+  --linha: #c4c5bc;
+  --brass: #c9ae79;
+  --brass-e: #755e32;
+  --marca: #1f3a2e;
+  --g: 'EB Garamond', Georgia, serif;
+  --a: 'Archivo', system-ui, sans-serif;
+  --t: 170ms cubic-bezier(0.2, 0.6, 0.3, 1);
+
+  background: var(--papel);
+  color: var(--ink);
+  font-family: var(--g);
+  font-size: 17px;
+  line-height: 1.62;
+  min-height: 100vh;
+}
+.memorial-root * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+.memorial-root a {
+  color: inherit;
+  touch-action: manipulation;
+}
+.memorial-root :focus-visible {
+  outline: 2px solid var(--brass-e);
+  outline-offset: 3px;
+}
+.memorial-root h1,
+.memorial-root h2,
+.memorial-root h3 {
+  font-weight: 400;
+  text-wrap: balance;
+}
+.memorial-root .eti {
+  font-family: var(--a);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+.memorial-root .eti2 {
+  font-family: var(--a);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--brass);
+}
+.memorial-root .num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* topo / rodapé */
+.memorial-root .topo {
+  background: var(--ink);
+  color: var(--papel);
+  border-bottom: 1px solid rgba(201, 174, 121, 0.2);
+}
+.memorial-root .topo-in {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 12px 26px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+}
+.memorial-root .wm {
+  font-size: 1.2rem;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 1.14;
+}
+.memorial-root .wm small {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.55rem;
+  font-weight: 500;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--brass);
+  margin-top: 4px;
+}
+.memorial-root .tel {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  font-family: var(--a);
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-height: 44px;
+  white-space: nowrap;
+}
+.memorial-root .tel em {
+  display: block;
+  font-style: normal;
+  font-size: 0.54rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass);
+  font-weight: 500;
+  margin-bottom: 2px;
+}
+
+/* hero */
+.memorial-root .hero {
+  background: var(--ink);
+  color: var(--papel);
+  position: relative;
+  overflow: hidden;
+  padding: 60px 26px 74px;
+  text-align: center;
+}
+.memorial-root .hero::before {
+  content: '';
+  position: absolute;
+  inset: 13px;
+  border: 1px solid rgba(201, 174, 121, 0.22);
+}
+.memorial-root .hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    118% 76% at 50% 6%,
+    rgba(201, 174, 121, 0.11),
+    transparent 62%
+  );
+}
+.memorial-root .hero > * {
+  position: relative;
+  z-index: 1;
+}
+.memorial-root .hero .eti {
+  color: var(--brass);
+}
+.memorial-root .moldura {
+  width: min(252px, 64vw);
+  margin: 32px auto 30px;
+  background: var(--vellum);
+  padding: 16px;
+  box-shadow: 0 20px 46px rgba(0, 0, 0, 0.45);
+}
+.memorial-root .janela {
+  aspect-ratio: 4/5;
+  border: 1px solid var(--linha);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(168deg, #d9d8d1, #b9bab2 60%, #a7a8a0);
+  overflow: hidden;
+}
+.memorial-root .janela img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.memorial-root .janela .mono {
+  font-size: 2.85rem;
+  font-weight: 500;
+  letter-spacing: 0.09em;
+  color: #6c6e67;
+}
+.memorial-root .hero h1 {
+  font-size: clamp(2.5rem, 10vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.014em;
+  max-width: 14ch;
+  margin: 0 auto;
+}
+.memorial-root .hero .trato {
+  font-style: italic;
+  font-size: 1.16rem;
+  opacity: 0.72;
+  margin-top: 12px;
+}
+.memorial-root .orn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 26px auto 0;
+  max-width: 236px;
+}
+.memorial-root .orn i {
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 174, 121, 0.6));
+}
+.memorial-root .orn i + i {
+  background: linear-gradient(90deg, rgba(201, 174, 121, 0.6), transparent);
+}
+.memorial-root .orn b {
+  width: 5px;
+  height: 5px;
+  background: var(--brass);
+  transform: rotate(45deg);
+}
+.memorial-root .hero .datas {
+  font-family: var(--a);
+  font-size: 0.83rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  margin-top: 20px;
+}
+.memorial-root .hero .idade {
+  font-style: italic;
+  font-size: 1rem;
+  opacity: 0.62;
+  margin-top: 8px;
+}
+.memorial-root .epi {
+  font-style: italic;
+  font-size: 1.16rem;
+  line-height: 1.6;
+  opacity: 0.8;
+  max-width: 30ch;
+  margin: 20px auto 0;
+}
+.memorial-root .cta {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 30px;
+}
+.memorial-root .cta a {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  font-family: var(--a);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  min-height: 52px;
+  padding: 0 24px;
+  border: 1px solid var(--brass);
+  color: var(--vellum);
+  cursor: pointer;
+  background: none;
+}
+.memorial-root .cta a.solid {
+  background: var(--brass);
+  color: var(--ink);
+}
+
+/* corpo / seções */
+.memorial-root .corpo {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 26px;
+}
+.memorial-root .sec {
+  padding: 58px 0 0;
+}
+.memorial-root .sec > h2.eti {
+  color: var(--brass-e);
+  display: block;
+  margin-bottom: 20px;
+}
+.memorial-root .placa {
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  padding: 8px;
+}
+.memorial-root .placa-in {
+  border: 1px solid rgba(117, 94, 50, 0.26);
+  padding: 4px 24px;
+}
+.memorial-root .fato {
+  padding: 23px 0;
+  border-bottom: 1px solid var(--linha);
+}
+.memorial-root .fato:last-child {
+  border-bottom: 0;
+}
+.memorial-root .fato h3 {
+  font-family: var(--a);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+}
+.memorial-root .fato .onde {
+  font-size: 1.42rem;
+  line-height: 1.26;
+  margin-top: 9px;
+}
+.memorial-root .fato .end {
+  font-family: var(--a);
+  font-size: 0.79rem;
+  opacity: 0.68;
+  margin-top: 5px;
+  line-height: 1.55;
+}
+.memorial-root .fato .quando {
+  font-family: var(--a);
+  font-size: 0.88rem;
+  font-weight: 600;
+  margin-top: 12px;
+}
+.memorial-root .fato .quando.pend {
+  font-weight: 500;
+  opacity: 0.62;
+}
+.memorial-root .acao {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  font-family: var(--a);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  min-height: 56px;
+  padding: 16px 22px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--papel);
+  cursor: pointer;
+  margin-top: 24px;
+  width: 100%;
+}
+.memorial-root .acao.vazia {
+  background: none;
+  color: var(--ink);
+  border-color: rgba(19, 26, 21, 0.32);
+}
+.memorial-root .acao.metal {
+  background: none;
+  color: var(--brass-e);
+  border-color: var(--brass-e);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .memorial-root .acao {
+    transition:
+      background var(--t),
+      color var(--t),
+      border-color var(--t);
+  }
+  .memorial-root .acao:hover {
+    background: var(--marca);
+    border-color: var(--marca);
+    color: var(--vellum);
+  }
+}
+.memorial-root .recado {
+  background: var(--vellum);
+  border-top: 2px solid var(--brass-e);
+  padding: 42px 28px 36px;
+  text-align: center;
+}
+.memorial-root .recado .aspas {
+  display: block;
+  font-size: 3.1rem;
+  line-height: 0.42;
+  color: var(--brass-e);
+  opacity: 0.45;
+  margin-bottom: 16px;
+}
+.memorial-root .recado p {
+  font-style: italic;
+  font-size: 1.24rem;
+  line-height: 1.66;
+  max-width: 34ch;
+  margin: 0 auto;
+}
+.memorial-root .duo {
+  display: grid;
+  gap: 11px;
+}
+@media (min-width: 480px) {
+  .memorial-root .duo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* contador */
+.memorial-root .contador {
+  display: flex;
+  justify-content: center;
+  max-width: 520px;
+  margin: 34px auto 0;
+  border: 1px solid var(--linha);
+  background: var(--vellum);
+}
+.memorial-root .contador div {
+  flex: 1;
+  text-align: center;
+  padding: 20px 8px;
+  border-left: 1px solid var(--linha);
+}
+.memorial-root .contador div:first-child {
+  border-left: 0;
+}
+.memorial-root .contador b {
+  display: block;
+  font-size: 2rem;
+  line-height: 1;
+  color: var(--brass-e);
+}
+.memorial-root .contador span {
+  font-family: var(--a);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  margin-top: 8px;
+  display: block;
+}
+
+/* marcos nascimento/falecimento */
+.memorial-root .marcos {
+  display: grid;
+  gap: 11px;
+}
+@media (min-width: 520px) {
+  .memorial-root .marcos {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.memorial-root .marco {
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  padding: 20px 22px;
+}
+.memorial-root .marco .rot {
+  font-family: var(--a);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+}
+.memorial-root .marco .loc {
+  font-size: 1.24rem;
+  margin-top: 10px;
+  line-height: 1.3;
+}
+.memorial-root .marco .dt {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  opacity: 0.7;
+  margin-top: 6px;
+}
+
+/* biografia / história */
+.memorial-root .bio {
+  font-size: 1.16rem;
+  line-height: 1.85;
+  letter-spacing: 0.003em;
+}
+.memorial-root .bio p {
+  margin-top: 1.1em;
+}
+.memorial-root .bio p:first-child {
+  margin-top: 0;
+}
+.memorial-root .bio p:first-child::first-letter {
+  font-size: 3.4rem;
+  line-height: 0.8;
+  float: left;
+  margin: 6px 12px 0 0;
+  color: var(--brass-e);
+  font-weight: 500;
+}
+.memorial-root .bio.corta {
+  -webkit-mask-image: linear-gradient(180deg, #000 68%, transparent);
+  mask-image: linear-gradient(180deg, #000 68%, transparent);
+  max-height: 19em;
+  overflow: hidden;
+}
+.memorial-root .lermais {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--a);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  margin-top: 18px;
+  padding: 0;
+}
+
+/* álbum */
+.memorial-root .galeria {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 9px;
+}
+@media (min-width: 520px) {
+  .memorial-root .galeria {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+.memorial-root .galeria figure {
+  position: relative;
+  aspect-ratio: 1;
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  overflow: hidden;
+}
+.memorial-root .galeria img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* comunidade */
+.memorial-root .com {
+  display: grid;
+  gap: 26px;
+}
+@media (min-width: 720px) {
+  .memorial-root .com {
+    grid-template-columns: 1fr 1fr;
+    gap: 34px;
+  }
+}
+.memorial-root .col h3 {
+  font-family: var(--a);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--linha);
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.memorial-root .col h3 a {
+  font-size: 0.62rem;
+  opacity: 0.6;
+  text-decoration: none;
+  letter-spacing: 0.12em;
+}
+.memorial-root .item {
+  display: flex;
+  gap: 14px;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--linha);
+}
+.memorial-root .item:last-child {
+  border-bottom: 0;
+}
+.memorial-root .av {
+  flex: none;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--brass);
+  display: grid;
+  place-items: center;
+  font-family: var(--a);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.memorial-root .item.vela .av {
+  background: var(--vellum);
+  color: var(--brass-e);
+  border: 1px solid var(--brass-e);
+  font-size: 1.1rem;
+}
+.memorial-root .item .quem {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.memorial-root .item .qd {
+  font-family: var(--a);
+  font-size: 0.66rem;
+  opacity: 0.55;
+  margin-left: 8px;
+  font-weight: 500;
+}
+.memorial-root .item .tx {
+  font-size: 1.06rem;
+  line-height: 1.6;
+  margin-top: 6px;
+}
+.memorial-root .vazio {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  opacity: 0.55;
+  padding: 22px 0;
+  line-height: 1.6;
+}
+
+/* formulários */
+.memorial-root .form {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 26px;
+}
+.memorial-root .mural {
+  max-width: 600px;
+  margin-top: 8px;
+}
+.memorial-root .form label,
+.memorial-root .mural label {
+  display: block;
+  margin-top: 16px;
+}
+.memorial-root .rot {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+}
+.memorial-root .form input,
+.memorial-root .form textarea,
+.memorial-root .form select,
+.memorial-root .mural input[type='text'],
+.memorial-root .mural textarea {
+  width: 100%;
+  font-family: var(--g);
+  font-size: 1.08rem;
+  padding: 13px;
+  margin-top: 7px;
+  border: 1px solid var(--linha);
+  background: var(--vellum);
+  min-height: 52px;
+  color: var(--ink);
+}
+.memorial-root .form textarea,
+.memorial-root .mural textarea {
+  min-height: 104px;
+  line-height: 1.55;
+}
+.memorial-root .dica {
+  font-family: var(--a);
+  font-size: 0.72rem;
+  opacity: 0.62;
+  margin-top: 5px;
+  line-height: 1.6;
+}
+.memorial-root .par {
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 520px) {
+  .memorial-root .par {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.memorial-root .grupo {
+  margin-top: 34px;
+  padding-top: 12px;
+  border-top: 2px solid var(--brass-e);
+}
+.memorial-root .grupo > .eti {
+  color: var(--brass-e);
+  display: block;
+  margin-bottom: 2px;
+}
+.memorial-root .zap input {
+  background: #f1f6f1;
+}
+.memorial-root .velacheck {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding: 16px 18px;
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  cursor: pointer;
+}
+.memorial-root .velacheck input {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  accent-color: var(--brass-e);
+}
+.memorial-root .velacheck .tt {
+  font-family: var(--a);
+  font-size: 0.86rem;
+  font-weight: 600;
+  display: block;
+}
+.memorial-root .velacheck .ds {
+  font-family: var(--a);
+  font-size: 0.72rem;
+  opacity: 0.6;
+  margin-top: 2px;
+  display: block;
+}
+.memorial-root .erro {
+  color: #8c2f2f;
+  font-family: var(--a);
+  font-size: 0.74rem;
+  margin-top: 6px;
+}
+.memorial-root .aviso {
+  background: var(--vellum);
+  border-left: 3px solid var(--brass-e);
+  padding: 18px 20px;
+  margin-top: 26px;
+  font-family: var(--a);
+  font-size: 0.82rem;
+  line-height: 1.7;
+}
+.memorial-root .mod {
+  font-family: var(--a);
+  font-size: 0.72rem;
+  opacity: 0.6;
+  margin-top: 12px;
+  line-height: 1.6;
+}
+
+/* listas simples */
+.memorial-root .lista a {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  border-top: 1px solid var(--linha);
+  padding: 18px 0;
+  min-height: 56px;
+}
+.memorial-root .lista a:last-child {
+  border-bottom: 1px solid var(--linha);
+}
+.memorial-root .lista .n {
+  font-size: 1.2rem;
+  line-height: 1.3;
+}
+.memorial-root .lista .d {
+  font-family: var(--a);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.55;
+  white-space: nowrap;
+}
+.memorial-root .corrigir {
+  font-family: var(--a);
+  font-size: 0.74rem;
+  opacity: 0.62;
+  margin: 32px 0 68px;
+  text-align: center;
+  line-height: 1.7;
+}
+
+/* rodapé */
+.memorial-root .rodape {
+  background: var(--ink);
+  color: var(--papel);
+  padding: 56px 26px 64px;
+  text-align: center;
+}
+.memorial-root .rodape .wm {
+  font-size: 1.55rem;
+}
+.memorial-root .rodape .end {
+  font-family: var(--a);
+  font-size: 0.77rem;
+  opacity: 0.6;
+  margin-top: 14px;
+  line-height: 1.7;
+}
+.memorial-root .rodape .fone {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 26px;
+  font-size: 2.1rem;
+  color: var(--brass);
+  text-decoration: none;
+}
+.memorial-root .rodape .fone small {
+  font-family: var(--a);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.26em;
+  text-transform: uppercase;
+  color: var(--papel);
+  opacity: 0.55;
+  margin-bottom: 7px;
+}
+.memorial-root .rodape .autoriz {
+  font-family: var(--a);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(201, 174, 121, 0.2);
+  line-height: 1.6;
+}

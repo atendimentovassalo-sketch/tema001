@@ -8,6 +8,8 @@ import NotFound from './pages/NotFound'
 import Layout from './components/Layout'
 import BlogHome from './pages/blog/BlogHome'
 import BlogPost from './pages/blog/BlogPost'
+import MemorialPage from './pages/memorial/MemorialPage'
+import NovoMemorial from './pages/memorial/NovoMemorial'
 
 // ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
 // AVOID REMOVING ANY CONTEXT PROVIDERS FROM THIS FILE (e.g. TooltipProvider, Toaster, Sonner)
@@ -26,6 +28,9 @@ const App = () => (
           <Route path="/blog" element={<BlogHome />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
         </Route>
+        {/* Memorial (tema próprio, fora do Layout iGreen) */}
+        <Route path="/m/:slug" element={<MemorialPage />} />
+        <Route path="/memorial/novo" element={<NovoMemorial />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
