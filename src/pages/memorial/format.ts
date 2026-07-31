@@ -66,6 +66,12 @@ export function idadeEm(
   return a >= 0 && a < 130 ? a : null
 }
 
+/** "28/07" a partir de um ISO (YYYY-MM-DD...). */
+export function ddmm(iso: string): string {
+  const s = String(iso)
+  return `${s.slice(8, 10)}/${s.slice(5, 7)}`
+}
+
 export function anoBR(iso: string | null): string {
   if (!iso) return ''
   const d = new Date(iso)

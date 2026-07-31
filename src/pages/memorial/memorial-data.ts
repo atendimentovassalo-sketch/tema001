@@ -1,26 +1,30 @@
-import type { Memorial } from './types'
+import type { Funeraria, Memorial } from './types'
 
-/* Mock de um memorial para desenvolvimento/prévia. Sem backend ainda. */
+/* Mock de memoriais para desenvolvimento/prévia. Sem backend ainda. */
 
 const H = 3600_000
 const D = 86_400_000
 const agora = Date.now()
 const atras = (ms: number) => new Date(agora - ms).toISOString()
 
+export const funeraria: Funeraria = {
+  id: 't1',
+  nome: 'Funerária Demonstração',
+  cidade: 'Catanduvas',
+  uf: 'PR',
+  telefone: '(45) 3253-1234',
+  whatsapp: '5545999990000',
+  endereco: 'Rua Sete de Setembro, 120 · Centro',
+  desde: '1987',
+  sobre:
+    'Há mais de três décadas cuidamos das famílias de Catanduvas e região com respeito, discrição e atendimento a qualquer hora. Um só telefone, uma equipe que conhece a cidade e acompanha cada detalhe.',
+  corMarca: '#1F3A2E',
+}
+
 const donaNair: Memorial = {
   id: 'o1',
   slug: 'nair-aparecida-de-souza',
-  funeraria: {
-    id: 't1',
-    nome: 'Funerária Demonstração',
-    cidade: 'Catanduvas',
-    uf: 'PR',
-    telefone: '(45) 3253-1234',
-    whatsapp: '5545999990000',
-    endereco: 'Rua Sete de Setembro, 120 · Centro',
-    desde: '1987',
-    corMarca: '#1F3A2E',
-  },
+  funeraria,
   nomeCompleto: 'Nair Aparecida de Souza',
   apelido: 'Dona Nair',
   fotoUrl: null,
@@ -123,9 +127,142 @@ const donaNair: Memorial = {
   moderarMensagens: false,
 }
 
-export const memoriais: Memorial[] = [donaNair]
+const joseCarlos: Memorial = {
+  id: 'o2',
+  slug: 'jose-carlos-lima',
+  funeraria,
+  nomeCompleto: 'José Carlos Lima',
+  apelido: 'Zé do Posto',
+  fotoUrl:
+    'https://img.usecurling.com/p/400/500?q=elderly%20man%20portrait&seed=21',
+  nascimentoISO: '1955-09-20',
+  cidadeNascimento: 'Cascavel · PR',
+  falecimentoISO: '2026-07-27',
+  cidadeFalecimento: 'Catanduvas · PR',
+  idade: 70,
+  epitafio: 'Atendia todo mundo pelo nome.',
+  historia: null,
+  eventos: [
+    {
+      id: 'e2a',
+      tipo: 'velorio',
+      localNome: 'Capela Municipal',
+      endereco: 'Rua XV de Novembro, 45 · Catanduvas/PR',
+      inicioISO: '2026-07-27T14:00:00-03:00',
+      horarioConfirmado: true,
+    },
+    {
+      id: 'e2b',
+      tipo: 'sepultamento',
+      localNome: 'Cemitério Municipal de Catanduvas',
+      endereco: null,
+      inicioISO: '2026-07-28T10:00:00-03:00',
+      horarioConfirmado: true,
+    },
+  ],
+  fotos: [],
+  mensagens: [],
+  velas: [
+    {
+      id: 'v2',
+      nome: 'Turma do posto',
+      texto: null,
+      criadoEmISO: atras(8 * H),
+    },
+  ],
+  visitas: 412,
+  autorizadoPor: 'Sandra Lima (esposa)',
+  moderarMensagens: false,
+}
+
+const therezinha: Memorial = {
+  id: 'o3',
+  slug: 'therezinha-alves',
+  funeraria,
+  nomeCompleto: 'Therezinha Alves',
+  apelido: 'Dona Tetê',
+  fotoUrl: null,
+  nascimentoISO: '1940-01-15',
+  cidadeNascimento: 'Guarapuava · PR',
+  falecimentoISO: '2026-07-25',
+  cidadeFalecimento: 'Catanduvas · PR',
+  idade: 86,
+  epitafio: null,
+  historia: null,
+  eventos: [
+    {
+      id: 'e3a',
+      tipo: 'velorio',
+      localNome: 'Capela Memorial São José',
+      endereco: 'Av. Brasil, 980 · Catanduvas/PR',
+      inicioISO: null,
+      horarioConfirmado: false,
+    },
+  ],
+  fotos: [],
+  mensagens: [],
+  velas: [],
+  visitas: 233,
+  autorizadoPor: 'Marcos Alves (filho)',
+  moderarMensagens: true,
+}
+
+const antonio: Memorial = {
+  id: 'o4',
+  slug: 'antonio-dos-santos',
+  funeraria,
+  nomeCompleto: 'Antônio dos Santos',
+  apelido: null,
+  fotoUrl:
+    'https://img.usecurling.com/p/400/500?q=old%20man%20hat%20portrait&seed=24',
+  nascimentoISO: '1962-11-02',
+  cidadeNascimento: 'Catanduvas · PR',
+  falecimentoISO: '2026-07-22',
+  cidadeFalecimento: 'Cascavel · PR',
+  idade: 63,
+  epitafio: 'A viola cala, a música fica.',
+  historia: null,
+  eventos: [
+    {
+      id: 'e4a',
+      tipo: 'velorio',
+      localNome: 'Capela Municipal',
+      endereco: 'Rua XV de Novembro, 45 · Catanduvas/PR',
+      inicioISO: '2026-07-22T18:00:00-03:00',
+      horarioConfirmado: true,
+    },
+  ],
+  fotos: [],
+  mensagens: [],
+  velas: [
+    {
+      id: 'v4a',
+      nome: 'Grupo de viola',
+      texto: 'Até sempre, mestre.',
+      criadoEmISO: atras(2 * D),
+    },
+  ],
+  visitas: 851,
+  autorizadoPor: 'Célia dos Santos (irmã)',
+  moderarMensagens: false,
+}
+
+export const memoriais: Memorial[] = [donaNair, joseCarlos, therezinha, antonio]
 
 export function getMemorial(slug?: string): Memorial | undefined {
   if (!slug) return memoriais[0]
   return memoriais.find((m) => m.slug === slug)
+}
+
+/** Publicados do inquilino, mais recentes primeiro. `excluir` remove um slug (página atual). */
+export function publicados(opts?: {
+  limite?: number
+  excluir?: string
+}): Memorial[] {
+  const { limite = 60, excluir } = opts ?? {}
+  return memoriais
+    .filter((m) => m.slug !== excluir)
+    .slice()
+    .sort((a, b) => (a.falecimentoISO < b.falecimentoISO ? 1 : -1))
+    .slice(0, limite)
 }

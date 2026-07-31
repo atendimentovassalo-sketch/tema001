@@ -9,6 +9,7 @@ export interface Funeraria {
   whatsapp: string
   endereco: string | null
   desde: string | null
+  sobre: string | null
   corMarca: string
 }
 
