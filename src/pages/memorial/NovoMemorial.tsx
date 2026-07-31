@@ -1,12 +1,15 @@
 /* Formulário do dono (funerária) para abrir uma nova nota de falecimento.
  * Front-end apenas: valida com zod e mostra toast. Persistência/prévia entram com o backend. */
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import { getMemorial } from './memorial-data'
 import { saveDraft } from './draft'
-import { idadeEm } from './format'
+import { idadeEm, iniciais } from './format'
+import { recortar45 } from './image'
 import type { Evento, Memorial } from './types'
 import './memorial.css'
 
@@ -86,6 +89,35 @@ export default function NovoMemorial() {
   })
 
   const moderar = watch('moderarMensagens')
+  const nomeAtual = watch('nomeCompleto')
+
+  const [foto, setFoto] = useState<string | null>(null)
+  const [fotoProcessando, setFotoProcessando] = useState(false)
+
+  const onFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (!file.type.startsWith('image/')) {
+      toast.error('Selecione um arquivo de imagem.')
+      return
+    }
+    if (file.size > 25 * 1024 * 1024) {
+      toast.error('Imagem muito grande', {
+        description: 'Envie uma foto de até 25 MB.',
+      })
+      return
+    }
+    setFotoProcessando(true)
+    try {
+      setFoto(await recortar45(file))
+    } catch {
+      toast.error('Não foi possível processar a imagem', {
+        description: 'Tente outra foto (JPG ou PNG).',
+      })
+    } finally {
+      setFotoProcessando(false)
+    }
+  }
 
   const onSubmit = (data: NovoForm) => {
     const eventos: Evento[] = []
@@ -116,7 +148,7 @@ export default function NovoMemorial() {
       funeraria: f,
       nomeCompleto: data.nomeCompleto,
       apelido: data.apelido || null,
-      fotoUrl: null,
+      fotoUrl: foto,
       nascimentoISO: data.nascimento || null,
       cidadeNascimento: data.cidadeNascimento || null,
       falecimentoISO: data.falecimento,
@@ -229,6 +261,51 @@ export default function NovoMemorial() {
             {errors.epitafio && (
               <span className="erro">{errors.epitafio.message}</span>
             )}
+          </label>
+
+          {/* Foto — recorte 4:5 no navegador */}
+          <label>
+            <span className="rot">Foto</span>
+            <div className="foto-campo">
+              <div className="foto-previa">
+                {foto ? (
+                  <img src={foto} alt="Prévia da foto" />
+                ) : (
+                  <span className="mono">
+                    {iniciais(nomeAtual || '') || '—'}
+                  </span>
+                )}
+              </div>
+              <div className="foto-acoes">
+                <input
+                  id="foto-input"
+                  type="file"
+                  accept="image/*"
+                  onChange={onFoto}
+                  style={{ display: 'none' }}
+                />
+                <label htmlFor="foto-input" className="foto-btn">
+                  {fotoProcessando
+                    ? 'Processando…'
+                    : foto
+                      ? 'Trocar foto'
+                      : 'Escolher foto'}
+                </label>
+                {foto && (
+                  <button
+                    type="button"
+                    className="foto-btn vazio"
+                    onClick={() => setFoto(null)}
+                  >
+                    Remover
+                  </button>
+                )}
+                <span className="dica">
+                  Recortamos em 4:5 automaticamente. Sem foto, publicamos com as
+                  iniciais.
+                </span>
+              </div>
+            </div>
           </label>
 
           {/* Eventos */}
