@@ -1,0 +1,335 @@
+/* Home v2 da funerária — direção "dignidade calma".
+ * Ordem invertida do mercado: presença e "o que fazer agora" antes de plano.
+ * Front-end apenas; usa a funerária e os publicados do mock. */
+import { useEffect, useRef } from 'react'
+import { Link } from 'react-router-dom'
+import { funeraria, publicados } from './memorial-data'
+import { ddmm } from './format'
+import './homev2.css'
+
+const IMG = (q: string, w = 900, h = 1100, seed = 1) =>
+  `https://img.usecurling.com/p/${w}/${h}?q=${encodeURIComponent(q)}&seed=${seed}`
+
+const SERVICOS = [
+  {
+    t: 'Velório',
+    d: 'Local, ornamentação e estrutura prontos, com a equipe presente o tempo todo.',
+  },
+  {
+    t: 'Sepultamento e cremação',
+    d: 'Conduzimos a escolha e toda a logística, no tempo da sua família.',
+  },
+  {
+    t: 'Traslado',
+    d: 'Transporte com cuidado e respeito, na cidade ou entre cidades.',
+  },
+  {
+    t: 'Documentação',
+    d: 'Cuidamos da papelada e das certidões para você não se preocupar com isso agora.',
+  },
+  {
+    t: 'Flores e homenagens',
+    d: 'Coroas, arranjos e a página de memorial online para quem não pôde vir.',
+  },
+  {
+    t: 'Apoio no luto',
+    d: 'Orientação e encaminhamento para quem precisar de acolhimento depois.',
+  },
+]
+
+function useReveal() {
+  const ref = useRef<HTMLDivElement>(null)
+  useEffect(() => {
+    const root = ref.current
+    if (!root) return
+    const els = root.querySelectorAll<HTMLElement>('.reveal')
+    if (!('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('in'))
+      return
+    }
+    const io = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add('in')
+            io.unobserve(e.target)
+          }
+        })
+      },
+      { threshold: 0.14 },
+    )
+    els.forEach((el) => io.observe(el))
+    return () => io.disconnect()
+  }, [])
+  return ref
+}
+
+export default function HomeV2() {
+  const f = funeraria
+  const ultimos = publicados({ limite: 4 })
+  const root = useReveal()
+
+  useEffect(() => {
+    document.title = `${f.nome} — Funerária 24 horas em ${f.cidade}/${f.uf}`
+  }, [f])
+
+  const telHref = `tel:${f.telefone.replace(/[^0-9+]/g, '')}`
+  const zapHref = `https://wa.me/${f.whatsapp}`
+
+  return (
+    <div className="homev2" ref={root}>
+      {/* barra */}
+      <header className="bar">
+        <div className="bar-in">
+          <Link to="/funeraria-v2" className="brand">
+            {f.nome}
+            <small>
+              {f.cidade} · {f.uf}
+            </small>
+          </Link>
+          <a className="fone" href={telHref}>
+            <em>Atendimento 24 horas</em>
+            <b className="num">{f.telefone}</b>
+          </a>
+        </div>
+      </header>
+
+      {/* HERO */}
+      <section className="hero">
+        <div className="hero-txt reveal">
+          <p className="kicker">
+            {f.cidade} e região{f.desde ? ` · desde ${f.desde}` : ''}
+          </p>
+          <h1>Quando o pior acontece, você não precisa saber o que fazer.</h1>
+          <p className="lede">
+            A gente conduz cada passo — do velório à despedida — e cuida para
+            que reste só o que importa: estar com quem você ama.
+          </p>
+          <div className="ctas">
+            <a className="btn solid" href={telHref}>
+              Ligar agora · 24 horas
+            </a>
+            <a
+              className="btn ghost"
+              href={zapHref}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Falar no WhatsApp
+            </a>
+          </div>
+          <div className="trust">
+            <span>
+              <b></b> Chegamos rápido em {f.cidade}
+            </span>
+            <span>
+              <b></b> A mesma equipe do começo ao fim
+            </span>
+            {f.desde && (
+              <span>
+                <b></b> Na cidade desde {f.desde}
+              </span>
+            )}
+          </div>
+        </div>
+        <div className="hero-img" aria-hidden="true">
+          <img
+            src={IMG(
+              'soft morning light through sheer curtain calm interior',
+              1100,
+              1300,
+              7,
+            )}
+            alt=""
+            loading="eager"
+          />
+        </div>
+      </section>
+
+      {/* O QUE FAZER AGORA */}
+      <section className="blk paper">
+        <div className="container">
+          <div className="reveal">
+            <p className="eyebrow">Acabou de acontecer?</p>
+            <h2>O que fazer agora — em três passos.</h2>
+            <p className="intro">
+              Você não precisa resolver nada sozinho. A partir da sua ligação, o
+              caminho é este:
+            </p>
+          </div>
+          <div className="passos">
+            <div className="passo reveal">
+              <span className="n">01</span>
+              <h3>Você liga</h3>
+              <p>
+                Um número, a qualquer hora do dia ou da noite. Quem atende já
+                sabe o que perguntar — e o que não perguntar.
+              </p>
+            </div>
+            <div className="passo reveal">
+              <span className="n">02</span>
+              <h3>A gente vai até você</h3>
+              <p>
+                Cuidamos da remoção e orientamos os primeiros passos. Você fica
+                com a família; a logística é conosco.
+              </p>
+            </div>
+            <div className="passo reveal">
+              <span className="n">03</span>
+              <h3>Conduzimos tudo</h3>
+              <p>
+                Velório, documentação, sepultamento ou cremação. Você decide o
+                essencial; nós resolvemos o resto.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* OBITUÁRIO RECENTE */}
+      <section className="blk">
+        <div className="container">
+          <div className="reveal">
+            <p className="eyebrow sage">Obituário</p>
+            <h2>Falecimentos recentes</h2>
+            <p className="intro">
+              As últimas notas publicadas. Cada página guarda a homenagem de
+              quem ficou.
+            </p>
+          </div>
+          <div className="lista reveal">
+            {ultimos.map((m) => (
+              <Link key={m.id} to={`/m/${m.slug}`}>
+                <span className="foto">
+                  {m.fotoUrl && <img src={m.fotoUrl} alt="" loading="lazy" />}
+                </span>
+                <span className="nm">{m.nomeCompleto}</span>
+                <span className="dt num">{ddmm(m.falecimentoISO)}</span>
+              </Link>
+            ))}
+          </div>
+          <Link className="vermais" to="/obituario">
+            Ver todo o obituário →
+          </Link>
+        </div>
+      </section>
+
+      {/* QUEM CUIDA DE VOCÊ */}
+      <section className="blk paper">
+        <div className="container">
+          <div className="duo">
+            <div className="col-txt reveal">
+              <p className="eyebrow">Quem cuida de você</p>
+              <h2>Gente da cidade, ao lado da sua família.</h2>
+              {f.sobre && <p className="big">{f.sobre}</p>}
+              <p className="small">
+                Não é um call center. É a equipe que você encontra na rua,
+                atendendo com a discrição e o respeito que este momento pede.
+              </p>
+            </div>
+            <div className="col-img reveal">
+              <img
+                src={IMG(
+                  'two hands holding gently warm natural light care',
+                  1000,
+                  800,
+                  3,
+                )}
+                alt="Mãos que acolhem"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* COMO AJUDAMOS */}
+      <section className="blk">
+        <div className="container">
+          <div className="reveal">
+            <p className="eyebrow sage">Como ajudamos</p>
+            <h2>Tudo o que pesa, a gente carrega junto.</h2>
+          </div>
+          <div className="servs reveal">
+            {SERVICOS.map((s) => (
+              <div className="serv" key={s.t}>
+                <h3>{s.t}</h3>
+                <p>{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* DEPOIMENTO */}
+      <section className="blk paper">
+        <div className="container">
+          <div className="quote reveal">
+            <span className="aspas" aria-hidden="true">
+              &ldquo;
+            </span>
+            <p>
+              Eu não sabia por onde começar. Eles chegaram, cuidaram de cada
+              detalhe, e me deixaram fazer a única coisa que importava: ficar
+              com a minha mãe.
+            </p>
+            <p className="autor">Marcos A. · Catanduvas</p>
+          </div>
+        </div>
+      </section>
+
+      {/* ANTECIPE */}
+      <section className="blk">
+        <div className="container">
+          <div className="antecipe reveal">
+            <div>
+              <p className="eyebrow">Com calma, hoje</p>
+              <h2>Decida agora para que ninguém precise decidir na dor.</h2>
+              <p>
+                Deixar tudo combinado é um gesto de cuidado com quem fica. Sem
+                pressa e sem compromisso — a gente conversa quando você quiser.
+              </p>
+            </div>
+            <div className="side">
+              <a
+                className="btn on-dark"
+                href={zapHref}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Conversar sem compromisso
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* RODAPÉ */}
+      <footer className="rodape">
+        <p className="brand">
+          {f.nome}
+          <small>Atendimento 24 horas</small>
+        </p>
+        <p className="end">
+          {f.endereco}
+          <br />
+          {f.cidade} · {f.uf}
+        </p>
+        <a className="tel-big num" href={telHref}>
+          <small>Ligue a qualquer hora</small>
+          {f.telefone}
+        </a>
+        <div className="zap">
+          <a
+            className="btn on-dark"
+            href={zapHref}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Falar no WhatsApp
+          </a>
+        </div>
+      </footer>
+    </div>
+  )
+}
