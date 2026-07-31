@@ -29,3 +29,6 @@ screenshot.png
 
 # Environment variables
 .env*
+
+# rascunhos de trabalho (não versionar)
+scratchpad/
