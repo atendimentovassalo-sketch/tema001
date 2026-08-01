@@ -3,7 +3,9 @@
 import type { Env } from './types'
 import { tokenAleatorio } from './http'
 
-const ITERACOES = 120_000
+// O Cloudflare Workers limita PBKDF2 a no máximo 100.000 iterações; acima
+// disso o crypto.subtle.deriveBits lança em produção (workerd local não impõe).
+const ITERACOES = 100_000
 const COOKIE = 'sessao'
 
 function hex(buf: ArrayBuffer | Uint8Array): string {
