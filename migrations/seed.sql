@@ -19,9 +19,11 @@ VALUES (
   '#B5623F'
 );
 
--- Admin sem senha ainda: define no 1º acesso (Fase 3).
-INSERT INTO usuario (id, tenant_id, nome, email, papel, ativo)
-VALUES ('u-admin', 't-demo', 'Administrador', 'admin@funerariademonstracao.com.br', 'admin', 1);
+-- Admin sem senha ainda: define no 1º acesso (Fase 3). O convite_token abaixo
+-- é só de DEV (tenant de demonstração); clientes reais recebem token aleatório.
+INSERT INTO usuario (id, tenant_id, nome, email, papel, ativo, convite_token, convite_expira)
+VALUES ('u-admin', 't-demo', 'Administrador', 'admin@funerariademonstracao.com.br',
+  'admin', 1, 'convite-demo-inicial', datetime('now', '+3650 days'));
 
 -- ---- Dona Nair -----------------------------------------------------------
 INSERT INTO memorial (id, tenant_id, slug, nome_completo, apelido, foto_url,

@@ -25,6 +25,19 @@ export interface TenantRow {
   cor_marca: string
 }
 
+export interface UsuarioRow {
+  id: string
+  tenant_id: string
+  nome: string
+  email: string
+  senha_hash: string | null
+  senha_salt: string | null
+  papel: string
+  ativo: number
+  convite_token: string | null
+  convite_expira: string | null
+}
+
 export interface MemorialRow {
   id: string
   tenant_id: string

@@ -2,6 +2,7 @@
 import type {
   Env,
   TenantRow,
+  UsuarioRow,
   MemorialRow,
   EventoRow,
   FotoRow,
@@ -98,6 +99,17 @@ export async function getTenant(
     : 'SELECT * FROM tenant ORDER BY criado_em ASC LIMIT 1'
   const stmt = slug ? env.DB.prepare(sql).bind(slug) : env.DB.prepare(sql)
   return (await stmt.first<TenantRow>()) ?? null
+}
+
+export async function getTenantPorId(
+  env: Env,
+  id: string,
+): Promise<TenantRow | null> {
+  return (
+    (await env.DB.prepare('SELECT * FROM tenant WHERE id = ? LIMIT 1')
+      .bind(id)
+      .first<TenantRow>()) ?? null
+  )
 }
 
 /* ---------- helpers ---------- */
@@ -337,5 +349,421 @@ export async function getMemorialNomeSlug(
     )
       .bind(memorialId)
       .first<{ nome_completo: string; slug: string }>()) ?? null
+  )
+}
+
+/* ===================== AUTENTICAÇÃO ===================== */
+
+export async function getUsuarioPorEmail(
+  env: Env,
+  email: string,
+): Promise<UsuarioRow | null> {
+  return (
+    (await env.DB.prepare(
+      `SELECT * FROM usuario WHERE email = ? AND ativo = 1 LIMIT 1`,
+    )
+      .bind(email.toLowerCase())
+      .first<UsuarioRow>()) ?? null
+  )
+}
+
+export async function getUsuarioPorConvite(
+  env: Env,
+  token: string,
+): Promise<UsuarioRow | null> {
+  return (
+    (await env.DB.prepare(
+      `SELECT * FROM usuario WHERE convite_token = ? AND ativo = 1 LIMIT 1`,
+    )
+      .bind(token)
+      .first<UsuarioRow>()) ?? null
+  )
+}
+
+export async function definirSenhaUsuario(
+  env: Env,
+  id: string,
+  hash: string,
+  salt: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE usuario SET senha_hash = ?, senha_salt = ?, convite_token = NULL,
+     convite_expira = NULL WHERE id = ?`,
+  )
+    .bind(hash, salt, id)
+    .run()
+}
+
+export async function registrarAcesso(env: Env, id: string): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE usuario SET ultimo_acesso = datetime('now') WHERE id = ?`,
+  )
+    .bind(id)
+    .run()
+}
+
+export async function inserirSessao(
+  env: Env,
+  token: string,
+  usuarioId: string,
+  tenantId: string,
+  expiraISO: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO sessao (id, usuario_id, tenant_id, expira_em) VALUES (?, ?, ?, ?)`,
+  )
+    .bind(token, usuarioId, tenantId, expiraISO)
+    .run()
+}
+
+export interface SessaoUsuario {
+  usuarioId: string
+  tenantId: string
+  nome: string
+  email: string
+  papel: string
+}
+
+/** Sessão válida (não expirada) + dados do usuário, ou null. */
+export async function getSessaoComUsuario(
+  env: Env,
+  token: string,
+): Promise<SessaoUsuario | null> {
+  const row = await env.DB.prepare(
+    `SELECT u.id AS usuarioId, u.tenant_id AS tenantId, u.nome, u.email, u.papel
+     FROM sessao s JOIN usuario u ON u.id = s.usuario_id
+     WHERE s.id = ? AND s.expira_em > datetime('now') AND u.ativo = 1 LIMIT 1`,
+  )
+    .bind(token)
+    .first<SessaoUsuario>()
+  return row ?? null
+}
+
+export async function deletarSessao(env: Env, token: string): Promise<void> {
+  await env.DB.prepare(`DELETE FROM sessao WHERE id = ?`).bind(token).run()
+}
+
+/* ===================== ADMIN: MEMORIAIS ===================== */
+
+export interface MemorialAdminItem {
+  id: string
+  slug: string
+  nomeCompleto: string
+  fotoUrl: string | null
+  falecimentoISO: string
+  status: string
+  visitas: number
+  pendentes: number
+}
+
+export async function listMemoriaisAdmin(
+  env: Env,
+  tenantId: string,
+): Promise<MemorialAdminItem[]> {
+  const rows = await env.DB.prepare(
+    `SELECT m.id, m.slug, m.nome_completo, m.foto_url, m.falecimento_iso,
+            m.status, m.visitas,
+            (SELECT count(*) FROM homenagem h
+              WHERE h.memorial_id = m.id AND h.status = 'pendente') AS pendentes
+     FROM memorial m WHERE m.tenant_id = ?
+     ORDER BY m.criado_em DESC`,
+  )
+    .bind(tenantId)
+    .all<{
+      id: string
+      slug: string
+      nome_completo: string
+      foto_url: string | null
+      falecimento_iso: string
+      status: string
+      visitas: number
+      pendentes: number
+    }>()
+  return rows.results.map((r) => ({
+    id: r.id,
+    slug: r.slug,
+    nomeCompleto: r.nome_completo,
+    fotoUrl: r.foto_url,
+    falecimentoISO: r.falecimento_iso,
+    status: r.status,
+    visitas: r.visitas,
+    pendentes: r.pendentes,
+  }))
+}
+
+export async function getMemorialAdmin(
+  env: Env,
+  tenant: TenantRow,
+  id: string,
+): Promise<MemorialDTO | null> {
+  const m = await env.DB.prepare(
+    `SELECT * FROM memorial WHERE tenant_id = ? AND id = ? LIMIT 1`,
+  )
+    .bind(tenant.id, id)
+    .first<MemorialRow>()
+  if (!m) return null
+  const rel = await carregarRelacionados(env, [m.id])
+  return toMemorialDTO(
+    m,
+    toFunerariaDTO(tenant),
+    rel.eventos.get(m.id) ?? [],
+    rel.fotos.get(m.id) ?? [],
+    [],
+  )
+}
+
+export interface DadosMemorial {
+  nomeCompleto: string
+  apelido: string | null
+  fotoUrl: string | null
+  nascimentoISO: string | null
+  cidadeNascimento: string | null
+  falecimentoISO: string
+  cidadeFalecimento: string | null
+  idade: number | null
+  epitafio: string | null
+  historia: string | null
+  autorizadoPor: string | null
+  moderarMensagens: boolean
+  eventos: {
+    tipo: string
+    localNome: string
+    endereco: string | null
+    inicioISO: string | null
+    horarioConfirmado: boolean
+  }[]
+  fotos: { url: string; alt: string | null }[]
+}
+
+function slugify(s: string): string {
+  return s
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 80)
+}
+
+async function slugUnico(
+  env: Env,
+  tenantId: string,
+  base: string,
+  ignorarId?: string,
+): Promise<string> {
+  const raiz = slugify(base) || 'memorial'
+  let slug = raiz
+  let n = 1
+  for (;;) {
+    const existe = await env.DB.prepare(
+      `SELECT id FROM memorial WHERE tenant_id = ? AND slug = ? AND id != ? LIMIT 1`,
+    )
+      .bind(tenantId, slug, ignorarId ?? '')
+      .first()
+    if (!existe) return slug
+    n += 1
+    slug = `${raiz}-${n}`
+  }
+}
+
+async function gravarEventosFotos(
+  env: Env,
+  memorialId: string,
+  d: DadosMemorial,
+): Promise<void> {
+  await env.DB.prepare(`DELETE FROM evento WHERE memorial_id = ?`)
+    .bind(memorialId)
+    .run()
+  await env.DB.prepare(`DELETE FROM foto WHERE memorial_id = ?`)
+    .bind(memorialId)
+    .run()
+  const stmts: D1PreparedStatement[] = []
+  d.eventos.forEach((e, i) => {
+    stmts.push(
+      env.DB.prepare(
+        `INSERT INTO evento (id, memorial_id, tipo, local_nome, endereco, inicio_iso, horario_confirmado, ordem)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      ).bind(
+        crypto.randomUUID(),
+        memorialId,
+        e.tipo,
+        e.localNome,
+        e.endereco,
+        e.inicioISO,
+        e.horarioConfirmado ? 1 : 0,
+        i,
+      ),
+    )
+  })
+  d.fotos.forEach((f, i) => {
+    stmts.push(
+      env.DB.prepare(
+        `INSERT INTO foto (id, memorial_id, url, alt, ordem) VALUES (?, ?, ?, ?, ?)`,
+      ).bind(crypto.randomUUID(), memorialId, f.url, f.alt, i),
+    )
+  })
+  if (stmts.length) await env.DB.batch(stmts)
+}
+
+export async function inserirMemorial(
+  env: Env,
+  tenantId: string,
+  d: DadosMemorial,
+): Promise<{ id: string; slug: string }> {
+  const id = crypto.randomUUID()
+  const slug = await slugUnico(env, tenantId, d.nomeCompleto)
+  await env.DB.prepare(
+    `INSERT INTO memorial (id, tenant_id, slug, nome_completo, apelido, foto_url,
+      nascimento_iso, cidade_nascimento, falecimento_iso, cidade_falecimento, idade,
+      epitafio, historia, autorizado_por, moderar_mensagens, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'rascunho')`,
+  )
+    .bind(
+      id,
+      tenantId,
+      slug,
+      d.nomeCompleto,
+      d.apelido,
+      d.fotoUrl,
+      d.nascimentoISO,
+      d.cidadeNascimento,
+      d.falecimentoISO,
+      d.cidadeFalecimento,
+      d.idade,
+      d.epitafio,
+      d.historia,
+      d.autorizadoPor,
+      d.moderarMensagens ? 1 : 0,
+    )
+    .run()
+  await gravarEventosFotos(env, id, d)
+  return { id, slug }
+}
+
+export async function atualizarMemorial(
+  env: Env,
+  tenantId: string,
+  id: string,
+  d: DadosMemorial,
+): Promise<string | null> {
+  const existe = await env.DB.prepare(
+    `SELECT id FROM memorial WHERE tenant_id = ? AND id = ? LIMIT 1`,
+  )
+    .bind(tenantId, id)
+    .first()
+  if (!existe) return null
+  const slug = await slugUnico(env, tenantId, d.nomeCompleto, id)
+  await env.DB.prepare(
+    `UPDATE memorial SET slug = ?, nome_completo = ?, apelido = ?, foto_url = ?,
+      nascimento_iso = ?, cidade_nascimento = ?, falecimento_iso = ?,
+      cidade_falecimento = ?, idade = ?, epitafio = ?, historia = ?,
+      autorizado_por = ?, moderar_mensagens = ? WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(
+      slug,
+      d.nomeCompleto,
+      d.apelido,
+      d.fotoUrl,
+      d.nascimentoISO,
+      d.cidadeNascimento,
+      d.falecimentoISO,
+      d.cidadeFalecimento,
+      d.idade,
+      d.epitafio,
+      d.historia,
+      d.autorizadoPor,
+      d.moderarMensagens ? 1 : 0,
+      tenantId,
+      id,
+    )
+    .run()
+  await gravarEventosFotos(env, id, d)
+  return slug
+}
+
+export async function publicarMemorial(
+  env: Env,
+  tenantId: string,
+  id: string,
+  publicar: boolean,
+): Promise<boolean> {
+  const novo = publicar ? 'publicado' : 'rascunho'
+  const r = await env.DB.prepare(
+    `UPDATE memorial SET status = ?,
+      publicado_em = CASE WHEN ? = 'publicado' THEN datetime('now') ELSE publicado_em END
+     WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(novo, novo, tenantId, id)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+export async function deletarMemorial(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `DELETE FROM memorial WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(tenantId, id)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+/* ===================== ADMIN: MODERAÇÃO ===================== */
+
+export interface HomenagemPendente {
+  id: string
+  nome: string
+  texto: string | null
+  vela: boolean
+  criadoEmISO: string
+  memorialSlug: string
+  memorialNome: string
+}
+
+export async function listHomenagensPendentes(
+  env: Env,
+  tenantId: string,
+): Promise<HomenagemPendente[]> {
+  const rows = await env.DB.prepare(
+    `SELECT h.id, h.nome, h.texto, h.vela, h.criado_em, m.slug AS mslug, m.nome_completo AS mnome
+     FROM homenagem h JOIN memorial m ON m.id = h.memorial_id
+     WHERE h.tenant_id = ? AND h.status = 'pendente'
+     ORDER BY h.criado_em ASC`,
+  )
+    .bind(tenantId)
+    .all<{
+      id: string
+      nome: string
+      texto: string | null
+      vela: number
+      criado_em: string
+      mslug: string
+      mnome: string
+    }>()
+  return rows.results.map((r) => ({
+    id: r.id,
+    nome: r.nome,
+    texto: r.texto,
+    vela: !!r.vela,
+    criadoEmISO: r.criado_em,
+    memorialSlug: r.mslug,
+    memorialNome: r.mnome,
+  }))
+}
+
+export async function getHomenagemDoTenant(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<{ id: string } | null> {
+  return (
+    (await env.DB.prepare(
+      `SELECT id FROM homenagem WHERE tenant_id = ? AND id = ? LIMIT 1`,
+    )
+      .bind(tenantId, id)
+      .first<{ id: string }>()) ?? null
   )
 }
