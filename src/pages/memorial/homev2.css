@@ -714,6 +714,20 @@
 .homev2 .rodape .zap {
   margin-top: 26px;
 }
+.homev2 .rodape-legal {
+  margin-top: 34px;
+  font-family: var(--sans);
+  font-size: 0.76rem;
+  letter-spacing: 0.02em;
+  opacity: 0.62;
+}
+.homev2 .rodape-legal a {
+  color: var(--gold);
+  text-decoration: none;
+}
+.homev2 .rodape-legal a:hover {
+  text-decoration: underline;
+}
 
 /* CTA fixo no rodapé — só no mobile (o herói sai da tela ao rolar) */
 .homev2 .mobicta {

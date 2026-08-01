@@ -402,6 +402,11 @@ export default function HomeV2() {
             Falar no WhatsApp
           </a>
         </div>
+        <p className="rodape-legal">
+          <Link to="/privacidade">Política de Privacidade</Link>
+          <span aria-hidden="true"> · </span>
+          <Link to="/termos">Termos de Uso</Link>
+        </p>
       </footer>
 
       {/* CTA fixo no mobile — o herói some ao rolar; mantém a ação à mão */}

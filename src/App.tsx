@@ -15,6 +15,8 @@ import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
 import HomeV2 from './pages/memorial/HomeV2'
 import AdminLogin from './pages/admin/Login'
 import AdminPainel from './pages/admin/Painel'
+import Privacidade from './pages/legal/Privacidade'
+import Termos from './pages/legal/Termos'
 
 // ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
 // AVOID REMOVING ANY CONTEXT PROVIDERS FROM THIS FILE (e.g. TooltipProvider, Toaster, Sonner)
@@ -42,6 +44,9 @@ const App = () => (
         {/* Painel administrativo da funerária */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminPainel />} />
+        {/* Páginas legais (LGPD) */}
+        <Route path="/privacidade" element={<Privacidade />} />
+        <Route path="/termos" element={<Termos />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>

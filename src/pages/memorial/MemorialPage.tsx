@@ -1,6 +1,6 @@
 /* Página pública do memorial. Front-end apenas: estado local + mock, sem backend. */
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
@@ -488,6 +488,14 @@ export default function MemorialPage({
               {memorial.moderarMensagens
                 ? 'A mensagem aparece assim que a família confirmar — costuma levar poucos minutos. A vela é registrada na hora.'
                 : 'Sua homenagem aparece na hora. Contamos com o respeito de todos neste momento.'}
+            </p>
+            <p className="mod">
+              Ao enviar, você concorda com a exibição da sua homenagem nesta
+              página, conforme a{' '}
+              <Link to="/privacidade" style={{ color: 'var(--brass-e)' }}>
+                Política de Privacidade
+              </Link>
+              .
             </p>
           </form>
         </section>
