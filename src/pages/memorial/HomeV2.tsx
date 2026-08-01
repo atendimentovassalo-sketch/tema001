@@ -310,6 +310,10 @@ export default function HomeV2() {
                 )}
                 alt="Mãos que acolhem"
                 loading="lazy"
+                onError={(e) => {
+                  // se o serviço de imagem falhar, some e fica o gradiente quente
+                  e.currentTarget.style.display = 'none'
+                }}
               />
             </div>
           </div>
