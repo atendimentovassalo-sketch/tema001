@@ -98,7 +98,9 @@ export default function HomeV2() {
       <section className="hero">
         <div className="hero-txt reveal">
           <p className="kicker">
-            {f.cidade} e região{f.desde ? ` · desde ${f.desde}` : ''}
+            {f.desde
+              ? `Ao lado das famílias de ${f.cidade} desde ${f.desde}`
+              : `${f.cidade} e região`}
           </p>
           <h1>Quando o pior acontece, você não precisa saber o que fazer.</h1>
           <p className="lede">
