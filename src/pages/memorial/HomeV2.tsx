@@ -410,6 +410,8 @@ export default function HomeV2() {
           <Link to="/privacidade">Política de Privacidade</Link>
           <span aria-hidden="true"> · </span>
           <Link to="/termos">Termos de Uso</Link>
+          <span aria-hidden="true"> · </span>
+          <Link to="/admin/login">Acesso da funerária</Link>
         </p>
       </footer>
 
