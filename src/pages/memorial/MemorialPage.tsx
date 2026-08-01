@@ -220,7 +220,8 @@ export default function MemorialPage({
         </div>
       </section>
 
-      <div className="corpo">
+      <div className="corpo corpo-mem">
+        <div className="corpo-cols">
         {/* contador */}
         <div className="contador">
           <div>
@@ -237,6 +238,50 @@ export default function MemorialPage({
           </div>
         </div>
 
+        {/* rail lateral: informação operacional (o motivo da visita) fica
+            sempre à vista — sticky no desktop, no topo do fluxo no mobile */}
+        <aside className="corpo-side">
+          <section className="sec">
+            <h2 className="eti">Onde e quando</h2>
+            <div className="placa">
+              <div className="placa-in">
+                {memorial.eventos.map((e) => (
+                  <div className="fato" key={e.id}>
+                    <h3>{ROT[e.tipo] ?? e.tipo}</h3>
+                    <p className="onde">{e.localNome}</p>
+                    {e.endereco && <p className="end">{e.endereco}</p>}
+                    <p
+                      className={`quando${e.horarioConfirmado && e.inicioISO ? '' : ' pend'}`}
+                    >
+                      {e.horarioConfirmado && e.inicioISO
+                        ? dataHoraBR(e.inicioISO)
+                        : 'Horário a confirmar'}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {velorio && (
+              <a
+                className="acao"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                  [velorio.localNome, velorio.endereco]
+                    .filter(Boolean)
+                    .join(', '),
+                )}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Como chegar ao velório
+              </a>
+            )}
+            <a className="acao vazia" href="#homenagear">
+              Acender uma vela
+            </a>
+          </section>
+        </aside>
+
+        <div className="corpo-main">
         {/* nascimento / falecimento */}
         <section className="sec">
           <h2 className="eti">Nascimento e falecimento</h2>
@@ -300,43 +345,6 @@ export default function MemorialPage({
             </div>
           </section>
         )}
-
-        {/* onde e quando */}
-        <section className="sec">
-          <h2 className="eti">Onde e quando</h2>
-          <div className="placa">
-            <div className="placa-in">
-              {memorial.eventos.map((e) => (
-                <div className="fato" key={e.id}>
-                  <h3>{ROT[e.tipo] ?? e.tipo}</h3>
-                  <p className="onde">{e.localNome}</p>
-                  {e.endereco && <p className="end">{e.endereco}</p>}
-                  <p
-                    className={`quando${e.horarioConfirmado && e.inicioISO ? '' : ' pend'}`}
-                  >
-                    {e.horarioConfirmado && e.inicioISO
-                      ? dataHoraBR(e.inicioISO)
-                      : 'Horário a confirmar'}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-          {velorio && (
-            <a
-              className="acao"
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                [velorio.localNome, velorio.endereco]
-                  .filter(Boolean)
-                  .join(', '),
-              )}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              Como chegar ao velório
-            </a>
-          )}
-        </section>
 
         {/* comunidade — feed único de homenagens.
             Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
@@ -470,6 +478,8 @@ export default function MemorialPage({
           </a>{' '}
           — corrigimos em minutos.
         </p>
+        </div>
+        </div>
       </div>
 
       {/* rodapé com linha de autorização */}

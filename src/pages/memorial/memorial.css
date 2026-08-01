@@ -282,6 +282,43 @@
 .memorial-root .sec {
   padding: 58px 0 0;
 }
+
+/* Memorial em 2 colunas no desktop: narrativa à esquerda, rail operacional
+   sticky à direita ("Onde e quando" + ações) — o motivo da visita não some
+   ao rolar. No mobile tudo empilha na ordem natural. */
+@media (min-width: 1024px) {
+  .memorial-root .corpo-mem {
+    max-width: 1080px;
+  }
+  .memorial-root .corpo-cols {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    grid-template-areas:
+      'contador side'
+      'main     side';
+    column-gap: 52px;
+    align-items: start;
+  }
+  .memorial-root .corpo-cols > .contador {
+    grid-area: contador;
+    margin: 0;
+    max-width: none;
+  }
+  .memorial-root .corpo-cols > .corpo-side {
+    grid-area: side;
+    position: sticky;
+    top: 24px;
+    align-self: start;
+  }
+  .memorial-root .corpo-cols > .corpo-main {
+    grid-area: main;
+    min-width: 0;
+  }
+  /* no rail, o cartão encosta no topo (sem o respiro de seção) */
+  .memorial-root .corpo-side .sec {
+    padding-top: 0;
+  }
+}
 .memorial-root .sec > h2.eti {
   color: var(--brass-e);
   display: block;
