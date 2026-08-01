@@ -1,4 +1,11 @@
 /* Helpers de formatação em pt-BR (America/Sao_Paulo). */
+import type { Memorial } from './types'
+
+/** Retrato canônico de um memorial: foto principal → primeira foto do álbum →
+ * null (chamador cai para as iniciais). Evita retrato vazio numa página de luto. */
+export function retratoDe(m: Pick<Memorial, 'fotoUrl' | 'fotos'>): string | null {
+  return m.fotoUrl ?? m.fotos?.[0]?.url ?? null
+}
 
 const MESES = [
   'janeiro',

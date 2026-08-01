@@ -12,6 +12,7 @@ import {
   dataHoraBR,
   dataLongaBR,
   iniciais,
+  retratoDe,
   tempoRelativo,
 } from './format'
 import './memorial.css'
@@ -189,8 +190,8 @@ export default function MemorialPage({
         <p className="eti2">Em memória de</p>
         <div className="moldura">
           <div className="janela">
-            {memorial.fotoUrl ? (
-              <img src={memorial.fotoUrl} alt={memorial.nomeCompleto} />
+            {retratoDe(memorial) ? (
+              <img src={retratoDe(memorial)!} alt={memorial.nomeCompleto} />
             ) : (
               <span className="mono">{iniciais(memorial.nomeCompleto)}</span>
             )}

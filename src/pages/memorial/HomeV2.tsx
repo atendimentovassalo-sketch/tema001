@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { funeraria, publicados } from './memorial-data'
-import { ddmm } from './format'
+import { ddmm, iniciais, retratoDe } from './format'
 import './homev2.css'
 
 const IMG = (q: string, w = 900, h = 1100, seed = 1) =>
@@ -201,7 +201,13 @@ export default function HomeV2() {
             {ultimos.map((m) => (
               <Link key={m.id} to={`/m/${m.slug}`}>
                 <span className="foto">
-                  {m.fotoUrl && <img src={m.fotoUrl} alt="" loading="lazy" />}
+                  {retratoDe(m) ? (
+                    <img src={retratoDe(m)!} alt="" loading="lazy" />
+                  ) : (
+                    <span className="ini" aria-hidden="true">
+                      {iniciais(m.nomeCompleto)}
+                    </span>
+                  )}
                 </span>
                 <span className="nm">{m.nomeCompleto}</span>
                 <span className="dt num">{ddmm(m.falecimentoISO)}</span>
