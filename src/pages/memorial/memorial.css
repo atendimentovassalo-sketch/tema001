@@ -823,14 +823,19 @@
   font-size: 0.74rem;
   margin-top: 6px;
 }
+/* Nota de conferência: cartão calmo com moldura fina — sem a barra-acento
+   lateral grossa (tell de UI gerada por IA). O destaque vem do <b> em verde. */
 .memorial-root .aviso {
   background: var(--vellum);
-  border-left: 3px solid var(--brass-e);
+  border: 1px solid var(--linha);
   padding: 18px 20px;
   margin-top: 26px;
   font-family: var(--a);
   font-size: 0.82rem;
   line-height: 1.7;
+}
+.memorial-root .aviso b {
+  color: var(--brass-e);
 }
 .memorial-root .mod {
   font-family: var(--a);
