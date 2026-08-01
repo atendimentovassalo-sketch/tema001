@@ -22,10 +22,17 @@ import { recortar45 } from './image'
 import type { Funeraria } from './types'
 import './memorial.css'
 
-/** Converte data URL (JPEG do recorte) em Blob para upload. */
-async function dataUrlParaBlob(dataUrl: string): Promise<Blob> {
-  const res = await fetch(dataUrl)
-  return res.blob()
+/** Converte data URL (JPEG do recorte) em Blob SEM fetch — a CSP
+ * (connect-src 'self') bloqueia fetch de data: URL. Decodifica o base64. */
+function dataUrlParaBlob(dataUrl: string): Blob {
+  const virgula = dataUrl.indexOf(',')
+  const cabecalho = dataUrl.slice(0, virgula)
+  const base64 = dataUrl.slice(virgula + 1)
+  const mime = cabecalho.match(/data:([^;]+)/)?.[1] ?? 'image/jpeg'
+  const bin = atob(base64)
+  const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+  return new Blob([bytes], { type: mime })
 }
 
 /** Recorta a hora "datetime-local" (sem timezone) mantendo o valor local. */
