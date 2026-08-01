@@ -6,6 +6,8 @@ import {
   getMemorialAdmin,
   atualizarMemorial,
   deletarMemorial,
+  getUrlsFotosMemorial,
+  apagarFotosR2,
 } from '../../../_lib/db'
 import { memorialInputSchema } from '../../../_lib/schemas'
 import { json, erro, lerJson } from '../../../_lib/http'
@@ -53,8 +55,13 @@ export const onRequestDelete: PagesFunction<Env, 'id', AdminData> = async ({
   env,
   params,
   data,
+  waitUntil,
 }) => {
-  const ok = await deletarMemorial(env, data.sessao.tenantId, String(params.id))
+  const id = String(params.id)
+  // remove as fotos do R2 junto (direito à exclusão — LGPD)
+  const urls = await getUrlsFotosMemorial(env, data.sessao.tenantId, id)
+  const ok = await deletarMemorial(env, data.sessao.tenantId, id)
   if (!ok) return erro('Memorial não encontrado.', 404)
+  waitUntil(apagarFotosR2(env, urls))
   return json({ ok: true })
 }

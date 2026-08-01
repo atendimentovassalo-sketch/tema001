@@ -698,6 +698,26 @@ export async function publicarMemorial(
   return (r.meta.changes ?? 0) > 0
 }
 
+/** URLs de foto (principal + álbum) de um memorial, para limpeza no R2. */
+export async function getUrlsFotosMemorial(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<string[]> {
+  const urls: string[] = []
+  const m = await env.DB.prepare(
+    `SELECT foto_url FROM memorial WHERE tenant_id = ? AND id = ? LIMIT 1`,
+  )
+    .bind(tenantId, id)
+    .first<{ foto_url: string | null }>()
+  if (m?.foto_url) urls.push(m.foto_url)
+  const fotos = await env.DB.prepare(`SELECT url FROM foto WHERE memorial_id = ?`)
+    .bind(id)
+    .all<{ url: string }>()
+  for (const f of fotos.results) urls.push(f.url)
+  return urls
+}
+
 export async function deletarMemorial(
   env: Env,
   tenantId: string,
@@ -709,6 +729,15 @@ export async function deletarMemorial(
     .bind(tenantId, id)
     .run()
   return (r.meta.changes ?? 0) > 0
+}
+
+/** Remove objetos do R2 a partir das URLs /api/fotos/<key>. */
+export async function apagarFotosR2(env: Env, urls: string[]): Promise<void> {
+  const chaves = urls
+    .filter((u) => u.startsWith('/api/fotos/'))
+    .map((u) => u.slice('/api/fotos/'.length))
+    .filter((k) => /^[a-zA-Z0-9._-]+$/.test(k))
+  await Promise.all(chaves.map((k) => env.PHOTOS.delete(k)))
 }
 
 /* ===================== ADMIN: MODERAÇÃO ===================== */
