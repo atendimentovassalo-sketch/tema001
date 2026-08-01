@@ -9,7 +9,7 @@ pages_build_output_dir = "dist"
 [[d1_databases]]
 binding = "DB"
 database_name = "funeraria-db"
-database_id = "00000000-0000-0000-0000-000000000000"
+database_id = "984b139e-7859-460d-826d-ec32ed288a3d"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
