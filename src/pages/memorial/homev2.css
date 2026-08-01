@@ -323,10 +323,32 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
   }
+  /* fio condutor: preenche o vão entre os topos, ligando 01→02→03 */
+  .homev2 .passos .passo:not(:first-child)::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -30px;
+    width: 30px;
+    height: 2px;
+    background: var(--sage);
+  }
 }
 .homev2 .passo {
+  position: relative;
   padding-top: 26px;
   border-top: 2px solid var(--sage);
+}
+/* nó do fio condutor em cada passo (losango — vocabulário da marca) */
+.homev2 .passo::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  background: var(--sage);
+  transform: rotate(45deg);
 }
 .homev2 .passo .n {
   font-family: var(--serif);
