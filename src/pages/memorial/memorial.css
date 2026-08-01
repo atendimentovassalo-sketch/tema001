@@ -880,6 +880,122 @@
   line-height: 1.7;
 }
 
+/* obituário em grade (página /obituario) */
+.memorial-root .obit-corpo {
+  max-width: 1120px;
+}
+.memorial-root .obit-busca {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 42px 0 8px;
+}
+.memorial-root .obit-busca input {
+  flex: 1 1 260px;
+  max-width: 420px;
+  font-family: var(--g);
+  font-size: 1.02rem;
+  padding: 13px 16px;
+  min-height: 52px;
+  border: 1px solid var(--linha);
+  border-radius: 2px;
+  background: var(--vellum);
+  color: var(--ink);
+}
+.memorial-root .obit-contagem {
+  font-family: var(--a);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+}
+.memorial-root .obit-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px 18px;
+  margin: 26px 0 8px;
+}
+@media (min-width: 620px) {
+  .memorial-root .obit-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (min-width: 900px) {
+  .memorial-root .obit-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+.memorial-root .obit-card {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+}
+.memorial-root .obit-foto {
+  position: relative;
+  aspect-ratio: 4/5;
+  background: linear-gradient(168deg, #d9d8d1, #b9bab2 60%, #a7a8a0);
+  border: 1px solid var(--linha);
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+}
+.memorial-root .obit-foto img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .memorial-root .obit-foto img {
+    transition: transform var(--t);
+  }
+  .memorial-root .obit-card:hover .obit-foto img {
+    transform: scale(1.03);
+  }
+}
+.memorial-root .obit-foto .ini {
+  font-family: var(--g);
+  font-size: 2rem;
+  letter-spacing: 0.08em;
+  color: #6c6e67;
+}
+.memorial-root .velhoje {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: var(--a);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--vellum);
+  background: var(--marca);
+  padding: 5px 9px;
+  border-radius: 2px;
+}
+.memorial-root .obit-nome {
+  font-size: 1.16rem;
+  line-height: 1.25;
+  margin-top: 13px;
+}
+.memorial-root .obit-datas {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  opacity: 0.72;
+  margin-top: 5px;
+}
+.memorial-root .obit-falec {
+  font-family: var(--a);
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  margin-top: 3px;
+}
+
 /* rodapé */
 .memorial-root .rodape {
   background: var(--ink);
