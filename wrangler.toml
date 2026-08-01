@@ -1,0 +1,17 @@
+# Configuração Cloudflare Pages + Functions (backend do SaaS de funerárias).
+# database_id/bucket_name reais são preenchidos no go-live (Fase 7); em dev
+# tudo roda local (miniflare/workerd), sem tocar a conta Cloudflare.
+name = "tema001"
+compatibility_date = "2026-08-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "dist"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "funeraria-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "funeraria-fotos"

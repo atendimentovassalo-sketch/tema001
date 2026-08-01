@@ -32,3 +32,7 @@ screenshot.png
 
 # rascunhos de trabalho (não versionar)
 scratchpad/
+
+# Cloudflare / wrangler — estado local do D1/R2, não versionar
+.wrangler/
+.dev.vars

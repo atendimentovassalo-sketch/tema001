@@ -8,6 +8,14 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: '::',
     port: 8080,
+    // Em dev, o front (Vite/8080) fala com a API das Pages Functions servida
+    // pelo `wrangler pages dev` (8788). Em produção /api é mesma origem.
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:8788',
+        changeOrigin: true,
+      },
+    },
   },
   experimental: {
     enableNativePlugin: true
