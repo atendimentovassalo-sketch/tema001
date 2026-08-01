@@ -2,10 +2,6 @@
  * pela funerária antes de ir ao ar (razão social, CNPJ, contato do DPO). */
 import LegalLayout from './LegalLayout'
 
-const PH = ({ children }: { children: string }) => (
-  <span className="legal-ph">{children}</span>
-)
-
 export default function Privacidade() {
   return (
     <LegalLayout titulo="Política de Privacidade" atualizadoEm="agosto de 2026">
@@ -20,10 +16,11 @@ export default function Privacidade() {
         <span className="legal-n">1.</span> Quem é o controlador
       </h2>
       <p>
-        O controlador dos dados é <PH>[RAZÃO SOCIAL DA FUNERÁRIA]</PH>, inscrita
-        no CNPJ sob nº <PH>[CNPJ]</PH>, com sede em <PH>[ENDEREÇO COMPLETO]</PH>.
-        Para assuntos de privacidade, fale com o Encarregado (DPO) pelo e-mail{' '}
-        <PH>[E-MAIL DO DPO]</PH>.
+        O controlador dos dados é Carvalho &amp; Borak Ltda (Funerária São
+        Francisco), inscrita no CNPJ sob nº 79.036.497/0001-58, com sede na
+        Avenida Adolfo Chagas, 401 — Centro, Catanduvas/PR, CEP 85.470-000. Para
+        assuntos de privacidade, fale com o Encarregado (DPO) pelo e-mail{' '}
+        equipeavassaladora@gmail.com.
       </p>
 
       <h2>
@@ -115,7 +112,7 @@ export default function Privacidade() {
         acesso, correção, anonimização, portabilidade, informação sobre
         compartilhamento e a exclusão de dados tratados com base no
         consentimento, além de revogar o consentimento. Para exercer, escreva
-        para <PH>[E-MAIL DO DPO]</PH>.
+        para equipeavassaladora@gmail.com.
       </p>
 
       <h2>
@@ -144,11 +141,6 @@ export default function Privacidade() {
         Mudanças relevantes serão sinalizadas no site.
       </p>
 
-      <p className="legal-nota">
-        <b>Modelo para revisão jurídica.</b> Este texto é um ponto de partida
-        adequado à LGPD e deve ser revisado por advogado e ter os campos
-        destacados preenchidos antes da publicação definitiva.
-      </p>
     </LegalLayout>
   )
 }

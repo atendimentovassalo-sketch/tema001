@@ -1,17 +1,14 @@
 /* Termos de Uso. Campos entre destaque são preenchidos pela funerária. */
 import LegalLayout from './LegalLayout'
 
-const PH = ({ children }: { children: string }) => (
-  <span className="legal-ph">{children}</span>
-)
-
 export default function Termos() {
   return (
     <LegalLayout titulo="Termos de Uso" atualizadoEm="agosto de 2026">
       <p>
         Estes Termos regem o uso deste site de memorial e obituário, mantido por{' '}
-        <PH>[RAZÃO SOCIAL DA FUNERÁRIA]</PH> (CNPJ <PH>[CNPJ]</PH>). Ao acessar
-        ou usar o site, você concorda com estas condições.
+        Carvalho &amp; Borak Ltda (Funerária São Francisco), CNPJ
+        79.036.497/0001-58. Ao acessar ou usar o site, você concorda com estas
+        condições.
       </p>
 
       <h2>
@@ -101,21 +98,16 @@ export default function Termos() {
       </h2>
       <p>
         Podemos atualizar estes Termos; a data no topo indica a última revisão.
-        Dúvidas podem ser enviadas para <PH>[E-MAIL DE CONTATO]</PH>.
+        Dúvidas podem ser enviadas para equipeavassaladora@gmail.com.
       </p>
 
       <h2>
         <span className="legal-n">10.</span> Lei aplicável e foro
       </h2>
       <p>
-        Aplica-se a legislação brasileira. Fica eleito o foro da comarca de{' '}
-        <PH>[COMARCA/CIDADE]</PH>, salvo disposição legal em contrário que
+        Aplica-se a legislação brasileira. Fica eleito o foro da comarca de
+        Catanduvas, Estado do Paraná, salvo disposição legal em contrário que
         favoreça o consumidor.
-      </p>
-
-      <p className="legal-nota">
-        <b>Modelo para revisão jurídica.</b> Revise com advogado e preencha os
-        campos destacados antes de publicar.
       </p>
     </LegalLayout>
   )
