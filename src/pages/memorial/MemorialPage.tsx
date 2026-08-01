@@ -5,7 +5,8 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { getMemorial } from './memorial-data'
+import { fetchMemorial, enviarHomenagem } from './api'
+import { ApiError } from '@/lib/api'
 import type { Homenagem, Memorial } from './types'
 import {
   anoBR,
@@ -54,12 +55,39 @@ export default function MemorialPage({
 } = {}) {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const memorial = memorialOverride ?? getMemorial(slug)
-
+  const [memorial, setMemorial] = useState<Memorial | null>(
+    memorialOverride ?? null,
+  )
+  const [carregando, setCarregando] = useState(!memorialOverride)
   const [homenagens, setHomenagens] = useState<Homenagem[]>(
-    memorial?.homenagens ?? [],
+    memorialOverride?.homenagens ?? [],
   )
   const [historiaAberta, setHistoriaAberta] = useState(false)
+
+  useEffect(() => {
+    if (memorialOverride) {
+      setMemorial(memorialOverride)
+      setHomenagens(memorialOverride.homenagens)
+      return
+    }
+    let vivo = true
+    if (slug) {
+      fetchMemorial(slug)
+        .then((m) => {
+          if (!vivo) return
+          setMemorial(m)
+          setHomenagens(m?.homenagens ?? [])
+        })
+        .finally(() => {
+          if (vivo) setCarregando(false)
+        })
+    } else {
+      setCarregando(false)
+    }
+    return () => {
+      vivo = false
+    }
+  }, [slug, memorialOverride])
 
   useEffect(() => {
     if (memorial) {
@@ -91,6 +119,10 @@ export default function MemorialPage({
     [homenagens],
   )
 
+  if (carregando) {
+    return <div className="memorial-root" style={{ minHeight: '100vh' }} />
+  }
+
   if (!memorial) {
     return (
       <div className="memorial-root">
@@ -114,47 +146,57 @@ export default function MemorialPage({
     `${memorial.nomeCompleto}\n${descCompartilhar}\n${urlAbs}`,
   )
 
-  const onSubmit = (data: HomenagemForm) => {
+  const onSubmit = async (data: HomenagemForm) => {
     if (data.website) return // honeypot: bot detectado, descarta em silêncio
-    const agora = new Date().toISOString()
     const nome = data.nome.trim()
     const texto = (data.texto ?? '').trim()
 
-    // Aprovação é opcional: quando a família não modera, a mensagem entra na hora.
-    // A vela nunca depende de aprovação.
-    const moderar = memorial.moderarMensagens
-    const status: Homenagem['status'] =
-      texto && moderar ? 'pendente' : 'aprovada'
-    setHomenagens((prev) => [
-      {
-        id: `h-${Date.now()}`,
-        nome,
-        texto: texto || null,
-        vela: data.vela,
-        criadoEmISO: agora,
-        status,
-      },
-      ...prev,
-    ])
-
-    if (texto && data.vela) {
-      toast.success('Vela acesa e mensagem publicada', {
-        description: moderar
-          ? 'A vela já aparece; a mensagem entra assim que a família confirmar.'
-          : 'Sua vela e sua mensagem já estão na página.',
-      })
-    } else if (texto) {
-      toast.success(moderar ? 'Mensagem enviada' : 'Mensagem publicada', {
-        description: moderar
-          ? 'Ela aparece assim que a família confirmar — costuma levar poucos minutos.'
-          : 'Sua mensagem já aparece na página.',
-      })
-    } else {
-      toast.success('Vela acesa', {
-        description: 'Obrigado por deixar sua luz.',
-      })
+    // Na prévia (memorial ainda não salvo) insere só localmente para visualizar.
+    if (preview) {
+      setHomenagens((prev) => [
+        {
+          id: `p-${Date.now()}`,
+          nome,
+          texto: texto || null,
+          vela: data.vela,
+          criadoEmISO: new Date().toISOString(),
+          status: 'aprovada',
+        },
+        ...prev,
+      ])
+      toast.success('Prévia — na página publicada a homenagem é registrada de verdade.')
+      reset({ nome: '', texto: '', vela: true, website: '' })
+      return
     }
-    reset({ nome: '', texto: '', vela: true, website: '' })
+
+    try {
+      const r = await enviarHomenagem({
+        memorialSlug: memorial.slug,
+        nome,
+        texto: texto || undefined,
+        vela: data.vela,
+      })
+      // vela sempre entra no feed; mensagem moderada fica oculta até aprovar
+      setHomenagens((prev) => [r.homenagem, ...prev])
+
+      if (r.moderada) {
+        toast.success('Mensagem enviada', {
+          description:
+            'Aparece assim que a família confirmar — costuma levar poucos minutos.',
+        })
+      } else if (texto && data.vela) {
+        toast.success('Vela acesa e mensagem publicada')
+      } else if (texto) {
+        toast.success('Mensagem publicada')
+      } else {
+        toast.success('Vela acesa', { description: 'Obrigado por deixar sua luz.' })
+      }
+      reset({ nome: '', texto: '', vela: true, website: '' })
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível enviar agora.',
+      )
+    }
   }
 
   const copiarLink = () => {

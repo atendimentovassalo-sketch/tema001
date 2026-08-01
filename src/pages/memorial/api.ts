@@ -1,0 +1,123 @@
+/* Chamadas à API do memorial usadas pelas páginas públicas e pelo admin.
+ * Os DTOs do backend espelham os tipos abaixo (Funeraria/Memorial). */
+import { api } from '@/lib/api'
+import type { Funeraria, Memorial, Homenagem } from './types'
+
+interface ListaResp {
+  funeraria: Funeraria
+  memoriais: Memorial[]
+}
+
+/** Home/obituário: funerária + publicados. */
+export function fetchPublicados(opts?: {
+  limite?: number
+  excluir?: string
+}): Promise<ListaResp> {
+  const q = new URLSearchParams()
+  if (opts?.limite) q.set('limite', String(opts.limite))
+  if (opts?.excluir) q.set('excluir', opts.excluir)
+  const qs = q.toString()
+  return api.get<ListaResp>(`/api/memoriais${qs ? `?${qs}` : ''}`)
+}
+
+/** Página de memorial por slug. */
+export async function fetchMemorial(slug: string): Promise<Memorial | null> {
+  try {
+    const r = await api.get<{ memorial: Memorial }>(
+      `/api/memoriais/${encodeURIComponent(slug)}`,
+    )
+    return r.memorial
+  } catch {
+    return null
+  }
+}
+
+export interface EnvioHomenagem {
+  memorialSlug: string
+  nome: string
+  texto?: string
+  vela: boolean
+  website?: string
+}
+
+export function enviarHomenagem(
+  dados: EnvioHomenagem,
+): Promise<{ ok: true; homenagem: Homenagem; moderada: boolean }> {
+  return api.post('/api/homenagens', dados)
+}
+
+export interface AprovacaoInfo {
+  homenagem: Homenagem
+  memorial: { nomeCompleto: string; slug: string } | null
+}
+
+export function fetchAprovacao(token: string): Promise<AprovacaoInfo> {
+  return api.get<AprovacaoInfo>(`/api/aprovar/${encodeURIComponent(token)}`)
+}
+
+export function decidirAprovacao(
+  token: string,
+  acao: 'aprovar' | 'recusar',
+): Promise<{ ok: true; status: string }> {
+  return api.post(`/api/aprovar/${encodeURIComponent(token)}`, { acao })
+}
+
+/* ----- admin (requer sessão) ----- */
+
+export interface DadosMemorialInput {
+  nomeCompleto: string
+  apelido: string | null
+  fotoUrl: string | null
+  nascimentoISO: string | null
+  cidadeNascimento: string | null
+  falecimentoISO: string
+  cidadeFalecimento: string | null
+  idade: number | null
+  epitafio: string | null
+  historia: string | null
+  autorizadoPor: string | null
+  moderarMensagens: boolean
+  eventos: {
+    tipo: 'velorio' | 'cerimonia' | 'sepultamento'
+    localNome: string
+    endereco: string | null
+    inicioISO: string | null
+    horarioConfirmado: boolean
+  }[]
+  fotos: { url: string; alt: string | null }[]
+}
+
+export async function fetchMemorialAdmin(id: string): Promise<Memorial | null> {
+  try {
+    const r = await api.get<{ memorial: Memorial }>(`/api/admin/memoriais/${id}`)
+    return r.memorial
+  } catch {
+    return null
+  }
+}
+
+export function criarMemorial(
+  dados: DadosMemorialInput,
+): Promise<{ ok: true; id: string; slug: string }> {
+  return api.post('/api/admin/memoriais', dados)
+}
+
+export function atualizarMemorialApi(
+  id: string,
+  dados: DadosMemorialInput,
+): Promise<{ ok: true; slug: string }> {
+  return api.put(`/api/admin/memoriais/${id}`, dados)
+}
+
+export function publicarMemorialApi(
+  id: string,
+  publicar: boolean,
+): Promise<{ ok: true; status: string }> {
+  return api.post(`/api/admin/memoriais/${id}/publicar`, { publicar })
+}
+
+/** Sobe uma foto (Blob) para o R2 e devolve o caminho servível. */
+export async function uploadFoto(blob: Blob): Promise<string> {
+  const r = await api.upload('/api/admin/fotos', blob)
+  return r.url
+}

@@ -1,26 +1,36 @@
 /* Formulário do dono (funerária) para abrir uma nova nota de falecimento.
  * Front-end apenas: valida com zod e mostra toast. Persistência/prévia entram com o backend. */
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
-import { getMemorial } from './memorial-data'
-import { saveDraft } from './draft'
+import { ApiError } from '@/lib/api'
+import {
+  fetchPublicados,
+  fetchMemorialAdmin,
+  criarMemorial,
+  atualizarMemorialApi,
+  publicarMemorialApi,
+  uploadFoto,
+  type DadosMemorialInput,
+} from './api'
+import { useSessao } from '../admin/auth'
 import { idadeEm, iniciais } from './format'
 import { recortar45 } from './image'
-import type { Evento, Memorial } from './types'
+import type { Funeraria } from './types'
 import './memorial.css'
 
-function slugify(nome: string): string {
-  return nome
-    .normalize('NFD')
-    .replace(/[\u0300-\u036f]/g, '')
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, 72)
+/** Converte data URL (JPEG do recorte) em Blob para upload. */
+async function dataUrlParaBlob(dataUrl: string): Promise<Blob> {
+  const res = await fetch(dataUrl)
+  return res.blob()
+}
+
+/** Recorta a hora "datetime-local" (sem timezone) mantendo o valor local. */
+function isoLocal(v: string): string | null {
+  return v ? v : null
 }
 
 const schema = z
@@ -75,13 +85,18 @@ const schema = z
 type NovoForm = z.input<typeof schema>
 
 export default function NovoMemorial() {
-  const f = getMemorial()!.funeraria
   const navigate = useNavigate()
+  const [params] = useSearchParams()
+  const editId = params.get('id')
+  const { carregando: authCarregando, usuario } = useSessao()
+
+  const [f, setF] = useState<Funeraria | null>(null)
 
   const {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors, isSubmitting },
   } = useForm<NovoForm>({
     resolver: zodResolver(schema),
@@ -93,6 +108,56 @@ export default function NovoMemorial() {
 
   const [foto, setFoto] = useState<string | null>(null)
   const [fotoProcessando, setFotoProcessando] = useState(false)
+  const [publicando, setPublicando] = useState(false)
+
+  // guarda de sessão: só admin logado
+  useEffect(() => {
+    if (!authCarregando && !usuario) navigate('/admin/login', { replace: true })
+  }, [authCarregando, usuario, navigate])
+
+  // funerária (cabeçalho)
+  useEffect(() => {
+    fetchPublicados({ limite: 1 })
+      .then((r) => setF(r.funeraria))
+      .catch(() => {})
+  }, [])
+
+  // modo edição: carrega e preenche
+  useEffect(() => {
+    if (!editId) return
+    let vivo = true
+    fetchMemorialAdmin(editId).then((m) => {
+      if (!vivo) return
+      if (!m) {
+        toast.error('Memorial não encontrado.')
+        navigate('/admin', { replace: true })
+        return
+      }
+      const vel = m.eventos.find((e) => e.tipo === 'velorio')
+      const sep = m.eventos.find((e) => e.tipo === 'sepultamento')
+      reset({
+        nomeCompleto: m.nomeCompleto,
+        apelido: m.apelido ?? '',
+        nascimento: m.nascimentoISO ?? '',
+        cidadeNascimento: m.cidadeNascimento ?? '',
+        falecimento: m.falecimentoISO,
+        cidadeFalecimento: m.cidadeFalecimento ?? '',
+        epitafio: m.epitafio ?? '',
+        historia: m.historia ?? '',
+        velorioLocal: vel?.localNome ?? '',
+        velorioEndereco: vel?.endereco ?? '',
+        velorioInicio: vel?.inicioISO?.slice(0, 16) ?? '',
+        sepLocal: sep?.localNome ?? '',
+        sepInicio: sep?.inicioISO?.slice(0, 16) ?? '',
+        autorizadoPor: m.autorizadoPor ?? '',
+        moderarMensagens: m.moderarMensagens,
+      })
+      setFoto(m.fotoUrl)
+    })
+    return () => {
+      vivo = false
+    }
+  }, [editId, reset, navigate])
 
   const onFoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -119,36 +184,36 @@ export default function NovoMemorial() {
     }
   }
 
-  const onSubmit = (data: NovoForm) => {
-    const eventos: Evento[] = []
+  async function montarDados(data: NovoForm): Promise<DadosMemorialInput> {
+    // sobe a foto se for nova (data URL do recorte); mantém URL já existente
+    let fotoUrl: string | null = foto
+    if (foto && foto.startsWith('data:')) {
+      const blob = await dataUrlParaBlob(foto)
+      fotoUrl = await uploadFoto(blob)
+    }
+    const eventos: DadosMemorialInput['eventos'] = []
     if (data.velorioLocal) {
       eventos.push({
-        id: 'ev-velorio',
         tipo: 'velorio',
         localNome: data.velorioLocal,
         endereco: data.velorioEndereco || null,
-        inicioISO: data.velorioInicio || null,
+        inicioISO: isoLocal(data.velorioInicio || ''),
         horarioConfirmado: Boolean(data.velorioInicio),
       })
     }
     if (data.sepLocal) {
       eventos.push({
-        id: 'ev-sep',
         tipo: 'sepultamento',
         localNome: data.sepLocal,
         endereco: null,
-        inicioISO: data.sepInicio || null,
+        inicioISO: isoLocal(data.sepInicio || ''),
         horarioConfirmado: Boolean(data.sepInicio),
       })
     }
-
-    const draft: Memorial = {
-      id: 'rascunho',
-      slug: slugify(data.nomeCompleto) || 'rascunho',
-      funeraria: f,
+    return {
       nomeCompleto: data.nomeCompleto,
       apelido: data.apelido || null,
-      fotoUrl: foto,
+      fotoUrl,
       nascimentoISO: data.nascimento || null,
       cidadeNascimento: data.cidadeNascimento || null,
       falecimentoISO: data.falecimento,
@@ -156,16 +221,39 @@ export default function NovoMemorial() {
       idade: idadeEm(data.nascimento || null, data.falecimento),
       epitafio: data.epitafio || null,
       historia: data.historia || null,
-      eventos,
-      fotos: [],
-      homenagens: [],
-      visitas: 0,
       autorizadoPor: data.autorizadoPor || null,
       moderarMensagens: data.moderarMensagens ?? false,
+      eventos,
+      fotos: [],
     }
+  }
 
-    saveDraft(draft)
-    navigate('/memorial/previa')
+  async function salvar(data: NovoForm, publicar: boolean) {
+    if (publicar) setPublicando(true)
+    try {
+      const dados = await montarDados(data)
+      let id: string | null = editId
+      if (editId) {
+        await atualizarMemorialApi(editId, dados)
+      } else {
+        const r = await criarMemorial(dados)
+        id = r.id
+      }
+      if (publicar && id) await publicarMemorialApi(id, true)
+      toast.success(publicar ? 'Memorial publicado' : 'Rascunho salvo')
+      navigate('/admin')
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível salvar agora.',
+      )
+      setPublicando(false)
+    }
+  }
+
+  const onSubmit = (data: NovoForm) => salvar(data, false)
+
+  if (!f) {
+    return <div className="memorial-root" style={{ minHeight: '100vh' }} />
   }
 
   return (
@@ -175,13 +263,13 @@ export default function NovoMemorial() {
     >
       <header className="topo">
         <div className="topo-in">
-          <a className="wm" href="/">
+          <a className="wm" href="/admin">
             {f.nome}
             <small>Painel</small>
           </a>
           <span className="tel">
             <span>
-              <em>Nova nota</em>
+              <em>{editId ? 'Editar nota' : 'Nova nota'}</em>
               <span className="num">
                 {f.cidade} · {f.uf}
               </span>
@@ -192,7 +280,7 @@ export default function NovoMemorial() {
 
       <div className="form">
         <p className="eti" style={{ color: 'var(--brass-e)' }}>
-          Nova nota de falecimento
+          {editId ? 'Editar nota de falecimento' : 'Nova nota de falecimento'}
         </p>
 
         <form onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -433,13 +521,27 @@ export default function NovoMemorial() {
           </div>
 
           <div className="aviso">
-            <b>Antes de publicar você vê a página exata.</b> A conferência do
-            nome e dos horários é sua — e a autorização da família precisa estar
-            registrada acima.
+            <b>Salve como rascunho para conferir a página antes de publicar.</b>{' '}
+            A conferência do nome e dos horários é sua — e a autorização da
+            família precisa estar registrada acima.
           </div>
-          <button className="acao" type="submit" disabled={isSubmitting}>
-            Continuar para a prévia
-          </button>
+          <div className="duo">
+            <button
+              className="acao"
+              type="submit"
+              disabled={isSubmitting || publicando}
+            >
+              {isSubmitting && !publicando ? 'Salvando…' : 'Salvar rascunho'}
+            </button>
+            <button
+              className="acao primaria"
+              type="button"
+              disabled={isSubmitting || publicando}
+              onClick={handleSubmit((d) => salvar(d, true))}
+            >
+              {publicando ? 'Publicando…' : 'Salvar e publicar'}
+            </button>
+          </div>
         </form>
       </div>
     </div>

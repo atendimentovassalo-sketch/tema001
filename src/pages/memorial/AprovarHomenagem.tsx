@@ -1,86 +1,119 @@
-/* Tela de aprovação por link (o responsável abre pelo WhatsApp quando a família modera).
- * Front-end apenas: o :token é ilustrativo; usa uma homenagem pendente de exemplo.
- * No backend, o token assinado identifica a mensagem e registra quem aprovou. */
-import { useState } from 'react'
-import { useParams } from 'react-router-dom'
-import { getMemorial } from './memorial-data'
+/* Tela de aprovação por link (o responsável abre pelo WhatsApp quando a família
+ * modera). O :token identifica a homenagem pendente no backend. */
+import { useEffect, useState } from 'react'
+import { useParams, Link } from 'react-router-dom'
+import { toast } from 'sonner'
+import { fetchAprovacao, decidirAprovacao, type AprovacaoInfo } from './api'
 import { iniciais, tempoRelativo } from './format'
 import './memorial.css'
 
-type Decisao = 'pendente' | 'aprovada' | 'recusada'
+type Estado = 'carregando' | 'pendente' | 'aprovada' | 'recusada' | 'invalido'
 
 export default function AprovarHomenagem() {
   const { token } = useParams()
-  const memorial = getMemorial() // demo: primeiro memorial
-  const f = memorial!.funeraria
+  const [estado, setEstado] = useState<Estado>('carregando')
+  const [info, setInfo] = useState<AprovacaoInfo | null>(null)
+  const [enviando, setEnviando] = useState(false)
 
-  // Homenagem pendente de exemplo (viria do backend pelo token).
-  const pendente = {
-    nome: 'Vizinho do 302',
-    texto:
-      'Seu Zé foi o primeiro a me receber quando cheguei no bairro. Nunca vou esquecer. Meus sentimentos à família.',
-    criadoEmISO: new Date(Date.now() - 40 * 60 * 1000).toISOString(),
+  useEffect(() => {
+    document.title = 'Aprovação de mensagem'
+  }, [])
+
+  useEffect(() => {
+    if (!token) {
+      setEstado('invalido')
+      return
+    }
+    let vivo = true
+    fetchAprovacao(token)
+      .then((r) => {
+        if (!vivo) return
+        setInfo(r)
+        setEstado('pendente')
+      })
+      .catch(() => {
+        if (vivo) setEstado('invalido')
+      })
+    return () => {
+      vivo = false
+    }
+  }, [token])
+
+  async function decidir(acao: 'aprovar' | 'recusar') {
+    if (!token) return
+    setEnviando(true)
+    try {
+      await decidirAprovacao(token, acao)
+      setEstado(acao === 'aprovar' ? 'aprovada' : 'recusada')
+    } catch {
+      toast.error('Não foi possível concluir. O link pode já ter sido usado.')
+      setEnviando(false)
+    }
   }
 
-  const [decisao, setDecisao] = useState<Decisao>('pendente')
+  const nome = info?.memorial?.nomeCompleto ?? 'seu ente querido'
+  const pendente = info?.homenagem
 
   return (
-    <div
-      className="memorial-root"
-      style={{ ['--marca' as string]: f.corMarca }}
-    >
+    <div className="memorial-root">
       <header className="topo">
         <div className="topo-in">
           <span className="wm">
-            {f.nome}
-            <small>Aprovação de mensagem</small>
-          </span>
-          <span className="tel">
-            <span>
-              <em>Responsável</em>
-              <span className="num">Link seguro</span>
-            </span>
+            Aprovação de mensagem
+            <small>Link seguro do responsável</small>
           </span>
         </div>
       </header>
 
       <div className="form" style={{ maxWidth: 560 }}>
-        <p className="eti" style={{ color: 'var(--brass-e)' }}>
-          Nova mensagem para aprovar
-        </p>
-        <p className="dica" style={{ marginTop: 8 }}>
-          Uma pessoa deixou uma homenagem em memória de{' '}
-          <b>{memorial!.nomeCompleto}</b>. Ela só aparece na página depois que
-          você aprovar.
-        </p>
+        {estado === 'carregando' && <p className="dica">Carregando…</p>}
 
-        {decisao === 'pendente' && (
+        {estado === 'invalido' && (
+          <div className="aviso" style={{ marginTop: 8 }}>
+            <b>Link inválido ou já utilizado.</b> Esta mensagem pode já ter sido
+            aprovada ou recusada. <Link to="/funeraria">Ir ao site</Link>.
+          </div>
+        )}
+
+        {estado === 'pendente' && pendente && (
           <>
+            <p className="eti" style={{ color: 'var(--brass-e)' }}>
+              Nova mensagem para aprovar
+            </p>
+            <p className="dica" style={{ marginTop: 8 }}>
+              Uma pessoa deixou uma homenagem em memória de <b>{nome}</b>. Ela só
+              aparece na página depois que você aprovar.
+            </p>
+
             <div className="feed" style={{ marginTop: 20 }}>
               <div className="item" style={{ borderBottom: 0 }}>
                 <div className="av">{iniciais(pendente.nome) || '·'}</div>
                 <div>
                   <span className="quem">{pendente.nome}</span>
-                  <span className="qd">
-                    {tempoRelativo(pendente.criadoEmISO)}
-                  </span>
-                  <p className="tx">{pendente.texto}</p>
+                  <span className="qd">{tempoRelativo(pendente.criadoEmISO)}</span>
+                  {pendente.texto ? (
+                    <p className="tx">{pendente.texto}</p>
+                  ) : (
+                    <p className="tx">Acendeu uma vela</p>
+                  )}
                 </div>
               </div>
             </div>
 
             <div className="duo" style={{ marginTop: 24 }}>
               <button
-                className="acao"
+                className="acao primaria"
                 type="button"
-                onClick={() => setDecisao('aprovada')}
+                disabled={enviando}
+                onClick={() => decidir('aprovar')}
               >
                 Aprovar e publicar
               </button>
               <button
                 className="acao vazia"
                 type="button"
-                onClick={() => setDecisao('recusada')}
+                disabled={enviando}
+                onClick={() => decidir('recusar')}
               >
                 Recusar
               </button>
@@ -92,24 +125,17 @@ export default function AprovarHomenagem() {
           </>
         )}
 
-        {decisao === 'aprovada' && (
+        {estado === 'aprovada' && (
           <div className="aviso" style={{ marginTop: 24 }}>
-            <b>Mensagem publicada.</b> Ela já aparece na página de{' '}
-            {memorial!.nomeCompleto}. Obrigado por cuidar disso.
+            <b>Mensagem publicada.</b> Ela já aparece na página de {nome}.
+            Obrigado por cuidar disso.
           </div>
         )}
 
-        {decisao === 'recusada' && (
+        {estado === 'recusada' && (
           <div className="aviso" style={{ marginTop: 24 }}>
-            <b>Mensagem recusada.</b> Ela não será publicada e ninguém é
-            avisado.
+            <b>Mensagem recusada.</b> Ela não será publicada e ninguém é avisado.
           </div>
-        )}
-
-        {import.meta.env.DEV && (
-          <p className="dica" style={{ marginTop: 20, opacity: 0.4 }}>
-            token: {token ?? '—'}
-          </p>
         )}
       </div>
     </div>

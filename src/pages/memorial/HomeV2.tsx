@@ -1,9 +1,10 @@
 /* Home v2 da funerária — direção "dignidade calma".
  * Ordem invertida do mercado: presença e "o que fazer agora" antes de plano.
  * Front-end apenas; usa a funerária e os publicados do mock. */
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { funeraria, publicados } from './memorial-data'
+import { fetchPublicados } from './api'
+import type { Funeraria, Memorial } from './types'
 import { anoBR, ddmm, iniciais, retratoDe } from './format'
 import './homev2.css'
 
@@ -37,7 +38,7 @@ const SERVICOS = [
   },
 ]
 
-function useReveal() {
+function useReveal(dep?: unknown) {
   const ref = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const root = ref.current
@@ -60,22 +61,48 @@ function useReveal() {
     )
     els.forEach((el) => io.observe(el))
     return () => io.disconnect()
-  }, [])
+    // re-observa quando o conteúdo carrega
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dep])
   return ref
 }
 
 export default function HomeV2() {
-  const f = funeraria
-  const ultimos = publicados({ limite: 4 })
+  const [dados, setDados] = useState<{
+    funeraria: Funeraria
+    ultimos: Memorial[]
+  } | null>(null)
+  const root = useReveal(dados)
+
+  useEffect(() => {
+    let vivo = true
+    fetchPublicados({ limite: 4 })
+      .then((r) => {
+        if (vivo) setDados({ funeraria: r.funeraria, ultimos: r.memoriais })
+      })
+      .catch(() => {
+        if (vivo) setDados({ funeraria: null as unknown as Funeraria, ultimos: [] })
+      })
+    return () => {
+      vivo = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (dados?.funeraria)
+      document.title = `${dados.funeraria.nome} — Funerária 24 horas em ${dados.funeraria.cidade}/${dados.funeraria.uf}`
+  }, [dados])
+
+  if (!dados || !dados.funeraria) {
+    return <div className="homev2" style={{ minHeight: '100vh' }} />
+  }
+
+  const f = dados.funeraria
+  const ultimos = dados.ultimos
   const destaque = ultimos[0]
   const velasDestaque = destaque
     ? destaque.homenagens.filter((h) => h.vela).length
     : 0
-  const root = useReveal()
-
-  useEffect(() => {
-    document.title = `${f.nome} — Funerária 24 horas em ${f.cidade}/${f.uf}`
-  }, [f])
 
   const telHref = `tel:${f.telefone.replace(/[^0-9+]/g, '')}`
   const zapHref = `https://wa.me/${f.whatsapp}`

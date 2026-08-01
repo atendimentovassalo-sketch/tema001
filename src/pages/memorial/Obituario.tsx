@@ -2,9 +2,9 @@
  * foto (ou iniciais), busca por nome e selo "Velório hoje". */
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { funeraria, publicados } from './memorial-data'
+import { fetchPublicados } from './api'
 import { anoBR, ddmm, iniciais, retratoDe } from './format'
-import type { Memorial } from './types'
+import type { Funeraria, Memorial } from './types'
 import './memorial.css'
 
 /** Normaliza para busca acento-insensível. */
@@ -31,12 +31,26 @@ function velorioHoje(m: Memorial): boolean {
 }
 
 export default function Obituario() {
-  const f = funeraria
-  const todos = useMemo(() => publicados({ limite: 5000 }), [])
+  const [f, setF] = useState<Funeraria | null>(null)
+  const [todos, setTodos] = useState<Memorial[]>([])
   const [busca, setBusca] = useState('')
 
   useEffect(() => {
-    document.title = `Obituário de ${f.cidade} | ${f.nome}`
+    let vivo = true
+    fetchPublicados({ limite: 5000 })
+      .then((r) => {
+        if (!vivo) return
+        setF(r.funeraria)
+        setTodos(r.memoriais)
+      })
+      .catch(() => {})
+    return () => {
+      vivo = false
+    }
+  }, [])
+
+  useEffect(() => {
+    if (f) document.title = `Obituário de ${f.cidade} | ${f.nome}`
   }, [f])
 
   const itens = useMemo(() => {
@@ -44,6 +58,10 @@ export default function Obituario() {
     if (!q) return todos
     return todos.filter((m) => norm(m.nomeCompleto).includes(q))
   }, [todos, busca])
+
+  if (!f) {
+    return <div className="memorial-root" style={{ minHeight: '100vh' }} />
+  }
 
   return (
     <div

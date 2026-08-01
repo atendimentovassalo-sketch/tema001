@@ -10,7 +10,6 @@ import BlogHome from './pages/blog/BlogHome'
 import BlogPost from './pages/blog/BlogPost'
 import MemorialPage from './pages/memorial/MemorialPage'
 import NovoMemorial from './pages/memorial/NovoMemorial'
-import PreviewMemorial from './pages/memorial/PreviewMemorial'
 import Obituario from './pages/memorial/Obituario'
 import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
 import HomeV2 from './pages/memorial/HomeV2'
@@ -39,7 +38,6 @@ const App = () => (
         <Route path="/obituario" element={<Obituario />} />
         <Route path="/m/:slug" element={<MemorialPage />} />
         <Route path="/memorial/novo" element={<NovoMemorial />} />
-        <Route path="/memorial/previa" element={<PreviewMemorial />} />
         <Route path="/aprovar/:token" element={<AprovarHomenagem />} />
         {/* Painel administrativo da funerária */}
         <Route path="/admin/login" element={<AdminLogin />} />
