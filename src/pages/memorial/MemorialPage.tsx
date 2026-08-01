@@ -427,7 +427,7 @@ export default function MemorialPage({
               </span>
             </label>
             <button
-              className="acao metal"
+              className="acao primaria"
               type="submit"
               style={{ marginTop: 20 }}
               disabled={isSubmitting}
