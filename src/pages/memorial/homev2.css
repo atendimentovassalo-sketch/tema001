@@ -265,28 +265,136 @@
   transform: rotate(45deg);
   display: inline-block;
 }
-.homev2 .hero-img {
+/* mockup do produto no herói (mostra a página de memorial) */
+.homev2 .hero-fig {
   position: relative;
   min-height: 340px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px;
+  overflow: hidden;
+  background:
+    radial-gradient(
+      120% 90% at 50% 0%,
+      rgba(201, 174, 121, 0.12),
+      transparent 60%
+    ),
+    linear-gradient(150deg, #e7e0d3, #cfc6b6 60%, #b9ae99);
 }
 @media (max-width: 899px) {
-  .homev2 .hero-img {
+  .homev2 .hero-fig {
     display: none;
   }
 }
-.homev2 .hero-img {
-  background:
-    linear-gradient(180deg, rgba(33, 29, 23, 0.06), rgba(33, 29, 23, 0.18)),
-    linear-gradient(150deg, #e7e0d3, #cfc6b6 60%, #b9ae99);
-  overflow: hidden;
+/* aparelho */
+.homev2 .fone {
+  position: relative;
+  width: 250px;
+  border-radius: 30px;
+  background: var(--ink);
+  padding: 10px;
+  box-shadow:
+    0 30px 60px rgba(33, 29, 23, 0.34),
+    0 4px 12px rgba(33, 29, 23, 0.22);
 }
-.homev2 .hero-img img {
-  position: absolute;
-  inset: 0;
+.homev2 .fone-tela {
+  border-radius: 22px;
+  background: var(--paper);
+  overflow: hidden;
+  padding: 24px 18px 26px;
+  text-align: center;
+}
+.homev2 .mini-eti {
+  font-family: var(--sans);
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--sage-mid);
+}
+.homev2 .mini-retrato {
+  width: 94px;
+  aspect-ratio: 4/5;
+  margin: 12px auto 0;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(168deg, #d9d8d1, #b9bab2 60%, #a7a8a0);
+  border: 1px solid var(--line);
+}
+.homev2 .mini-retrato img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: saturate(0.82) contrast(0.96);
+}
+.homev2 .mini-retrato .ini {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  color: #6b5f4c;
+}
+.homev2 .mini-nome {
+  font-family: var(--serif);
+  font-size: 1.16rem;
+  line-height: 1.14;
+  margin-top: 14px;
+}
+.homev2 .mini-datas {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-top: 5px;
+}
+.homev2 .mini-epi {
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--ink);
+  opacity: 0.72;
+  margin-top: 10px;
+}
+.homev2 .mini-velas {
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  color: var(--amber);
+  margin-top: 13px;
+  padding-top: 13px;
+  border-top: 1px solid var(--line-soft);
+}
+/* cartões satélite */
+.homev2 .sat {
+  position: absolute;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 10px 13px;
+  box-shadow: 0 12px 26px rgba(33, 29, 23, 0.16);
+  text-align: left;
+}
+.homev2 .sat-k {
+  display: block;
+  font-family: var(--sans);
+  font-size: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--sage-mid);
+}
+.homev2 .sat-v {
+  display: block;
+  font-family: var(--serif);
+  font-size: 0.9rem;
+  margin-top: 3px;
+}
+.homev2 .sat-a {
+  top: 40px;
+  left: 16px;
+}
+.homev2 .sat-b {
+  bottom: 44px;
+  right: 14px;
 }
 
 /* seções */

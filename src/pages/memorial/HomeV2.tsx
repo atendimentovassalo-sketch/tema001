@@ -4,7 +4,7 @@
 import { useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { funeraria, publicados } from './memorial-data'
-import { ddmm, iniciais, retratoDe } from './format'
+import { anoBR, ddmm, iniciais, retratoDe } from './format'
 import './homev2.css'
 
 const IMG = (q: string, w = 900, h = 1100, seed = 1) =>
@@ -67,6 +67,10 @@ function useReveal() {
 export default function HomeV2() {
   const f = funeraria
   const ultimos = publicados({ limite: 4 })
+  const destaque = ultimos[0]
+  const velasDestaque = destaque
+    ? destaque.homenagens.filter((h) => h.vela).length
+    : 0
   const root = useReveal()
 
   useEffect(() => {
@@ -134,17 +138,51 @@ export default function HomeV2() {
             )}
           </div>
         </div>
-        <div className="hero-img" aria-hidden="true">
-          <img
-            src={IMG(
-              'soft morning light through sheer curtain calm interior',
-              1100,
-              1300,
-              7,
-            )}
-            alt=""
-            loading="eager"
-          />
+        {/* mockup do produto: mostra a página de memorial (o diferencial)
+            em vez de uma foto de cortina genérica */}
+        <div className="hero-fig" aria-hidden="true">
+          {destaque && (
+            <>
+              <div className="fone">
+                <div className="fone-tela">
+                  <span className="mini-eti">Em memória de</span>
+                  <div className="mini-retrato">
+                    {retratoDe(destaque) ? (
+                      <img src={retratoDe(destaque)!} alt="" loading="eager" />
+                    ) : (
+                      <span className="ini">
+                        {iniciais(destaque.nomeCompleto)}
+                      </span>
+                    )}
+                  </div>
+                  <p className="mini-nome">{destaque.nomeCompleto}</p>
+                  <p className="mini-datas num">
+                    {destaque.nascimentoISO
+                      ? `${anoBR(destaque.nascimentoISO)} – `
+                      : ''}
+                    {anoBR(destaque.falecimentoISO)}
+                  </p>
+                  {destaque.epitafio && (
+                    <p className="mini-epi">
+                      &ldquo;{destaque.epitafio}&rdquo;
+                    </p>
+                  )}
+                  <p className="mini-velas">
+                    🕯️ {velasDestaque}{' '}
+                    {velasDestaque === 1 ? 'vela acesa' : 'velas acesas'}
+                  </p>
+                </div>
+              </div>
+              <div className="sat sat-a">
+                <span className="sat-k">Velório hoje</span>
+                <span className="sat-v">19h · Capela São José</span>
+              </div>
+              <div className="sat sat-b">
+                <span className="sat-k">Publicado em minutos</span>
+                <span className="sat-v">Foto, datas e local</span>
+              </div>
+            </>
+          )}
         </div>
       </section>
 
