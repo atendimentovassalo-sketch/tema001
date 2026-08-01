@@ -523,6 +523,16 @@ export default function MemorialPage({
           </button>
         </div>
       )}
+
+      {/* CTA fixo no mobile — o botão do herói some ao rolar e a homenagem
+          fica a milhares de pixels; a barra mantém a ação sempre à mão */}
+      {!preview && (
+        <nav className="mobicta" aria-label="Ação rápida">
+          <a className="mb-btn" href="#homenagear">
+            Deixar uma homenagem
+          </a>
+        </nav>
+      )}
     </div>
   )
 }

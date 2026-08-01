@@ -584,3 +584,50 @@
 .homev2 .rodape .zap {
   margin-top: 26px;
 }
+
+/* CTA fixo no rodapé — só no mobile (o herói sai da tela ao rolar) */
+.homev2 .mobicta {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  gap: 10px;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--cream) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--line);
+}
+.homev2 .mobicta .mb-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+  border-radius: 2px;
+  border: 1px solid transparent;
+  font-family: var(--sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.homev2 .mobicta .mb-btn.solid {
+  background: var(--amber);
+  color: #fbf7f2;
+}
+.homev2 .mobicta .mb-btn.zap {
+  background: var(--paper);
+  border-color: var(--sage);
+  color: var(--sage);
+}
+@media (max-width: 720px) {
+  .homev2 .mobicta {
+    display: flex;
+  }
+  /* respiro para a barra fixa não cobrir o fim do rodapé */
+  .homev2 .rodape {
+    padding-bottom: calc(80px + env(safe-area-inset-bottom));
+  }
+}

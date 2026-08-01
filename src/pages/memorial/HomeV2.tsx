@@ -336,6 +336,21 @@ export default function HomeV2() {
           </a>
         </div>
       </footer>
+
+      {/* CTA fixo no mobile — o herói some ao rolar; mantém a ação à mão */}
+      <nav className="mobicta" aria-label="Ações rápidas">
+        <a className="mb-btn solid" href={telHref}>
+          Ligar · 24h
+        </a>
+        <a
+          className="mb-btn zap"
+          href={zapHref}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          WhatsApp
+        </a>
+      </nav>
     </div>
   )
 }

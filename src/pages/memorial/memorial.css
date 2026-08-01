@@ -921,3 +921,43 @@
   border-top: 1px solid rgba(201, 174, 121, 0.2);
   line-height: 1.6;
 }
+
+/* CTA fixo no mobile: "Deixar uma homenagem" sempre à mão */
+.memorial-root .mobicta {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--papel) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--linha);
+}
+.memorial-root .mobicta .mb-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 52px;
+  border-radius: 2px;
+  font-family: var(--a);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  background: var(--marca);
+  border: 1px solid var(--marca);
+  color: var(--vellum);
+}
+@media (max-width: 720px) {
+  .memorial-root .mobicta {
+    display: block;
+  }
+  /* respiro para a barra fixa não cobrir o fim do rodapé */
+  .memorial-root .rodape {
+    padding-bottom: calc(74px + env(safe-area-inset-bottom));
+  }
+}
