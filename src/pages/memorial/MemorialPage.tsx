@@ -44,6 +44,15 @@ const homenagemSchema = z
 
 type HomenagemForm = z.input<typeof homenagemSchema>
 
+/** Chama de vela em CSS puro, bruxuleando (respeita prefers-reduced-motion). */
+function Chama({ grande = false }: { grande?: boolean }) {
+  return (
+    <span className={`chama${grande ? ' chama-g' : ''}`} aria-hidden="true">
+      <i />
+    </span>
+  )
+}
+
 export default function MemorialPage({
   memorialOverride,
   preview = false,
@@ -266,17 +275,18 @@ export default function MemorialPage({
         <div className="corpo-cols">
         {/* contador */}
         <div className="contador">
-          <div>
+          <div className="cel-vela">
+            <Chama grande />
             <b className="num">{totalVelas}</b>
-            <span>Velas acesas</span>
+            <span>{totalVelas === 1 ? 'vela acesa' : 'velas acesas'}</span>
           </div>
           <div>
             <b className="num">{totalMensagens}</b>
-            <span>Mensagens</span>
+            <span>{totalMensagens === 1 ? 'mensagem' : 'mensagens'}</span>
           </div>
           <div>
             <b className="num">{memorial.visitas.toLocaleString('pt-BR')}</b>
-            <span>Visitas</span>
+            <span>{memorial.visitas === 1 ? 'visita' : 'visitas'}</span>
           </div>
         </div>
 
@@ -408,7 +418,7 @@ export default function MemorialPage({
                   key={h.id}
                 >
                   <div className="av">
-                    {h.vela ? '🕯️' : iniciais(h.nome) || '·'}
+                    {h.vela ? <Chama /> : iniciais(h.nome) || '·'}
                   </div>
                   <div>
                     <span className="quem">{h.nome}</span>

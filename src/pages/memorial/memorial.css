@@ -489,6 +489,91 @@
   margin-top: 8px;
   display: block;
 }
+/* célula de velas em destaque: chama grande acima do número */
+.memorial-root .cel-vela .num {
+  color: var(--marca);
+}
+.memorial-root .cel-vela .chama-g {
+  margin: 0 auto 6px;
+  display: block;
+}
+
+/* ===== chama de vela (CSS puro, bruxuleando) ===== */
+.memorial-root .chama {
+  position: relative;
+  display: inline-block;
+  width: 14px;
+  height: 20px;
+  vertical-align: middle;
+}
+.memorial-root .chama-g {
+  width: 26px;
+  height: 38px;
+}
+.memorial-root .chama i {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 60%;
+  height: 78%;
+  transform: translateX(-50%);
+  transform-origin: 50% 92%;
+  border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+  background: radial-gradient(
+    ellipse at 50% 78%,
+    #fff7dd 0%,
+    #ffd35a 26%,
+    #ff9b32 58%,
+    #d9531d 100%
+  );
+  box-shadow:
+    0 0 8px 2px rgba(255, 168, 63, 0.6),
+    0 0 18px 6px rgba(185, 154, 107, 0.4);
+  animation: bruxula 1.5s ease-in-out infinite alternate;
+}
+/* núcleo claro e quente */
+.memorial-root .chama i::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 8%;
+  width: 42%;
+  height: 52%;
+  transform: translateX(-50%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: radial-gradient(ellipse at 50% 70%, #fffef7, #ffe58c 68%, transparent);
+  animation: bruxula-nucleo 1.1s ease-in-out infinite alternate;
+}
+@keyframes bruxula {
+  0% {
+    transform: translateX(-50%) rotate(-2deg) scale(1, 1);
+  }
+  30% {
+    transform: translateX(-51%) rotate(2deg) scale(0.96, 1.08);
+  }
+  60% {
+    transform: translateX(-49%) rotate(-1.5deg) scale(1.04, 0.97);
+  }
+  100% {
+    transform: translateX(-50%) rotate(1deg) scale(1, 1.03);
+  }
+}
+@keyframes bruxula-nucleo {
+  0% {
+    opacity: 0.7;
+    transform: translateX(-50%) translateY(1px) scaleY(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-1px) scaleY(1.12);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .memorial-root .chama i,
+  .memorial-root .chama i::before {
+    animation: none;
+  }
+}
 
 /* marcos nascimento/falecimento */
 .memorial-root .marcos {
