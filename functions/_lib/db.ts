@@ -234,6 +234,37 @@ export async function incrementarVisitas(
     .run()
 }
 
+/** Dados mínimos de um memorial publicado (para inserir homenagem). */
+export async function getMemorialBasico(
+  env: Env,
+  tenantId: string,
+  slug: string,
+): Promise<{ id: string; moderar: boolean } | null> {
+  const row = await env.DB.prepare(
+    `SELECT id, moderar_mensagens FROM memorial
+     WHERE tenant_id = ? AND slug = ? AND status = 'publicado' LIMIT 1`,
+  )
+    .bind(tenantId, slug)
+    .first<{ id: string; moderar_mensagens: number }>()
+  if (!row) return null
+  return { id: row.id, moderar: !!row.moderar_mensagens }
+}
+
+/** Quantas homenagens este IP criou nos últimos N segundos (rate-limit). */
+export async function contarHomenagensRecentesPorIp(
+  env: Env,
+  ipHashValor: string,
+  segundos: number,
+): Promise<number> {
+  const row = await env.DB.prepare(
+    `SELECT count(*) AS n FROM homenagem
+     WHERE ip_hash = ? AND criado_em > datetime('now', ?)`,
+  )
+    .bind(ipHashValor, `-${segundos} seconds`)
+    .first<{ n: number }>()
+  return row?.n ?? 0
+}
+
 /* ---------- homenagens ---------- */
 
 export interface NovaHomenagem {
@@ -288,7 +319,23 @@ export async function definirStatusHomenagem(
   id: string,
   status: 'aprovada' | 'recusada',
 ): Promise<void> {
-  await env.DB.prepare(`UPDATE homenagem SET status = ? WHERE id = ?`)
+  // limpa o token para o link de aprovação não ser reutilizado
+  await env.DB.prepare(
+    `UPDATE homenagem SET status = ?, aprovar_token = NULL WHERE id = ?`,
+  )
     .bind(status, id)
     .run()
+}
+
+export async function getMemorialNomeSlug(
+  env: Env,
+  memorialId: string,
+): Promise<{ nome_completo: string; slug: string } | null> {
+  return (
+    (await env.DB.prepare(
+      `SELECT nome_completo, slug FROM memorial WHERE id = ? LIMIT 1`,
+    )
+      .bind(memorialId)
+      .first<{ nome_completo: string; slug: string }>()) ?? null
+  )
 }
