@@ -14,6 +14,8 @@ import PreviewMemorial from './pages/memorial/PreviewMemorial'
 import Obituario from './pages/memorial/Obituario'
 import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
 import HomeV2 from './pages/memorial/HomeV2'
+import AdminLogin from './pages/admin/Login'
+import AdminPainel from './pages/admin/Painel'
 
 // ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
 // AVOID REMOVING ANY CONTEXT PROVIDERS FROM THIS FILE (e.g. TooltipProvider, Toaster, Sonner)
@@ -39,6 +41,9 @@ const App = () => (
         <Route path="/memorial/novo" element={<NovoMemorial />} />
         <Route path="/memorial/previa" element={<PreviewMemorial />} />
         <Route path="/aprovar/:token" element={<AprovarHomenagem />} />
+        {/* Painel administrativo da funerária */}
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin" element={<AdminPainel />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </TooltipProvider>
