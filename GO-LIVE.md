@@ -96,3 +96,32 @@ npx wrangler d1 export funeraria-db --remote --output backup-$(data).sql
 ### Fora do MVP (fases pós-venda)
 Cobrança/assinatura in-app, cadastro self-service de várias funerárias, e envio
 automático do link de aprovação por WhatsApp (hoje a moderação é feita no painel).
+
+---
+
+## 11. Recuperação de senha por e-mail (Resend)
+
+A tela "Esqueci minha senha" (`/admin/recuperar`) e o backend já estão no código.
+Falta só ligar o ENVIO do e-mail configurando o Resend:
+
+1. Criar conta grátis em **resend.com**.
+2. **Add Domain** → `novomodelo.com.br`. O Resend mostra registros DNS (SPF/DKIM/
+   DMARC) — adicioná-los na zona DNS da Cloudflare (mesma conta) e aguardar verificar.
+3. **API Keys** → gerar uma chave.
+4. No painel do Pages (**tema001 → Settings → Environment variables**), adicionar
+   em **Production** (como *Secret* a chave):
+   - `RESEND_API_KEY` = a chave do Resend
+   - `EMAIL_FROM` = `Funerária São Francisco <nao-responda@novomodelo.com.br>`
+5. Refazer o deploy (qualquer push, ou "Retry deployment").
+
+**Sem `RESEND_API_KEY`**, o fluxo funciona (gera o link) mas o e-mail NÃO é enviado
+(no-op silencioso). Enquanto não configurar, para redefinir a senha de alguém, gere
+o convite manualmente no D1 e mande o link:
+```sql
+UPDATE usuario SET convite_token = '<TOKEN>', convite_expira = datetime('now','+1 day')
+WHERE email = '<email>';
+```
+Link: `https://funeraria.novomodelo.com.br/admin/login?convite=<TOKEN>`
+
+**Teste rápido sem verificar domínio:** use `EMAIL_FROM = Painel <onboarding@resend.dev>`
+(domínio de teste do Resend; só entrega para o e-mail dono da conta Resend).

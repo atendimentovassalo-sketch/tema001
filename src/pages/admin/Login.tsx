@@ -92,6 +92,12 @@ export default function AdminLogin() {
           </button>
         </form>
 
+        {!primeiroAcesso && (
+          <Link className="adm-esqueci" to="/admin/recuperar">
+            Esqueci minha senha
+          </Link>
+        )}
+
         <Link className="adm-voltar" to="/funeraria">
           ← Voltar ao site
         </Link>

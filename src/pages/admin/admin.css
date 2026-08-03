@@ -453,3 +453,16 @@
   align-items: center;
   text-decoration: none;
 }
+
+/* link "esqueci minha senha" */
+.adm-esqueci {
+  display: block;
+  margin-top: 18px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--amber);
+  text-decoration: none;
+}
+.adm-esqueci:hover {
+  text-decoration: underline;
+}

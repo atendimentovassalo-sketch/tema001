@@ -7,6 +7,9 @@ export interface Env {
   PHOTOS: R2Bucket
   // segredos/vars (Fase 3+)
   SESSION_TTL_HOURS?: string
+  // e-mail transacional (recuperação de senha) — Resend
+  RESEND_API_KEY?: string
+  EMAIL_FROM?: string
 }
 
 /* ----- Linhas do banco (snake_case) ----- */

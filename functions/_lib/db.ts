@@ -443,6 +443,20 @@ export async function definirSenhaUsuario(
     .run()
 }
 
+/** Gera/atualiza o token de convite para recuperação de senha. */
+export async function definirConviteRecuperacao(
+  env: Env,
+  id: string,
+  token: string,
+  expiraISO: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE usuario SET convite_token = ?, convite_expira = ? WHERE id = ?`,
+  )
+    .bind(token, expiraISO, id)
+    .run()
+}
+
 export async function registrarAcesso(env: Env, id: string): Promise<void> {
   await env.DB.prepare(
     `UPDATE usuario SET ultimo_acesso = datetime('now') WHERE id = ?`,
