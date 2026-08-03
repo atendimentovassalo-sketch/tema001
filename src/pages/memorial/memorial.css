@@ -1117,6 +1117,37 @@
   opacity: 0.5;
   margin-top: 3px;
 }
+/* barra de compartilhar por nota */
+.memorial-root .obit-share {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.memorial-root .obit-share-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--a);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--linha);
+  border-radius: 2px;
+  background: var(--vellum);
+  color: var(--brass-e);
+  text-decoration: none;
+  cursor: pointer;
+}
+.memorial-root .obit-share-btn:hover {
+  border-color: var(--brass-e);
+}
+.memorial-root .obit-share-btn.zap {
+  color: var(--marca);
+}
 
 /* rodapé */
 .memorial-root .rodape {

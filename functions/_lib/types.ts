@@ -23,6 +23,10 @@ export interface TenantRow {
   desde: string | null
   sobre: string | null
   cor_marca: string
+  velorio_local_padrao: string | null
+  velorio_endereco_padrao: string | null
+  sepultamento_local_padrao: string | null
+  whatsapp_template: string | null
 }
 
 export interface UsuarioRow {
@@ -56,6 +60,7 @@ export interface MemorialRow {
   autorizado_por: string | null
   moderar_mensagens: number
   status: string
+  whatsapp_texto: string | null
 }
 
 export interface EventoRow {
@@ -101,6 +106,24 @@ export interface FunerariaDTO {
   desde: string | null
   sobre: string | null
   corMarca: string
+  /** Modelo de mensagem do WhatsApp (com variáveis). Null = usa o padrão do app. */
+  whatsappTemplate: string | null
+}
+
+/** Configuração editável da funerária (área admin). */
+export interface ConfigDTO {
+  nome: string
+  cidade: string
+  uf: string
+  telefone: string
+  whatsapp: string
+  endereco: string | null
+  desde: string | null
+  sobre: string | null
+  velorioLocalPadrao: string | null
+  velorioEnderecoPadrao: string | null
+  sepultamentoLocalPadrao: string | null
+  whatsappTemplate: string | null
 }
 
 export interface EventoDTO {
@@ -147,4 +170,6 @@ export interface MemorialDTO {
   visitas: number
   autorizadoPor: string | null
   moderarMensagens: boolean
+  /** Override da mensagem do WhatsApp para esta nota (null = usa o modelo). */
+  whatsappTexto: string | null
 }

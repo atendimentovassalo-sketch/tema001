@@ -6,6 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { fetchMemorial, enviarHomenagem } from './api'
+import { montarTextoWhatsapp } from './share'
 import { ApiError } from '@/lib/api'
 import type { Homenagem, Memorial } from './types'
 import {
@@ -148,12 +149,8 @@ export default function MemorialPage({
   const f = memorial.funeraria
   const velorio = memorial.eventos.find((e) => e.tipo === 'velorio')
   const urlAbs = typeof window !== 'undefined' ? window.location.href : ''
-  const descCompartilhar = velorio
-    ? `Velório ${velorio.horarioConfirmado && velorio.inicioISO ? dataHoraBR(velorio.inicioISO) : 'horário a confirmar'}, ${velorio.localNome}. ${f.nome}, ${f.cidade}/${f.uf}.`
-    : `${f.nome} — ${f.cidade}/${f.uf}`
-  const textoZap = encodeURIComponent(
-    `${memorial.nomeCompleto}\n${descCompartilhar}\n${urlAbs}`,
-  )
+  // texto do WhatsApp: modelo da funerária (ou override da nota) com variáveis
+  const textoZap = encodeURIComponent(montarTextoWhatsapp(memorial, f))
 
   const onSubmit = async (data: HomenagemForm) => {
     if (data.website) return // honeypot: bot detectado, descarta em silêncio

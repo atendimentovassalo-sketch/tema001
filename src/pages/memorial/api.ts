@@ -77,6 +77,7 @@ export interface DadosMemorialInput {
   historia: string | null
   autorizadoPor: string | null
   moderarMensagens: boolean
+  whatsappTexto: string | null
   eventos: {
     tipo: 'velorio' | 'cerimonia' | 'sepultamento'
     localNome: string
@@ -85,6 +86,30 @@ export interface DadosMemorialInput {
     horarioConfirmado: boolean
   }[]
   fotos: { url: string; alt: string | null }[]
+}
+
+export interface ConfigTenant {
+  nome: string
+  cidade: string
+  uf: string
+  telefone: string
+  whatsapp: string
+  endereco: string | null
+  desde: string | null
+  sobre: string | null
+  velorioLocalPadrao: string | null
+  velorioEnderecoPadrao: string | null
+  sepultamentoLocalPadrao: string | null
+  whatsappTemplate: string | null
+}
+
+export async function fetchConfig(): Promise<ConfigTenant> {
+  const r = await api.get<{ config: ConfigTenant }>('/api/admin/config')
+  return r.config
+}
+
+export function salvarConfig(c: ConfigTenant): Promise<{ ok: true }> {
+  return api.put('/api/admin/config', c)
 }
 
 export async function fetchMemorialAdmin(id: string): Promise<Memorial | null> {

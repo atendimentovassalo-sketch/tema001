@@ -37,8 +37,24 @@ export const memorialInputSchema = z.object({
   historia: z.string().trim().max(8000).nullable().default(null),
   autorizadoPor: z.string().trim().max(160).nullable().default(null),
   moderarMensagens: z.boolean().default(false),
+  whatsappTexto: z.string().trim().max(1000).nullable().default(null),
   eventos: z.array(eventoInputSchema).max(6).default([]),
   fotos: z.array(fotoInputSchema).max(12).default([]),
 })
 
 export type MemorialInput = z.infer<typeof memorialInputSchema>
+
+export const configInputSchema = z.object({
+  nome: z.string().trim().min(1, 'Informe o nome.').max(120),
+  cidade: z.string().trim().min(1, 'Informe a cidade.').max(80),
+  uf: z.string().trim().length(2, 'UF com 2 letras.'),
+  telefone: z.string().trim().min(1, 'Informe o telefone.').max(40),
+  whatsapp: z.string().trim().min(8, 'WhatsApp com DDI+DDD (ex.: 5545...).').max(20),
+  endereco: z.string().trim().max(200).nullable().default(null),
+  desde: z.string().trim().max(10).nullable().default(null),
+  sobre: z.string().trim().max(2000).nullable().default(null),
+  velorioLocalPadrao: z.string().trim().max(160).nullable().default(null),
+  velorioEnderecoPadrao: z.string().trim().max(200).nullable().default(null),
+  sepultamentoLocalPadrao: z.string().trim().max(160).nullable().default(null),
+  whatsappTemplate: z.string().trim().max(1000).nullable().default(null),
+})

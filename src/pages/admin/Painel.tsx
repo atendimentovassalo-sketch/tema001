@@ -96,9 +96,14 @@ export default function AdminPainel() {
             Painel da funerária
             <small>{usuario.nome}</small>
           </div>
-          <button className="adm-sair" onClick={sair}>
-            Sair
-          </button>
+          <div className="adm-top-acoes">
+            <Link className="adm-sair" to="/admin/config">
+              Configurações
+            </Link>
+            <button className="adm-sair" onClick={sair}>
+              Sair
+            </button>
+          </div>
         </div>
       </header>
 

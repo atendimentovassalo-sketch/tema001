@@ -15,6 +15,7 @@ import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
 import HomeV2 from './pages/memorial/HomeV2'
 import AdminLogin from './pages/admin/Login'
 import AdminPainel from './pages/admin/Painel'
+import AdminConfig from './pages/admin/Configuracoes'
 import Privacidade from './pages/legal/Privacidade'
 import Termos from './pages/legal/Termos'
 
@@ -44,6 +45,7 @@ const App = () => (
         {/* Painel administrativo da funerária */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin" element={<AdminPainel />} />
+        <Route path="/admin/config" element={<AdminConfig />} />
         {/* Páginas legais (LGPD) */}
         <Route path="/privacidade" element={<Privacidade />} />
         <Route path="/termos" element={<Termos />} />

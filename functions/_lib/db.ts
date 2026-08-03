@@ -8,6 +8,7 @@ import type {
   FotoRow,
   HomenagemRow,
   FunerariaDTO,
+  ConfigDTO,
   EventoDTO,
   FotoDTO,
   HomenagemDTO,
@@ -28,6 +29,7 @@ export function toFunerariaDTO(t: TenantRow): FunerariaDTO {
     desde: t.desde,
     sobre: t.sobre,
     corMarca: t.cor_marca,
+    whatsappTemplate: t.whatsapp_template,
   }
 }
 
@@ -84,6 +86,7 @@ function toMemorialDTO(
     visitas: m.visitas,
     autorizadoPor: m.autorizado_por,
     moderarMensagens: !!m.moderar_mensagens,
+    whatsappTexto: m.whatsapp_texto,
   }
 }
 
@@ -110,6 +113,52 @@ export async function getTenantPorId(
       .bind(id)
       .first<TenantRow>()) ?? null
   )
+}
+
+export function toConfigDTO(t: TenantRow): ConfigDTO {
+  return {
+    nome: t.nome,
+    cidade: t.cidade,
+    uf: t.uf,
+    telefone: t.telefone,
+    whatsapp: t.whatsapp,
+    endereco: t.endereco,
+    desde: t.desde,
+    sobre: t.sobre,
+    velorioLocalPadrao: t.velorio_local_padrao,
+    velorioEnderecoPadrao: t.velorio_endereco_padrao,
+    sepultamentoLocalPadrao: t.sepultamento_local_padrao,
+    whatsappTemplate: t.whatsapp_template,
+  }
+}
+
+export async function atualizarConfig(
+  env: Env,
+  tenantId: string,
+  c: ConfigDTO,
+): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE tenant SET nome = ?, cidade = ?, uf = ?, telefone = ?, whatsapp = ?,
+      endereco = ?, desde = ?, sobre = ?, velorio_local_padrao = ?,
+      velorio_endereco_padrao = ?, sepultamento_local_padrao = ?,
+      whatsapp_template = ? WHERE id = ?`,
+  )
+    .bind(
+      c.nome,
+      c.cidade,
+      c.uf,
+      c.telefone,
+      c.whatsapp,
+      c.endereco,
+      c.desde,
+      c.sobre,
+      c.velorioLocalPadrao,
+      c.velorioEnderecoPadrao,
+      c.sepultamentoLocalPadrao,
+      c.whatsappTemplate,
+      tenantId,
+    )
+    .run()
 }
 
 /* ---------- helpers ---------- */
@@ -525,6 +574,7 @@ export interface DadosMemorial {
   historia: string | null
   autorizadoPor: string | null
   moderarMensagens: boolean
+  whatsappTexto: string | null
   eventos: {
     tipo: string
     localNome: string
@@ -615,8 +665,8 @@ export async function inserirMemorial(
   await env.DB.prepare(
     `INSERT INTO memorial (id, tenant_id, slug, nome_completo, apelido, foto_url,
       nascimento_iso, cidade_nascimento, falecimento_iso, cidade_falecimento, idade,
-      epitafio, historia, autorizado_por, moderar_mensagens, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'rascunho')`,
+      epitafio, historia, autorizado_por, moderar_mensagens, whatsapp_texto, status)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'rascunho')`,
   )
     .bind(
       id,
@@ -634,6 +684,7 @@ export async function inserirMemorial(
       d.historia,
       d.autorizadoPor,
       d.moderarMensagens ? 1 : 0,
+      d.whatsappTexto,
     )
     .run()
   await gravarEventosFotos(env, id, d)
@@ -657,7 +708,8 @@ export async function atualizarMemorial(
     `UPDATE memorial SET slug = ?, nome_completo = ?, apelido = ?, foto_url = ?,
       nascimento_iso = ?, cidade_nascimento = ?, falecimento_iso = ?,
       cidade_falecimento = ?, idade = ?, epitafio = ?, historia = ?,
-      autorizado_por = ?, moderar_mensagens = ? WHERE tenant_id = ? AND id = ?`,
+      autorizado_por = ?, moderar_mensagens = ?, whatsapp_texto = ?
+     WHERE tenant_id = ? AND id = ?`,
   )
     .bind(
       slug,
@@ -673,6 +725,7 @@ export async function atualizarMemorial(
       d.historia,
       d.autorizadoPor,
       d.moderarMensagens ? 1 : 0,
+      d.whatsappTexto,
       tenantId,
       id,
     )

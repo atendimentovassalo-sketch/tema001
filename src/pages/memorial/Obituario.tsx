@@ -2,7 +2,9 @@
  * foto (ou iniciais), busca por nome e selo "Velório hoje". */
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { toast } from 'sonner'
 import { fetchPublicados } from './api'
+import { urlWhatsapp, linkMemorial } from './share'
 import { anoBR, ddmm, iniciais, retratoDe } from './format'
 import type { Funeraria, Memorial } from './types'
 import './memorial.css'
@@ -58,6 +60,11 @@ export default function Obituario() {
     if (!q) return todos
     return todos.filter((m) => norm(m.nomeCompleto).includes(q))
   }, [todos, busca])
+
+  function copiarLink(m: Memorial) {
+    navigator.clipboard?.writeText(linkMemorial(m))
+    toast.success('Link copiado')
+  }
 
   if (!f) {
     return <div className="memorial-root" style={{ minHeight: '100vh' }} />
@@ -138,6 +145,23 @@ export default function Obituario() {
                       Faleceu em {ddmm(m.falecimentoISO)}
                     </span>
                   </Link>
+                  <div className="obit-share">
+                    <a
+                      className="obit-share-btn zap"
+                      href={urlWhatsapp(m, f)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      WhatsApp
+                    </a>
+                    <button
+                      className="obit-share-btn"
+                      type="button"
+                      onClick={() => copiarLink(m)}
+                    >
+                      Copiar link
+                    </button>
+                  </div>
                 </li>
               )
             })}

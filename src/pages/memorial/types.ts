@@ -11,6 +11,7 @@ export interface Funeraria {
   desde: string | null
   sobre: string | null
   corMarca: string
+  whatsappTemplate: string | null
 }
 
 export type TipoEvento = 'velorio' | 'cerimonia' | 'sepultamento'
@@ -65,6 +66,8 @@ export interface Memorial {
   fotos: Foto[]
   homenagens: Homenagem[]
   visitas: number
+  /** Override do texto de compartilhamento no WhatsApp (null = usa o modelo). */
+  whatsappTexto: string | null
   /** Nome de quem autorizou a publicação — exibido no rodapé. */
   autorizadoPor: string | null
   /**

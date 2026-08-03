@@ -414,3 +414,42 @@
     padding-top: 10px;
   }
 }
+
+/* tela de configurações */
+.adm-form-config {
+  max-width: 640px;
+}
+.adm-par {
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 520px) {
+  .adm-par {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.adm textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+.adm-var {
+  display: inline-block;
+  font-family: var(--mono, ui-monospace, monospace);
+  font-size: 0.72rem;
+  background: rgba(75, 94, 76, 0.12);
+  color: var(--sage);
+  padding: 1px 6px;
+  border-radius: 2px;
+  margin: 0 3px 3px 0;
+}
+
+/* ações no topo (Configurações + Sair) */
+.adm-top-acoes {
+  display: flex;
+  gap: 10px;
+}
+.adm-sair {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}

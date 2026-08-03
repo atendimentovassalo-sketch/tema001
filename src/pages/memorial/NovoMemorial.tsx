@@ -8,18 +8,19 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ApiError } from '@/lib/api'
 import {
-  fetchPublicados,
+  fetchConfig,
   fetchMemorialAdmin,
   criarMemorial,
   atualizarMemorialApi,
   publicarMemorialApi,
   uploadFoto,
   type DadosMemorialInput,
+  type ConfigTenant,
 } from './api'
+import { TEMPLATE_WHATSAPP_PADRAO } from './share'
 import { useSessao } from '../admin/auth'
 import { idadeEm, iniciais } from './format'
 import { recortar45 } from './image'
-import type { Funeraria } from './types'
 import './memorial.css'
 
 /** Converte data URL (JPEG do recorte) em Blob SEM fetch — a CSP
@@ -55,6 +56,7 @@ const schema = z
       .optional()
       .default(''),
     historia: z.string().trim().max(4000).optional().default(''),
+    whatsappTexto: z.string().trim().max(1000).optional().default(''),
     velorioLocal: z
       .string()
       .trim()
@@ -97,13 +99,14 @@ export default function NovoMemorial() {
   const editId = params.get('id')
   const { carregando: authCarregando, usuario } = useSessao()
 
-  const [f, setF] = useState<Funeraria | null>(null)
+  const [cfg, setCfg] = useState<ConfigTenant | null>(null)
 
   const {
     register,
     handleSubmit,
     watch,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<NovoForm>({
     resolver: zodResolver(schema),
@@ -122,12 +125,22 @@ export default function NovoMemorial() {
     if (!authCarregando && !usuario) navigate('/admin/login', { replace: true })
   }, [authCarregando, usuario, navigate])
 
-  // funerária (cabeçalho)
+  // config da funerária (cabeçalho + padrões + modelo). Em nota NOVA,
+  // pré-preenche os locais padrão (editáveis).
   useEffect(() => {
-    fetchPublicados({ limite: 1 })
-      .then((r) => setF(r.funeraria))
+    fetchConfig()
+      .then((c) => {
+        setCfg(c)
+        if (!editId) {
+          if (c.velorioLocalPadrao) setValue('velorioLocal', c.velorioLocalPadrao)
+          if (c.velorioEnderecoPadrao)
+            setValue('velorioEndereco', c.velorioEnderecoPadrao)
+          if (c.sepultamentoLocalPadrao)
+            setValue('sepLocal', c.sepultamentoLocalPadrao)
+        }
+      })
       .catch(() => {})
-  }, [])
+  }, [editId, setValue])
 
   // modo edição: carrega e preenche
   useEffect(() => {
@@ -151,6 +164,7 @@ export default function NovoMemorial() {
         cidadeFalecimento: m.cidadeFalecimento ?? '',
         epitafio: m.epitafio ?? '',
         historia: m.historia ?? '',
+        whatsappTexto: m.whatsappTexto ?? '',
         velorioLocal: vel?.localNome ?? '',
         velorioEndereco: vel?.endereco ?? '',
         velorioInicio: vel?.inicioISO?.slice(0, 16) ?? '',
@@ -230,6 +244,7 @@ export default function NovoMemorial() {
       historia: data.historia || null,
       autorizadoPor: data.autorizadoPor || null,
       moderarMensagens: data.moderarMensagens ?? false,
+      whatsappTexto: data.whatsappTexto?.trim() || null,
       eventos,
       fotos: [],
     }
@@ -259,26 +274,23 @@ export default function NovoMemorial() {
 
   const onSubmit = (data: NovoForm) => salvar(data, false)
 
-  if (!f) {
+  if (!cfg) {
     return <div className="memorial-root" style={{ minHeight: '100vh' }} />
   }
 
   return (
-    <div
-      className="memorial-root"
-      style={{ ['--marca' as string]: f.corMarca }}
-    >
+    <div className="memorial-root">
       <header className="topo">
         <div className="topo-in">
           <a className="wm" href="/admin">
-            {f.nome}
+            {cfg.nome}
             <small>Painel</small>
           </a>
           <span className="tel">
             <span>
               <em>{editId ? 'Editar nota' : 'Nova nota'}</em>
               <span className="num">
-                {f.cidade} · {f.uf}
+                {cfg.cidade} · {cfg.uf}
               </span>
             </span>
           </span>
@@ -444,6 +456,21 @@ export default function NovoMemorial() {
               <textarea
                 placeholder="Texto biográfico enviado pela família"
                 {...register('historia')}
+              />
+            </label>
+          </div>
+
+          {/* Mensagem do WhatsApp (opcional, sobrescreve o modelo) */}
+          <div className="grupo">
+            <span className="eti">Mensagem do WhatsApp (opcional)</span>
+            <p className="dica">
+              Texto que acompanha o link ao compartilhar esta nota. Em branco =
+              usa o modelo padrão da funerária (defina em Configurações).
+            </p>
+            <label>
+              <textarea
+                placeholder={cfg.whatsappTemplate || TEMPLATE_WHATSAPP_PADRAO}
+                {...register('whatsappTexto')}
               />
             </label>
           </div>
