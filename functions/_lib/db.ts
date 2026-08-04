@@ -506,6 +506,146 @@ export async function deletarSessao(env: Env, token: string): Promise<void> {
   await env.DB.prepare(`DELETE FROM sessao WHERE id = ?`).bind(token).run()
 }
 
+/* ----- administração de usuários da funerária ----- */
+
+export interface UsuarioAdminDTO {
+  id: string
+  nome: string
+  email: string
+  papel: string
+  ativo: boolean
+  temSenha: boolean
+  conviteAtivo: boolean
+  ultimoAcessoISO: string | null
+  criadoEmISO: string
+}
+
+interface UsuarioAdminRow {
+  id: string
+  nome: string
+  email: string
+  papel: string
+  ativo: number
+  tem_senha: number
+  convite_token: string | null
+  convite_expira: string | null
+  ultimo_acesso: string | null
+  criado_em: string
+}
+
+function toUsuarioAdminDTO(r: UsuarioAdminRow): UsuarioAdminDTO {
+  const conviteAtivo =
+    !!r.convite_token &&
+    (!r.convite_expira || new Date(r.convite_expira + 'Z').getTime() > Date.now())
+  return {
+    id: r.id,
+    nome: r.nome,
+    email: r.email,
+    papel: r.papel,
+    ativo: !!r.ativo,
+    temSenha: !!r.tem_senha,
+    conviteAtivo,
+    ultimoAcessoISO: r.ultimo_acesso,
+    criadoEmISO: r.criado_em,
+  }
+}
+
+export async function listUsuarios(
+  env: Env,
+  tenantId: string,
+): Promise<UsuarioAdminDTO[]> {
+  const rows = await env.DB.prepare(
+    `SELECT id, nome, email, papel, ativo, (senha_hash IS NOT NULL) AS tem_senha,
+            convite_token, convite_expira, ultimo_acesso, criado_em
+     FROM usuario WHERE tenant_id = ? ORDER BY criado_em ASC`,
+  )
+    .bind(tenantId)
+    .all<UsuarioAdminRow>()
+  return rows.results.map(toUsuarioAdminDTO)
+}
+
+export async function getUsuarioDoTenant(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<UsuarioRow | null> {
+  return (
+    (await env.DB.prepare(
+      `SELECT * FROM usuario WHERE id = ? AND tenant_id = ? LIMIT 1`,
+    )
+      .bind(id, tenantId)
+      .first<UsuarioRow>()) ?? null
+  )
+}
+
+/** Checa e-mail em uso (inclusive inativos: a coluna é UNIQUE). */
+export async function emailEmUso(env: Env, email: string): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `SELECT 1 AS x FROM usuario WHERE email = ? LIMIT 1`,
+  )
+    .bind(email.toLowerCase())
+    .first<{ x: number }>()
+  return !!r
+}
+
+export async function criarUsuario(
+  env: Env,
+  dados: {
+    id: string
+    tenantId: string
+    nome: string
+    email: string
+    papel: string
+    conviteToken: string
+    conviteExpiraISO: string
+  },
+): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO usuario (id, tenant_id, nome, email, papel, ativo,
+       convite_token, convite_expira)
+     VALUES (?, ?, ?, ?, ?, 1, ?, ?)`,
+  )
+    .bind(
+      dados.id,
+      dados.tenantId,
+      dados.nome,
+      dados.email.toLowerCase(),
+      dados.papel,
+      dados.conviteToken,
+      dados.conviteExpiraISO,
+    )
+    .run()
+}
+
+export async function atualizarUsuario(
+  env: Env,
+  id: string,
+  dados: { nome: string; papel: string },
+): Promise<void> {
+  await env.DB.prepare(`UPDATE usuario SET nome = ?, papel = ? WHERE id = ?`)
+    .bind(dados.nome, dados.papel, id)
+    .run()
+}
+
+export async function setAtivoUsuario(
+  env: Env,
+  id: string,
+  ativo: boolean,
+): Promise<void> {
+  await env.DB.prepare(`UPDATE usuario SET ativo = ? WHERE id = ?`)
+    .bind(ativo ? 1 : 0, id)
+    .run()
+  if (!ativo) {
+    // desativar derruba as sessões abertas dessa pessoa
+    await env.DB.prepare(`DELETE FROM sessao WHERE usuario_id = ?`).bind(id).run()
+  }
+}
+
+export async function deletarUsuario(env: Env, id: string): Promise<void> {
+  await env.DB.prepare(`DELETE FROM sessao WHERE usuario_id = ?`).bind(id).run()
+  await env.DB.prepare(`DELETE FROM usuario WHERE id = ?`).bind(id).run()
+}
+
 /* ===================== ADMIN: MEMORIAIS ===================== */
 
 export interface MemorialAdminItem {

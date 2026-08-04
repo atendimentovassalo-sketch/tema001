@@ -97,6 +97,9 @@ export default function AdminPainel() {
             <small>{usuario.nome}</small>
           </div>
           <div className="adm-top-acoes">
+            <Link className="adm-sair" to="/admin/usuarios">
+              Usuários
+            </Link>
             <Link className="adm-sair" to="/admin/config">
               Configurações
             </Link>

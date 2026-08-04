@@ -58,3 +58,16 @@ export const configInputSchema = z.object({
   sepultamentoLocalPadrao: z.string().trim().max(160).nullable().default(null),
   whatsappTemplate: z.string().trim().max(1000).nullable().default(null),
 })
+
+export const usuarioNovoSchema = z.object({
+  nome: z.string().trim().min(2, 'Informe o nome.').max(120),
+  email: z.string().trim().toLowerCase().email('E-mail inválido.').max(160),
+  papel: z.enum(['admin', 'editor']).default('admin'),
+})
+
+export const usuarioEditarSchema = z.object({
+  nome: z.string().trim().min(2, 'Informe o nome.').max(120).optional(),
+  papel: z.enum(['admin', 'editor']).optional(),
+  ativo: z.boolean().optional(),
+  reenviarConvite: z.boolean().optional(),
+})

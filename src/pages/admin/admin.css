@@ -466,3 +466,49 @@
 .adm-esqueci:hover {
   text-decoration: underline;
 }
+
+/* ---- usuários ---- */
+.adm-form-usuario {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 14px;
+  align-items: end;
+}
+@media (max-width: 720px) {
+  .adm-form-usuario {
+    grid-template-columns: 1fr;
+  }
+}
+.adm-email {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+.adm-eu {
+  margin-left: 8px;
+  font-size: 0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+.adm-status.pend {
+  background: rgba(181, 98, 63, 0.14);
+  color: #8a4526;
+}
+.adm-link-convite {
+  margin-top: 18px;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--paper-2, rgba(0, 0, 0, 0.02));
+}
+.adm-link-convite p {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.adm-link-convite code {
+  display: block;
+  word-break: break-all;
+  font-size: 0.78rem;
+  margin-bottom: 12px;
+}

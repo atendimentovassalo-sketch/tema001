@@ -56,3 +56,29 @@ ${link}
 Se não foi você, ignore este e-mail — sua senha continua a mesma.`
   return { assunto, html, texto }
 }
+
+/** Conteúdo do e-mail de convite para o painel (1º acesso). */
+export function emailConvite(
+  nomeFuneraria: string,
+  nomeConvidado: string,
+  link: string,
+): { assunto: string; html: string; texto: string } {
+  const assunto = `Seu acesso ao painel — ${nomeFuneraria}`
+  const html = `
+  <div style="font-family:Arial,Helvetica,sans-serif;max-width:480px;margin:0 auto;color:#211d17;line-height:1.6">
+    <h2 style="font-weight:normal;color:#211d17">Bem-vindo(a), ${nomeConvidado}</h2>
+    <p>Você foi cadastrado(a) no painel de <b>${nomeFuneraria}</b>, onde as notas de
+      falecimento são publicadas e as homenagens moderadas.</p>
+    <p style="margin:24px 0">
+      <a href="${link}" style="background:#b5623f;color:#fff;text-decoration:none;padding:12px 22px;border-radius:2px;display:inline-block">Definir minha senha</a>
+    </p>
+    <p style="font-size:14px;color:#6c6458">O link vale por 7 dias e só pode ser usado uma vez.
+      Ninguém além de você conhece a senha que escolher.</p>
+  </div>`
+  const texto = `Bem-vindo(a), ${nomeConvidado}
+
+Você foi cadastrado(a) no painel de ${nomeFuneraria}.
+Defina sua senha neste link (vale 7 dias, uso único):
+${link}`
+  return { assunto, html, texto }
+}
