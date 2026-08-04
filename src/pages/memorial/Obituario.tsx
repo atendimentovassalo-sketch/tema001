@@ -7,6 +7,7 @@ import { fetchPublicados } from './api'
 import { urlWhatsapp, linkMemorial } from './share'
 import { anoBR, ddmm, iniciais, retratoDe } from './format'
 import type { Funeraria, Memorial } from './types'
+import { SiteShell } from '@/components/SiteChrome'
 import './memorial.css'
 
 /** Normaliza para busca acento-insensível. */
@@ -71,27 +72,11 @@ export default function Obituario() {
   }
 
   return (
+    <SiteShell aqui="obituario">
     <div
       className="memorial-root"
       style={{ ['--marca' as string]: f.corMarca }}
     >
-      <header className="topo">
-        <div className="topo-in">
-          <Link className="wm" to="/funeraria">
-            {f.nome}
-            <small>
-              {f.cidade} · {f.uf}
-            </small>
-          </Link>
-          <a className="tel" href={`tel:${f.telefone}`}>
-            <span>
-              <em>24 horas</em>
-              <span className="num">{f.telefone}</span>
-            </span>
-          </a>
-        </div>
-      </header>
-
       <section className="hero" style={{ paddingBottom: 56 }}>
         <p className="eti">{f.cidade} e região</p>
         <h1 style={{ maxWidth: 'none' }}>Obituário</h1>
@@ -173,16 +158,7 @@ export default function Obituario() {
         </p>
       </div>
 
-      <footer className="rodape">
-        <p className="wm">
-          {f.nome}
-          <small>Atendimento 24 horas</small>
-        </p>
-        <a className="fone num" href={`tel:${f.telefone}`}>
-          <small>Ligue a qualquer hora</small>
-          {f.telefone}
-        </a>
-      </footer>
     </div>
+    </SiteShell>
   )
 }

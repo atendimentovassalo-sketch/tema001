@@ -46,6 +46,8 @@ export default function AdminLogin() {
   return (
     <div className="adm adm-login-wrap">
       <div className="adm-login">
+        <img className="adm-logo" src="/logo.png"
+          alt="Funerária São Francisco — Catanduvas/PR" />
         <div className="adm-brand">
           Painel da funerária
           <small>Área restrita</small>

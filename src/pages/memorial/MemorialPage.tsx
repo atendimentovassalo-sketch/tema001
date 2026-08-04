@@ -17,6 +17,7 @@ import {
   retratoDe,
   tempoRelativo,
 } from './format'
+import { SiteShell } from '@/components/SiteChrome'
 import './memorial.css'
 
 const ROT: Record<string, string> = {
@@ -211,27 +212,11 @@ export default function MemorialPage({
   }
 
   return (
+    <SiteShell>
     <div
       className="memorial-root"
       style={{ ['--marca' as string]: f.corMarca }}
     >
-      {/* topo */}
-      <header className="topo">
-        <div className="topo-in">
-          <a className="wm" href="/">
-            {f.nome}
-            <small>
-              {f.cidade} · {f.uf}
-            </small>
-          </a>
-          <a className="tel" href={`tel:${f.telefone}`}>
-            <span>
-              <em>24 horas</em>
-              <span className="num">{f.telefone}</span>
-            </span>
-          </a>
-        </div>
-      </header>
 
       {/* hero */}
       <section className="hero" style={{ paddingBottom: 66 }}>
@@ -540,27 +525,6 @@ export default function MemorialPage({
       </div>
 
       {/* rodapé com linha de autorização */}
-      <footer className="rodape">
-        <p className="wm">
-          {f.nome}
-          <small>Atendimento 24 horas</small>
-        </p>
-        <p className="end">
-          {f.endereco}
-          <br />
-          {f.cidade} · {f.uf}
-        </p>
-        <a className="fone num" href={`tel:${f.telefone}`}>
-          <small>Ligue a qualquer hora</small>
-          {f.telefone}
-        </a>
-        {memorial.autorizadoPor && (
-          <p className="autoriz">
-            Publicação autorizada pela família, por{' '}
-            <b>{memorial.autorizadoPor}</b>.
-          </p>
-        )}
-      </footer>
 
       {preview && (
         <div className="form" style={{ maxWidth: 640 }}>
@@ -601,5 +565,6 @@ export default function MemorialPage({
         </nav>
       )}
     </div>
+    </SiteShell>
   )
 }

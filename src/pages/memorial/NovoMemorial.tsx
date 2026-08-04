@@ -21,6 +21,7 @@ import { TEMPLATE_WHATSAPP_PADRAO } from './share'
 import { useSessao } from '../admin/auth'
 import { idadeEm, iniciais } from './format'
 import { recortar45 } from './image'
+import { SiteHeader } from '@/components/SiteChrome'
 import './memorial.css'
 
 /** Converte data URL (JPEG do recorte) em Blob SEM fetch — a CSP
@@ -280,22 +281,7 @@ export default function NovoMemorial() {
 
   return (
     <div className="memorial-root">
-      <header className="topo">
-        <div className="topo-in">
-          <a className="wm" href="/admin">
-            {cfg.nome}
-            <small>Painel</small>
-          </a>
-          <span className="tel">
-            <span>
-              <em>{editId ? 'Editar nota' : 'Nova nota'}</em>
-              <span className="num">
-                {cfg.cidade} · {cfg.uf}
-              </span>
-            </span>
-          </span>
-        </div>
-      </header>
+      <SiteHeader />
 
       <div className="form">
         <p className="eti" style={{ color: 'var(--brass-e)' }}>

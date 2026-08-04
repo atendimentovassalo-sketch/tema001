@@ -92,6 +92,9 @@ export default function AdminPainel() {
     <div className="adm">
       <header className="adm-top">
         <div className="adm-top-in">
+          <a className="adm-marca" href="/">
+            <img src="/logo.png" alt="Funerária São Francisco" />
+          </a>
           <div className="adm-brand">
             Painel da funerária
             <small>{usuario.nome}</small>

@@ -5,6 +5,7 @@ import { useParams, Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { fetchAprovacao, decidirAprovacao, type AprovacaoInfo } from './api'
 import { iniciais, tempoRelativo } from './format'
+import { SiteHeader } from '@/components/SiteChrome'
 import './memorial.css'
 
 type Estado = 'carregando' | 'pendente' | 'aprovada' | 'recusada' | 'invalido'
@@ -56,14 +57,7 @@ export default function AprovarHomenagem() {
 
   return (
     <div className="memorial-root">
-      <header className="topo">
-        <div className="topo-in">
-          <span className="wm">
-            Aprovação de mensagem
-            <small>Link seguro do responsável</small>
-          </span>
-        </div>
-      </header>
+      <SiteHeader />
 
       <div className="form" style={{ maxWidth: 560 }}>
         {estado === 'carregando' && <p className="dica">Carregando…</p>}

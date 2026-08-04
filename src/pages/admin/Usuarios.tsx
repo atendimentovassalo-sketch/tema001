@@ -127,6 +127,9 @@ export default function AdminUsuarios() {
     <div className="adm">
       <header className="adm-top">
         <div className="adm-top-in">
+          <a className="adm-marca" href="/">
+            <img src="/logo.png" alt="Funerária São Francisco" />
+          </a>
           <div className="adm-brand">
             Usuários
             <small>{usuario.nome}</small>
