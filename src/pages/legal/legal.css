@@ -59,7 +59,7 @@
   font-family: var(--a);
   font-size: 0.86rem;
   line-height: 1.6;
-  color: var(--muted, #6c6458);
+  color: var(--muted, #565049);
 }
 .legal-corpo .legal-ph {
   background: rgba(181, 98, 63, 0.12);

@@ -1,24 +1,25 @@
 /*
  * Home v2 da funerária — direção "dignidade calma" (pesquisa: clínicas premium).
- * Creme quente + verde sereno + âmbar terroso, serifa editorial (Fraunces) + sans (Archivo).
+ * Paleta da Funerária São Francisco: creme + carvão + ouro, Fraunces + Figtree.
  * Escopado sob .homev2 para não colidir com o resto do app.
  */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,400&family=Archivo:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&family=Figtree:ital,wght@0,300..600;1,300..500&display=swap');
 
 .homev2 {
-  --cream: #f4f0e8;
-  --paper: #fbf9f5;
-  --ink: #211d17;
-  --muted: #6c6458;
-  --line: #ddd5c7;
-  --line-soft: #e9e3d7;
-  --sage: #4b5e4c;
-  --sage-mid: #7c8b7a;
-  --amber: #b5623f;
-  --amber-dark: #9a4f31;
-  --gold: #b99a6b;
-  --serif: 'Fraunces', Georgia, 'Times New Roman', serif;
-  --sans: 'Archivo', system-ui, -apple-system, sans-serif;
+  --cream: #faf8f3;
+  --paper: #ffffff;
+  --ink: #1a1712;
+  --muted: #565049;
+  --line: #e4e0d6;
+  --line-soft: #efebe1;
+  --sage: #8a6828; /* ouro de texto (rótulos) */
+  --sage-mid: #b0873b;
+  --amber: #c8a04e; /* ouro de superfície (botão) */
+  --amber-dark: #b0873b;
+  --amber-txt: #1a1712; /* texto por cima do ouro */
+  --gold: #c8a04e;
+  --serif: 'Fraunces', 'Iowan Old Style', Palatino, Georgia, serif;
+  --sans: 'Figtree', ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;
   --t: 240ms cubic-bezier(0.2, 0.6, 0.3, 1);
 
   background: var(--cream);
@@ -170,7 +171,7 @@
 }
 .homev2 .btn.solid {
   background: var(--amber);
-  color: #fbf7f2;
+  color: var(--amber-txt);
 }
 .homev2 .btn.solid:hover {
   background: var(--amber-dark);
@@ -759,7 +760,7 @@
 }
 .homev2 .mobicta .mb-btn.solid {
   background: var(--amber);
-  color: #fbf7f2;
+  color: var(--amber-txt);
 }
 .homev2 .mobicta .mb-btn.zap {
   background: var(--paper);

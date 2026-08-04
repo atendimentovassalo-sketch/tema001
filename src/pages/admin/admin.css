@@ -1,20 +1,21 @@
 /* Painel administrativo — mesma linguagem "dignidade calma", tom sóbrio.
    Escopado sob .adm para não colidir com o resto do app. */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500&family=Archivo:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&family=Figtree:ital,wght@0,300..600;1,300..500&display=swap');
 
 .adm {
-  --cream: #f4f0e8;
-  --paper: #fbf9f5;
-  --ink: #211d17;
-  --muted: #6c6458;
-  --line: #ddd5c7;
-  --line-soft: #e9e3d7;
-  --sage: #4b5e4c;
-  --amber: #b5623f;
-  --amber-d: #9a4f31;
+  --cream: #faf8f3;
+  --paper: #ffffff;
+  --ink: #1a1712;
+  --muted: #565049;
+  --line: #e4e0d6;
+  --line-soft: #efebe1;
+  --sage: #8a6828; /* ouro de texto (rótulos) */
+  --amber: #c8a04e; /* ouro de superfície (botão primário) */
+  --amber-d: #b0873b;
+  --amber-txt: #1a1712; /* texto por cima do ouro */
   --erro: #8c2f2f;
-  --serif: 'Fraunces', Georgia, serif;
-  --sans: 'Archivo', system-ui, sans-serif;
+  --serif: 'Fraunces', 'Iowan Old Style', Palatino, Georgia, serif;
+  --sans: 'Figtree', ui-sans-serif, system-ui, -apple-system, Arial, sans-serif;
 
   min-height: 100vh;
   background: var(--cream);
@@ -76,7 +77,7 @@
 }
 .adm-btn-primario {
   background: var(--amber);
-  color: #fbf7f2;
+  color: var(--amber-txt);
 }
 .adm-btn-primario:hover {
   background: var(--amber-d);
@@ -265,7 +266,7 @@
   padding: 0 6px;
   border-radius: 11px;
   background: var(--amber);
-  color: #fff;
+  color: var(--amber-txt);
   font-family: var(--sans);
   font-size: 0.72rem;
   font-weight: 600;
@@ -341,7 +342,7 @@
   padding: 0 5px;
   border-radius: 10px;
   background: var(--amber);
-  color: #fff;
+  color: var(--amber-txt);
   font-family: var(--sans);
   font-size: 0.68rem;
   font-weight: 600;
@@ -355,11 +356,11 @@
   border-radius: 2px;
 }
 .adm-status.on {
-  background: rgba(75, 94, 76, 0.14);
+  background: rgba(138, 104, 40, 0.14);
   color: var(--sage);
 }
 .adm-status.off {
-  background: rgba(108, 100, 88, 0.14);
+  background: rgba(86, 80, 73, 0.14);
   color: var(--muted);
 }
 .adm-col-acoes {
@@ -436,7 +437,7 @@
   display: inline-block;
   font-family: var(--mono, ui-monospace, monospace);
   font-size: 0.72rem;
-  background: rgba(75, 94, 76, 0.12);
+  background: rgba(138, 104, 40, 0.12);
   color: var(--sage);
   padding: 1px 6px;
   border-radius: 2px;
@@ -491,8 +492,8 @@
   color: var(--sage);
 }
 .adm-status.pend {
-  background: rgba(181, 98, 63, 0.14);
-  color: #8a4526;
+  background: rgba(200, 160, 78, 0.22);
+  color: #6f5320;
 }
 .adm-link-convite {
   margin-top: 18px;
