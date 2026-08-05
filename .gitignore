@@ -36,3 +36,7 @@ scratchpad/
 # Cloudflare / wrangler — estado local do D1/R2, não versionar
 .wrangler/
 .dev.vars
+
+# Lixo/artefatos locais e dossiês binários (não versionar)
+_lixo_git/
+*.pdf

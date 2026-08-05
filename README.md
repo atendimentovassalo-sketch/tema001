@@ -1,132 +1,66 @@
-# Projeto Criado com o Skip
+# tema001 — SaaS de obituário/memorial para funerárias
 
-Este projeto foi criado de ponta a ponta com o [Skip](https://goskip.dev).
+Aplicação multi-tenant que dá a uma funerária um **site institucional + obituário online + painel de
+gestão**. Primeiro cliente em produção: **Funerária São Francisco** (`funerariacatanduvas.com.br`).
+Demo público: `funeraria.novomodelo.com.br`.
 
-## 🚀 Stack Tecnológica
+> **👉 Estado do projeto, o que está feito e o que falta:** ver **[`ESTADO-DO-PROJETO.md`](ESTADO-DO-PROJETO.md)**.
+> Esse é o ponto de entrada para qualquer pessoa (ou IA) que chegar ao repo. Leia antes de mexer.
 
-- **React 19** - Biblioteca JavaScript para construção de interfaces
-- **Vite** - Build tool extremamente rápida
-- **TypeScript** - Superset tipado do JavaScript
-- **Shadcn UI** - Componentes reutilizáveis e acessíveis
-- **Tailwind CSS** - Framework CSS utility-first
-- **React Router** - Roteamento para aplicações React
-- **React Hook Form** - Gerenciamento de formulários performático
-- **Zod** - Validação de schemas TypeScript-first
-- **Recharts** - Biblioteca de gráficos para React
+## O que faz
 
-## 📋 Pré-requisitos
+- **Obituário / memorial:** a funerária publica notas de falecimento (foto, história, locais e horários de
+  velório/sepultamento); famílias deixam **homenagens** que a funerária **modera** antes de publicar.
+- **Painel admin:** CRUD de memoriais, moderação, upload de fotos, configurações, gestão de usuários.
+- **Compartilhamento:** cada nota gera mensagem pronta de WhatsApp; prévia de link com a marca da funerária.
+- **Multi-tenant:** `tenant_id` em todo o schema; a API resolve a funerária pelo domínio.
 
-- Node.js 18+
-- npm
+## Stack
 
-## 🔧 Instalação
+- **Front:** React + Vite + TypeScript + Shadcn UI + Tailwind + React Router (template "Skip").
+- **Back:** Cloudflare **Pages Functions** (`functions/api/*`) + **D1** (SQLite) + **R2** (fotos).
+- **Auth:** própria — PBKDF2-SHA256 (**100k** iterações, limite do Workers) + sessão cookie httpOnly.
+- **E-mail:** Resend (recuperação de senha).
+- **Deploy:** Cloudflare Pages, deploy automático no push da branch `main`.
 
-```bash
-npm install
-```
+## Arquitetura em produção (importante)
 
-## 💻 Scripts Disponíveis
+O domínio do cliente (`funerariacatanduvas.com.br`) é servido por **3 peças**, não uma:
 
-### Desenvolvimento
+1. **Pages `funerariacatanduvas`** (direct upload) — o **site institucional estático** (fora deste repo).
+2. **Pages `tema001`** (este repo) — o app React + API, publicado em `tema001.pages.dev`.
+3. **Worker `proxy-obituario`** — roteia as rotas do app (`/obituario`, `/admin`, `/api/*`, `/assets/*`,
+   `/memorial/*`, `/og-image.png*`…) para o `tema001.pages.dev` **e reescreve as meta tags `og:` por tenant**
+   (marca correta na prévia de compartilhamento). O shell `index.html` deste repo ainda traz o texto do
+   template — a marca certa em produção vem do Worker.
 
-```bash
-# Iniciar servidor de desenvolvimento
-npm start
-# ou
-npm run dev
-```
+Detalhes completos e mapa de estado em [`ESTADO-DO-PROJETO.md`](ESTADO-DO-PROJETO.md).
 
-Abre a aplicação em modo de desenvolvimento em [http://localhost:5173](http://localhost:5173).
+## Rodar localmente (Windows — atenção aos gotchas)
 
-### Build
-
-```bash
-# Build para produção
-npm run build
-
-# Build para desenvolvimento
-npm run build:dev
-```
-
-Gera os arquivos otimizados para produção na pasta `dist/`.
-
-### Preview
+`pnpm dev` / `npm run dev` **quebram** neste ambiente (o `pnpm-workspace.yaml` tem artefatos de hospedagem).
+Rode o Vite e o Wrangler direto:
 
 ```bash
-# Visualizar build de produção localmente
-npm run preview
+corepack pnpm install
+# front (porta 8080):
+node node_modules/vite/bin/vite.js
+# API + D1 + R2 local (porta 8788):
+node node_modules/wrangler/bin/wrangler.js pages dev dist --port 8788 --local
 ```
 
-Permite visualizar a build de produção localmente antes do deploy.
+- Só **uma** instância do Wrangler por porta. Migrations: `wrangler d1 migrations apply funeraria-db --local`;
+  seed: `--file migrations/seed.sql`.
+- ⚠️ **NÃO** commitar mudança no `pnpm-workspace.yaml` (a linha `virtualStoreDir: ${...:-/app}/...` quebra o
+  build da Cloudflare — deve ficar removida; ver histórico do go-live).
 
-### Linting e Formatação
+## Deploy
 
-```bash
-# Executar linter
-npm run lint
+Push na `main` → build+deploy automático no Pages (`tema001.pages.dev`). Fixes de produção vão direto na
+`main`. Após o deploy, abas já abertas podem precisar de **Ctrl+Shift+R**.
 
-# Executar linter e corrigir problemas automaticamente
-npm run lint:fix
+## Convenções
 
-# Formatar código com Prettier
-npm run format
-```
-
-## 📁 Estrutura do Projeto
-
-```
-.
-├── src/              # Código fonte da aplicação
-├── public/           # Arquivos estáticos
-├── dist/             # Build de produção (gerado)
-├── node_modules/     # Dependências (gerado)
-└── package.json      # Configurações e dependências do projeto
-```
-
-## 🎨 Componentes UI
-
-Este template inclui uma biblioteca completa de componentes Shadcn UI baseados em Radix UI:
-
-- Accordion
-- Alert Dialog
-- Avatar
-- Button
-- Checkbox
-- Dialog
-- Dropdown Menu
-- Form
-- Input
-- Label
-- Select
-- Switch
-- Tabs
-- Toast
-- Tooltip
-- E muito mais...
-
-## 📝 Ferramentas de Qualidade de Código
-
-- **TypeScript**: Tipagem estática
-- **ESLint**: Análise de código estático
-- **Oxlint**: Linter extremamente rápido
-- **Prettier**: Formatação automática de código
-
-## 🔄 Workflow de Desenvolvimento
-
-1. Instale as dependências: `npm install`
-2. Inicie o servidor de desenvolvimento: `npm start`
-3. Faça suas alterações
-4. Verifique o código: `npm run lint`
-5. Formate o código: `npm run format`
-6. Crie a build: `npm run build`
-7. Visualize a build: `npm run preview`
-
-## 📦 Build e Deploy
-
-Para criar uma build otimizada para produção:
-
-```bash
-npm run build
-```
-
-Os arquivos otimizados serão gerados na pasta `dist/` e estarão prontos para deploy.
+- Existe **apenas UM tenant real** (o cliente). Não rodar `PUT /api/admin/config` nele em teste (sobrescreve
+  dados reais). Usar tenant/admin descartável para testes destrutivos.
+- Segredos (tokens de convite, e-mails de admin, chaves) **não** vivem neste repo — ficam no handoff interno.
