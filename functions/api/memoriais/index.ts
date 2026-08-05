@@ -1,11 +1,11 @@
 /* GET /api/memoriais — lista pública de publicados do tenant.
  * Query: ?limite=N&excluir=slug */
 import type { Env } from '../../_lib/types'
-import { getTenant, listPublicados, toFunerariaDTO } from '../../_lib/db'
+import { getTenantPorHost, listPublicados, toFunerariaDTO } from '../../_lib/db'
 import { json, erro } from '../../_lib/http'
 
 export const onRequestGet: PagesFunction<Env> = async ({ env, request }) => {
-  const tenant = await getTenant(env)
+  const tenant = await getTenantPorHost(env, request)
   if (!tenant) return erro('Funerária não configurada.', 503)
 
   const url = new URL(request.url)

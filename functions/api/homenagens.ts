@@ -3,7 +3,7 @@
 import { z } from 'zod'
 import type { Env, HomenagemDTO } from './../_lib/types'
 import {
-  getTenant,
+  getTenantPorHost,
   getMemorialBasico,
   contarHomenagensRecentesPorIp,
   inserirHomenagem,
@@ -25,7 +25,7 @@ const schema = z
   })
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
-  const tenant = await getTenant(env)
+  const tenant = await getTenantPorHost(env, request)
   if (!tenant) return erro('Funerária não configurada.', 503)
 
   let body: unknown

@@ -45,7 +45,14 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
 
 - **Multi-tenant operacional (próxima frente):** onboarding sem SQL, provisionamento por domínio,
   `og-image` por tenant (hoje o banner é único no Worker), UI de gestão de tenant/usuários.
-  Decisão em aberto: site institucional **dentro** do SaaS ou **separado** (como a São Francisco).
+  Decisão **fechada** (05/08): Modelo A (D1 único + isolamento lógico + backup por tenant) e site institucional
+  **separado** por cliente. Dossiê/plano/briefs em `PROJETOS - CLAUDE/SAAS-FUNERARIAS/`.
+  - 🟡 **Fase 0 (resolução por host) — código feito e testado local:** coluna `tenant.dominio` (migration
+    `0003_dominio.sql`), `getTenantPorHost()` em `_lib/db.ts`, e os 3 chamadores públicos trocados
+    (`memoriais/index`, `memoriais/[slug]`, `homenagens`). `tsc` limpo. **Falta produção:** deploy + aplicar
+    `0003` no `--remote` (via `execute --file`, **não** `migrations apply` — varreria o `seed.sql`) +
+    preencher `dominio` dos tenants + diagnosticar se o Worker precisa reencaminhar o host. Runbook completo
+    em `SAAS-FUNERARIAS/BRIEF-EXECUCAO-FASE-0-host.md`.
 - **Shell `index.html`** ainda tem o texto do template ("Demonstração") — a marca certa vem do Worker;
   corrigir aqui como cinto-e-suspensório na próxima vez que o repo for tocado.
 - Bindings do ambiente **Preview** não configurados (só Produção). Revisão jurídica das páginas legais.

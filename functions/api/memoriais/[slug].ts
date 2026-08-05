@@ -1,14 +1,15 @@
 /* GET /api/memoriais/:slug — memorial público por slug (+1 visita). */
 import type { Env } from '../../_lib/types'
-import { getTenant, getMemorialPublico, incrementarVisitas } from '../../_lib/db'
+import { getTenantPorHost, getMemorialPublico, incrementarVisitas } from '../../_lib/db'
 import { json, erro } from '../../_lib/http'
 
 export const onRequestGet: PagesFunction<Env, 'slug'> = async ({
   env,
   params,
   waitUntil,
+  request,
 }) => {
-  const tenant = await getTenant(env)
+  const tenant = await getTenantPorHost(env, request)
   if (!tenant) return erro('Funerária não configurada.', 503)
 
   const slug = String(params.slug)

@@ -104,6 +104,44 @@ export async function getTenant(
   return (await stmt.first<TenantRow>()) ?? null
 }
 
+/**
+ * Resolve o tenant pelo domínio público da requisição.
+ * Prefere o host reencaminhado pelo Worker-proxy (header `x-tenant-host`); cai
+ * para `x-forwarded-host`, depois o `Host`, depois o host da URL. Normaliza
+ * (minúsculas, sem `www.`, sem porta).
+ *
+ * Fallback de transição: se NÃO houver correspondência e existir só 1 tenant,
+ * devolve-o (mantém compatibilidade enquanto os domínios não estão preenchidos).
+ * Com 2+ tenants e host desconhecido, devolve null — nunca "vaza" o tenant errado.
+ */
+export async function getTenantPorHost(
+  env: Env,
+  request: Request,
+): Promise<TenantRow | null> {
+  const host = (
+    request.headers.get('x-tenant-host') ??
+    request.headers.get('x-forwarded-host') ??
+    request.headers.get('host') ??
+    new URL(request.url).hostname
+  )
+    .toLowerCase()
+    .replace(/^www\./, '')
+    .split(':')[0]
+
+  const porHost = await env.DB.prepare(
+    'SELECT * FROM tenant WHERE dominio = ? LIMIT 1',
+  )
+    .bind(host)
+    .first<TenantRow>()
+  if (porHost) return porHost
+
+  const total = await env.DB.prepare(
+    'SELECT COUNT(*) AS n FROM tenant',
+  ).first<{ n: number }>()
+  if ((total?.n ?? 0) <= 1) return getTenant(env)
+  return null
+}
+
 export async function getTenantPorId(
   env: Env,
   id: string,
