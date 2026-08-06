@@ -73,13 +73,7 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
 - **Shell `index.html`** ainda tem o texto do template ("Demonstração") — a marca certa vem do Worker;
   corrigir aqui como cinto-e-suspensório na próxima vez que o repo for tocado.
 - Bindings do ambiente **Preview** não configurados (só Produção). Revisão jurídica das páginas legais.
-- **🌐 Próxima frente de DEV — guarda-chuva `obituario.com.br` (Modelo B, decidido 06/08):**
-  ⚠️ **DOMÍNIO AINDA NÃO SECURIZADO (06/08):** `obituario.com.br` (grafia certa) é de **terceiro** (Arnaldo,
-  parado há 10 anos, expira **23/10/2026** — plano do Felipe: aguardar o drop p/ pegar por ~R$40; senão comprar
-  ou marca própria). `obtuario.com.br` (o que o Felipe registrou) é **grafia errada** → só redirect defensivo,
-  **nunca a marca**. Plano B = **marca própria** (o domínio não precisa conter "obituario"; ranqueia por
-  conteúdo). **O DEV NÃO DEVE CHUMBAR NENHUM DOMÍNIO — usar placeholder/variável de ambiente.** O histórico
-  acumula no D1 (agnóstico de domínio); quando securizar, é só apontar. — o obituário **vive
+- **🌐 Próxima frente de DEV — guarda-chuva `obituario.com.br` (Modelo B, decidido 06/08):** o obituário **vive
   só no `obituario.com.br`**, white-label com a marca da funerária que informou (não espelha no domínio da
   funerária). Rotas novas: `obituario.com.br/<cidade>` (índice **cross-tenant** neutro, com card da funerária
   por nota) e `/<cidade>/<slug>` (nota individual, branding pela funerária **dona da nota** — não pelo host).
@@ -87,7 +81,18 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
   WhatsApp aponta pro `obituario.com.br` → concentra todo o tráfego no domínio → é o que ranqueia (o moat). O
   "espelho + canonical" (Modelo A) fica como premium do tier exclusivo. Arquitetura completa:
   `SAAS-FUNERARIAS/ARQUITETURA-obituario-umbrella.md`; design + plano de execução fechados em
-  `SAAS-FUNERARIAS/PROPOSTA-obituario-umbrella-v4-FECHADA.md` (11 decisões, fases U0–U8).
+  `SAAS-FUNERARIAS/PROPOSTA-umbrella-v5.md` (12 decisões, fases U0–U8).
+  - 🚨 **DOMÍNIO NÃO DEFINIDO (D12) — não chumbar nome nenhum:** `obituario.com.br` (grafia certa) é de
+    **terceiro** (registrado há 10 anos, estacionado, vence 23/10/2026). Pelo registro.br o vencimento
+    congela o domínio por ~104 dias com o dono podendo renovar; a liberação é por **candidatura com
+    leilão** quando há 2+ interessados — quase certo num domínio de palavra-chave. Cenário otimista de
+    liberação: **fev/2027**, disputado. `obtuario.com.br` (sem o "i") é grafia ERRADA → só redirect
+    defensivo, NUNCA a marca. **Plano B: marca própria** (não precisa conter "obituário" — ranqueia por
+    conteúdo, como o Legacy.com). No código: `Env.UMBRELLA_DOMAIN` e `Env.UMBRELLA_NOME`; front usa
+    `window.location.origin`; rota com request usa o host da requisição. O histórico acumula no D1, que é
+    agnóstico de domínio. **O portão real não é "antes do dev" — é antes de publicar a 1ª nota real no
+    guarda-chuva**, porque link já circulado no WhatsApp não tem redirect se o domínio antigo não for
+    nosso. Desenvolver U2–U6 em subdomínio de teste **com `noindex`**.
   - ✅ **U0 (cidade + marca no banco) — FEITA E APLICADA EM PRODUÇÃO (06/08):** migrations `0004_cidade.sql`
     (tabela `cidade` + `memorial.cidade_id` + `tenant.cidade_id` + índice `idx_memorial_indice`),
     `0005_marca.sql` (`tenant.logo_url`, `tenant.site_url`) e `0006_backfill_cidade.sql`. Só aditivas —

@@ -30,6 +30,8 @@ export function toFunerariaDTO(t: TenantRow): FunerariaDTO {
     sobre: t.sobre,
     corMarca: t.cor_marca,
     whatsappTemplate: t.whatsapp_template,
+    logoUrl: t.logo_url ?? null,
+    siteUrl: t.site_url ?? null,
   }
 }
 
@@ -48,7 +50,7 @@ function toFotoDTO(f: FotoRow): FotoDTO {
   return f.alt ? { id: f.id, url: f.url, alt: f.alt } : { id: f.id, url: f.url }
 }
 
-function toHomenagemDTO(h: HomenagemRow): HomenagemDTO {
+export function toHomenagemDTO(h: HomenagemRow): HomenagemDTO {
   return {
     id: h.id,
     nome: h.nome,
@@ -59,7 +61,7 @@ function toHomenagemDTO(h: HomenagemRow): HomenagemDTO {
   }
 }
 
-function toMemorialDTO(
+export function toMemorialDTO(
   m: MemorialRow,
   funeraria: FunerariaDTO,
   eventos: EventoDTO[],
@@ -206,11 +208,11 @@ function placeholders(n: number): string {
 }
 
 /** Feed público: velas sempre; mensagens só aprovadas. */
-function homenagemVisivelPublica(h: HomenagemRow): boolean {
+export function homenagemVisivelPublica(h: HomenagemRow): boolean {
   return !!h.vela || h.status === 'aprovada'
 }
 
-async function carregarRelacionados(
+export async function carregarRelacionados(
   env: Env,
   memorialIds: string[],
 ): Promise<{
