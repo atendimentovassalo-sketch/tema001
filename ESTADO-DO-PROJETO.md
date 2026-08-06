@@ -2,7 +2,7 @@
 
 > Ponto de entrada para qualquer pessoa/IA. Diz **o que é**, **como está montado**, **o que está feito**,
 > **o que falta** e **como foi feito**. Sem segredos (tokens/e-mails ficam no handoff interno).
-> **Atualizado:** 06/08/2026 · **Estado:** 🟢 em produção, 1º cliente ativo.
+> **Atualizado:** 06/08/2026 · **Estado:** 🟢 em produção, 1º cliente ativo · guarda-chuva `obituario.com.br` nas fases U0–U1.
 
 ## 1. Visão
 
@@ -73,16 +73,51 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
 - **Shell `index.html`** ainda tem o texto do template ("Demonstração") — a marca certa vem do Worker;
   corrigir aqui como cinto-e-suspensório na próxima vez que o repo for tocado.
 - Bindings do ambiente **Preview** não configurados (só Produção). Revisão jurídica das páginas legais.
-- **🌐 Próxima frente de DEV — guarda-chuva `obituario.com.br` (Modelo B, decidido 06/08):** o obituário **vive
+- **🌐 Próxima frente de DEV — guarda-chuva `obituario.com.br` (Modelo B, decidido 06/08):**
+  ⚠️ **DOMÍNIO AINDA NÃO SECURIZADO (06/08):** `obituario.com.br` (grafia certa) é de **terceiro** (Arnaldo,
+  parado há 10 anos, expira **23/10/2026** — plano do Felipe: aguardar o drop p/ pegar por ~R$40; senão comprar
+  ou marca própria). `obtuario.com.br` (o que o Felipe registrou) é **grafia errada** → só redirect defensivo,
+  **nunca a marca**. Plano B = **marca própria** (o domínio não precisa conter "obituario"; ranqueia por
+  conteúdo). **O DEV NÃO DEVE CHUMBAR NENHUM DOMÍNIO — usar placeholder/variável de ambiente.** O histórico
+  acumula no D1 (agnóstico de domínio); quando securizar, é só apontar. — o obituário **vive
   só no `obituario.com.br`**, white-label com a marca da funerária que informou (não espelha no domínio da
   funerária). Rotas novas: `obituario.com.br/<cidade>` (índice **cross-tenant** neutro, com card da funerária
   por nota) e `/<cidade>/<slug>` (nota individual, branding pela funerária **dona da nota** — não pelo host).
   O site próprio da funerária (domínio à parte) linka "Obituários" → obituario.com.br. **Por que B:** o link do
   WhatsApp aponta pro `obituario.com.br` → concentra todo o tráfego no domínio → é o que ranqueia (o moat). O
-  "espelho + canonical" (Modelo A) fica como premium do tier exclusivo. Também pendente: **link de moderação/
-  consentimento da família** (estende `aprovar_token`, ver Decisão 06). Arquitetura completa:
-  `PROJETOS - CLAUDE/SAAS-FUNERARIAS/ARQUITETURA-obituario-umbrella.md`. Design da página de obituário + esse
-  dev = próxima conversa do Felipe.
+  "espelho + canonical" (Modelo A) fica como premium do tier exclusivo. Arquitetura completa:
+  `SAAS-FUNERARIAS/ARQUITETURA-obituario-umbrella.md`; design + plano de execução fechados em
+  `SAAS-FUNERARIAS/PROPOSTA-obituario-umbrella-v4-FECHADA.md` (11 decisões, fases U0–U8).
+  - ✅ **U0 (cidade + marca no banco) — FEITA E APLICADA EM PRODUÇÃO (06/08):** migrations `0004_cidade.sql`
+    (tabela `cidade` + `memorial.cidade_id` + `tenant.cidade_id` + índice `idx_memorial_indice`),
+    `0005_marca.sql` (`tenant.logo_url`, `tenant.site_url`) e `0006_backfill_cidade.sql`. Só aditivas —
+    nenhum dado alterado ou removido; contagens conferidas antes/depois (2 tenants, 2 memoriais,
+    4 homenagens, 2 eventos, 3 usuários; nome da SF intacto). Catanduvas/PR criada com slug
+    **`catanduvas-pr`** — regra fechada: slug de cidade é SEMPRE `<cidade>-<uf>`, porque há homônimas entre
+    estados (existe Catanduvas no PR e em SC) e slug de cidade vira URL permanente. Nota real da SF
+    (Amalia) vinculada; `t-modelo` ficou com `cidade_id` NULL de propósito (é demo, cidade "Cidade"/"UF" —
+    criaria a URL lixo `/cidade`, e nota sem cidade nunca entra em índice).
+    - ⚠️ **Achado que validou a decisão da chave de cidade:** a única nota real tem
+      `cidade_falecimento = "Cascavel"` (polo hospitalar) sendo de Catanduvas. Usar esse campo como chave
+      do índice mandaria **2 de 2 notas** para a cidade errada. A cidade do índice é a da **funerária que
+      publicou**, sempre — preenchida automaticamente, sem campo editável na v1.
+  - ✅ **U1 (APIs cross-tenant) — FEITA no código (06/08), ainda NÃO exposta ao público:**
+    `functions/_lib/umbrella.ts` (novo) + rotas `api/publico/cidades`, `api/publico/<cidade>`,
+    `api/publico/<cidade>/<slug>` e `api/publico/homenagens`. Resolvem o tenant **pela nota**, não pelo
+    host — corrige o achado de que `getTenantPorHost` devolve `null` no `obituario.com.br` (com 2+ tenants
+    e host desconhecido), o que faria a nota não carregar e a homenagem não gravar. `db.ts` só ganhou
+    `export` em 4 helpers e `logoUrl`/`siteUrl` no DTO; **nenhuma rota antiga mudou de comportamento**.
+    Verificado: `tsc --noEmit` nas 31 Functions sem erro, e ensaio SQL com **duas funerárias na mesma
+    cidade** (`migrations/testar_u1.py`) — rascunho não vaza, velório não confirmado não vira selo, e o
+    slug da nota não colide com o do tenant no `JOIN t.*`.
+  - ⏳ **Próximo: U2** — rotas `/`, `/<cidade>`, `/<cidade>/<slug>` no app + Worker do `obituario.com.br`
+    com lista de prefixos reservados. Atenção: `/<cidade>` é catch-all de um segmento e engoliria `/api`,
+    `/assets`, `/admin`; slug de cidade desconhecido tem que devolver **404 real**, senão o domínio gera
+    URLs infinitas e é rebaixado na busca. Depois: U3 og/sitemap/schema, U4 logo, U5 link da família,
+    U6 fotos de familiares, U7 aviso por e-mail (Worker + cron, nunca no `proxy-obituario`), U8 métrica.
+  - 🔒 **Portão jurídico antes de U5/U6:** termo revisado por advogado (§3.6 da proposta). Inclui o ponto
+    novo de que foto enviada por terceiro pode conter **outras pessoas vivas** — direito de imagem de
+    titular vivo, que o termo atual não cobre.
 
 ## 6. Como foi feito (histórico)
 
