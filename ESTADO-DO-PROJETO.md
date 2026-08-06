@@ -2,12 +2,12 @@
 
 > Ponto de entrada para qualquer pessoa/IA. Diz **o que é**, **como está montado**, **o que está feito**,
 > **o que falta** e **como foi feito**. Sem segredos (tokens/e-mails ficam no handoff interno).
-> **Atualizado:** 05/08/2026 · **Estado:** 🟢 em produção, 1º cliente ativo.
+> **Atualizado:** 06/08/2026 · **Estado:** 🟢 em produção, 1º cliente ativo.
 
 ## 1. Visão
 
 SaaS multi-tenant: site institucional + obituário/memorial + painel. 1º cliente:
-**Funerária São Francisco** (`funerariacatanduvas.com.br`). Demo: `funeraria.novomodelo.com.br`.
+**Funerária São Francisco** (`funerariacatanduvas.com.br`). Demo: **`novomodelo.com.br`** (apex).
 
 ## 2. Arquitetura em produção (3 peças sob o mesmo domínio)
 
@@ -47,12 +47,29 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
   `og-image` por tenant (hoje o banner é único no Worker), UI de gestão de tenant/usuários.
   Decisão **fechada** (05/08): Modelo A (D1 único + isolamento lógico + backup por tenant) e site institucional
   **separado** por cliente. Dossiê/plano/briefs em `PROJETOS - CLAUDE/SAAS-FUNERARIAS/`.
-  - 🟡 **Fase 0 (resolução por host) — código feito e testado local:** coluna `tenant.dominio` (migration
-    `0003_dominio.sql`), `getTenantPorHost()` em `_lib/db.ts`, e os 3 chamadores públicos trocados
-    (`memoriais/index`, `memoriais/[slug]`, `homenagens`). `tsc` limpo. **Falta produção:** deploy + aplicar
-    `0003` no `--remote` (via `execute --file`, **não** `migrations apply` — varreria o `seed.sql`) +
-    preencher `dominio` dos tenants + diagnosticar se o Worker precisa reencaminhar o host. Runbook completo
-    em `SAAS-FUNERARIAS/BRIEF-EXECUCAO-FASE-0-host.md`.
+  - ✅ **Fase 0 (resolução por host) — FEITA E NO AR (05/08):** coluna `tenant.dominio` (migration
+    `0003_dominio.sql` aplicada local+remoto), `getTenantPorHost()` em `_lib/db.ts` (lê `X-Forwarded-Host`
+    que o Worker já repassa), 3 chamadores públicos trocados. Deploy `c9e09b8` Active. Verificado ao vivo:
+    `funerariacatanduvas.com.br`→São Francisco (Amalia), `funeraria.novomodelo.com.br`→Funerária Modelo.
+    SF intacta. Fallback single-tenant não vaza com 2+ tenants.
+  - ✅ **Cliente 02 criado (Funerária Modelo, tenant `t-modelo`):** DEMO/vendas, cidade "Cidade", WhatsApp do
+    vendedor `5545920033029` + `whatsapp_template` de vendas, com memorial de exemplo
+    (`exemplo-memorial`, Maria Aparecida Ribeiro).
+  - ✅ **Fiação do `novomodelo.com.br` — FEITA E NO AR (06/08):** o modelo passou do subdomínio para o **apex**,
+    no mesmo padrão da São Francisco. `tenant.dominio` de `t-modelo` = `novomodelo.com.br`. Pages
+    `funeraria-modelo` virou custom domain do apex (CNAME `@`); as 9 rotas do app foram criadas no
+    `proxy-obituario` para `novomodelo.com.br`; `funeraria.novomodelo.com.br` foi **decomissionado**
+    (custom domain e CNAME removidos) e o Pages `tema001` ficou **sem custom domains**. Registros de e-mail
+    (MX/SPF/DKIM/DMARC do Resend) intactos. Verificado ao vivo: raiz = site estático do modelo,
+    `/funeraria` e `/api/memoriais` = Funerária Modelo, São Francisco intacta.
+    Brief: `SAAS-FUNERARIAS/BRIEF-EXECUCAO-fiacao-novomodelo.md`.
+  - ⏳ **Pendências do modelo:** (a) preview WhatsApp/`og:` de `novomodelo.com.br` ainda diz "Demonstração"
+    (host não está no mapa `TENANTS` do Worker — resolver na Fase 1 ou add manual);
+    (b) ⚠️ **mudança de destino do domínio:** o `novomodelo.com.br` passará a ser **portfólio multi-nicho**
+    (sites + GBP de funerárias, advogados, psiquiatras, chaveiros, oficinas, despachantes…), com meta de
+    ranquear para "site para \<nicho\>" / "modelos de site". Isso conflita com a raiz servir hoje a home de
+    **uma** funerária-modelo, e as rotas do app no apex (`/assets/*`, `/api/*`, `/admin*`) passam a ocupar
+    caminhos que um site de portfólio normalmente usa. Decidir a arquitetura antes de produzir conteúdo.
 - **Shell `index.html`** ainda tem o texto do template ("Demonstração") — a marca certa vem do Worker;
   corrigir aqui como cinto-e-suspensório na próxima vez que o repo for tocado.
 - Bindings do ambiente **Preview** não configurados (só Produção). Revisão jurídica das páginas legais.
