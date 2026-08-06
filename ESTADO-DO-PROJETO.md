@@ -73,6 +73,15 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
 - **Shell `index.html`** ainda tem o texto do template ("Demonstração") — a marca certa vem do Worker;
   corrigir aqui como cinto-e-suspensório na próxima vez que o repo for tocado.
 - Bindings do ambiente **Preview** não configurados (só Produção). Revisão jurídica das páginas legais.
+- **🌐 Próxima frente de DEV — guarda-chuva `obituario.com.br` (decidido 06/08):** cada obituário é publicado
+  1 vez no app e servido em 2 hosts — o **domínio próprio da funerária** (site completo entregue a ela) **e**
+  **`obituario.com.br`** (do Felipe), com o `obituario.com.br` como **canônico** (indexa/ranqueia). Rotas novas:
+  `obituario.com.br/<cidade>` (índice **cross-tenant** por cidade, marca por nota) e `/<cidade>/<slug>` (nota
+  canônica). Nas páginas de obituário do domínio da funerária, `rel=canonical` → obituario.com.br (evita
+  conteúdo duplicado). Isso ranqueia o guarda-chuva e é o moat da assinatura. Também pendente: **link de
+  moderação/consentimento da família** (estende `aprovar_token`, ver Decisão 06). Arquitetura completa:
+  `PROJETOS - CLAUDE/SAAS-FUNERARIAS/ARQUITETURA-obituario-umbrella.md`. Design da página de obituário +
+  esse dev = próxima conversa do Felipe.
 
 ## 6. Como foi feito (histórico)
 
