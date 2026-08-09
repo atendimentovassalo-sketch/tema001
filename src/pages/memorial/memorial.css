@@ -3,7 +3,7 @@
  * Tudo escopado sob .memorial-root para não colidir com o app iGreen/blog.
  * A cor da marca (--marca) é definida por inquilino via style inline no root.
  */
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&family=Figtree:ital,wght@0,300..600;1,300..500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..600,0..100,0..1;1,9..144,300..600,0..100,0..1&family=Figtree:ital,wght@0,300..600;1,300..500&family=Newsreader:ital,opsz,wght@0,6..72,400..500;1,6..72,400&display=swap');
 
 /* Paleta da Funerária São Francisco — carvão + ouro + creme, a mesma do site
    institucional (funerariacatanduvas.com.br). Contrastes conferidos: ouro só
@@ -20,7 +20,20 @@
   --marca-txt: #1a1712; /* texto POR CIMA do ouro — nunca branco */
   --g: 'Fraunces', 'Iowan Old Style', Palatino, Georgia, serif;
   --a: 'Figtree', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --read: 'Newsreader', Georgia, serif; /* prosa de leitura (história, mural) — redesign v3 */
   --t: 170ms cubic-bezier(0.2, 0.6, 0.3, 1);
+
+  /* ---- redesign v3 (MemorialPage): tons adicionais, sem alterar a paleta
+     acima usada por Obituário/Novo memorial/Aprovar homenagem/páginas legais.
+     --marca continua sendo a cor por inquilino (corMarca) — os botões dourados
+     do v3 usam var(--marca) como já fazia o tema anterior. */
+  --sage: #4a5b4e;
+  --sage-d: #3b4a3f;
+  --sage-w: #e1e8e2;
+  --sage-ink: #33453a;
+  --sage-line: rgba(74, 91, 78, 0.26);
+  --card-r: 16px;
+  --card-shadow: 0 16px 38px -30px rgba(38, 40, 42, 0.45);
 
   background: var(--papel);
   color: var(--ink);
@@ -1237,4 +1250,760 @@
   .memorial-root .rodape {
     padding-bottom: calc(74px + env(safe-area-inset-bottom));
   }
+}
+
+/* ============================================================
+   REDESIGN v3 — só para MemorialPage (página pública de um memorial)
+   Prefixo "mv3-" em toda classe nova para não colidir com as classes
+   acima (.hero, .eti, .corpo, .av, .zap, .corrigir, .form, .acao...)
+   que continuam servindo Obituário, Novo memorial, Aprovar homenagem
+   e as páginas legais. A âncora ".memorial-root.mv3" isola resets e
+   seletores de elemento (h1/h2/h3/a) desta página, sem tocar nas
+   demais. Referência visual: mockup estático "memorial-v3" (retrato
+   circular, cartões arredondados com sombra suave, dourado + sálvia,
+   serifa de leitura Newsreader na história e no mural).
+   ============================================================ */
+.memorial-root.mv3 {
+  background: var(--papel);
+}
+.memorial-root.mv3 .mv3-w {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+.memorial-root.mv3 [id] {
+  scroll-margin-top: 88px;
+}
+.memorial-root.mv3 .mv3-cap {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-family: var(--a);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+  margin-bottom: 14px;
+}
+.memorial-root.mv3 .mv3-cap::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--marca-d);
+}
+.memorial-root.mv3 .mv3-h2 {
+  font-family: var(--g);
+  font-weight: 500;
+  font-size: clamp(22px, 4.4vw, 30px);
+  line-height: 1.16;
+  margin-bottom: 4px;
+}
+
+/* ---- seções: hairline no topo, respiro entre blocos ---- */
+.memorial-root.mv3 .mv3-sec {
+  padding-block: clamp(30px, 5vw, 46px);
+  border-top: 1px solid var(--linha);
+}
+.memorial-root.mv3 .mv3-sec:first-of-type {
+  border-top: 0;
+}
+
+/* ---- herói: retrato circular, claro, sem moldura escura ---- */
+.memorial-root.mv3 .mv3-hero {
+  text-align: center;
+  padding-block: clamp(30px, 5vw, 50px) clamp(22px, 4vw, 34px);
+}
+.memorial-root.mv3 .mv3-portrait {
+  width: clamp(148px, 42vw, 190px);
+  aspect-ratio: 1;
+  margin: 0 auto 22px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--linha);
+  border: 1px solid var(--linha);
+  box-shadow: 0 20px 44px -26px rgba(38, 40, 42, 0.45);
+}
+.memorial-root.mv3 .mv3-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.memorial-root.mv3 .mv3-portrait .mv3-stub {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: #8f8a7c;
+  font-family: var(--g);
+  font-size: 44px;
+  background: radial-gradient(120% 120% at 50% 20%, #efece3, #ddd8c9);
+}
+.memorial-root.mv3 .mv3-hero h1 {
+  font-size: clamp(30px, 6.5vw, 46px);
+  font-weight: 500;
+  letter-spacing: -0.012em;
+  max-width: 16ch;
+  margin: 0 auto;
+}
+.memorial-root.mv3 .mv3-apelido {
+  font-family: var(--read);
+  font-style: italic;
+  color: var(--brass-e);
+  font-size: 1.05rem;
+  margin-top: 8px;
+}
+.memorial-root.mv3 .mv3-datas {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  font-family: var(--g);
+  font-size: clamp(15px, 3.4vw, 17px);
+  color: var(--ink);
+  opacity: 0.72;
+  font-variant-numeric: tabular-nums;
+}
+.memorial-root.mv3 .mv3-datas b {
+  font-weight: 500;
+  opacity: 1;
+}
+.memorial-root.mv3 .mv3-datas .mv3-bar {
+  width: 22px;
+  height: 1px;
+  background: var(--marca-d);
+}
+.memorial-root.mv3 .mv3-epitafio {
+  font-family: var(--read);
+  font-style: italic;
+  font-size: 1.14rem;
+  line-height: 1.58;
+  color: var(--ink);
+  opacity: 0.82;
+  max-width: 40ch;
+  margin: 22px auto 0;
+}
+
+/* ---- botões (3 estilos: dourado sólido, sálvia sólido, contorno) ---- */
+.memorial-root.mv3 .mv3-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 28px;
+}
+.memorial-root.mv3 .mv3-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  text-decoration: none;
+  font-family: var(--a);
+  font-weight: 600;
+  font-size: 0.92rem;
+  min-height: 50px;
+  padding: 0 22px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  background: none;
+  color: var(--ink);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .memorial-root.mv3 .mv3-btn {
+    transition:
+      transform var(--t),
+      background var(--t),
+      border-color var(--t),
+      color var(--t);
+  }
+  .memorial-root.mv3 .mv3-btn:hover {
+    transform: translateY(-1px);
+  }
+}
+.memorial-root.mv3 .mv3-btn--ouro {
+  background: var(--marca);
+  color: var(--marca-txt);
+}
+.memorial-root.mv3 .mv3-btn--ouro:hover {
+  background: var(--marca-d);
+}
+.memorial-root.mv3 .mv3-btn--sage {
+  background: var(--sage);
+  color: #f2f5f2;
+}
+.memorial-root.mv3 .mv3-btn--sage:hover {
+  background: var(--sage-d);
+}
+.memorial-root.mv3 .mv3-btn--linha {
+  background: var(--vellum);
+  color: var(--ink);
+  border-color: var(--silver, rgba(19, 26, 21, 0.32));
+}
+.memorial-root.mv3 .mv3-btn--linha:hover {
+  background: var(--ink);
+  color: var(--papel);
+  border-color: var(--ink);
+}
+.memorial-root.mv3 .mv3-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ---- contador (velas · mensagens · visitas) ---- */
+.memorial-root.mv3 .mv3-contador {
+  display: flex;
+  justify-content: center;
+  max-width: 480px;
+  margin: 8px auto 0;
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: var(--card-r);
+  box-shadow: var(--card-shadow);
+  overflow: hidden;
+}
+.memorial-root.mv3 .mv3-contador > div {
+  flex: 1;
+  text-align: center;
+  padding: 18px 8px;
+  border-left: 1px solid var(--linha);
+}
+.memorial-root.mv3 .mv3-contador > div:first-child {
+  border-left: 0;
+}
+.memorial-root.mv3 .mv3-contador b {
+  display: block;
+  font-family: var(--g);
+  font-size: 1.7rem;
+  line-height: 1;
+  color: var(--brass-e);
+}
+.memorial-root.mv3 .mv3-contador span {
+  font-family: var(--a);
+  font-size: 0.6rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-top: 8px;
+  display: block;
+}
+.memorial-root.mv3 .mv3-cel-vela b {
+  color: var(--marca);
+}
+.memorial-root.mv3 .mv3-cel-vela .chama-g {
+  margin: 0 auto 6px;
+  display: block;
+}
+
+/* ---- eventos: onde e quando ---- */
+.memorial-root.mv3 .mv3-eventos {
+  display: grid;
+  gap: 12px;
+  margin-top: 4px;
+}
+.memorial-root.mv3 .mv3-ev {
+  display: grid;
+  grid-template-columns: 62px 1fr;
+  gap: 16px;
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: var(--card-r);
+  padding: 16px 18px;
+  box-shadow: var(--card-shadow);
+}
+.memorial-root.mv3 .mv3-ev.sage {
+  border-left: 3px solid var(--sage);
+}
+.memorial-root.mv3 .mv3-ev-cal {
+  background: var(--papel);
+  border-radius: 11px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 0;
+  height: 62px;
+}
+.memorial-root.mv3 .mv3-ev.sage .mv3-ev-cal {
+  background: var(--sage-w);
+}
+.memorial-root.mv3 .mv3-ev-cal .m {
+  font-family: var(--a);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+}
+.memorial-root.mv3 .mv3-ev.sage .mv3-ev-cal .m {
+  color: var(--sage-ink);
+}
+.memorial-root.mv3 .mv3-ev-cal .d {
+  font-family: var(--g);
+  font-size: 24px;
+  line-height: 1;
+  font-weight: 500;
+  color: var(--ink);
+}
+.memorial-root.mv3 .mv3-ev h3 {
+  font-family: var(--a);
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+.memorial-root.mv3 .mv3-ev .mv3-ev-quando {
+  font-family: var(--a);
+  font-size: 0.88rem;
+  color: var(--ink);
+  opacity: 0.78;
+  margin-top: 3px;
+}
+.memorial-root.mv3 .mv3-ev .mv3-ev-quando.pend {
+  font-style: italic;
+  opacity: 0.58;
+}
+.memorial-root.mv3 .mv3-ev .mv3-ev-onde {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  color: var(--ink);
+  opacity: 0.62;
+  margin-top: 7px;
+  line-height: 1.5;
+}
+.memorial-root.mv3 .mv3-link-mapa {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 16px;
+  font-family: var(--a);
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--brass-e);
+  text-decoration: none;
+  border-bottom: 1px solid var(--marca-d);
+  padding-bottom: 2px;
+}
+
+/* ---- nascimento e falecimento ---- */
+.memorial-root.mv3 .mv3-marcos {
+  display: grid;
+  gap: 11px;
+  margin-top: 4px;
+}
+@media (min-width: 520px) {
+  .memorial-root.mv3 .mv3-marcos {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.memorial-root.mv3 .mv3-marco {
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: var(--card-r);
+  padding: 20px 22px;
+  box-shadow: var(--card-shadow);
+}
+.memorial-root.mv3 .mv3-marco .rot {
+  font-family: var(--a);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--brass-e);
+}
+.memorial-root.mv3 .mv3-marco .loc {
+  font-family: var(--g);
+  font-size: 1.2rem;
+  margin-top: 9px;
+  line-height: 1.3;
+}
+.memorial-root.mv3 .mv3-marco .dt {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  opacity: 0.68;
+  margin-top: 6px;
+}
+
+/* ---- história (prosa de leitura) ---- */
+.memorial-root.mv3 .mv3-historia {
+  font-family: var(--read);
+  font-size: 1.12rem;
+  line-height: 1.75;
+  color: var(--ink);
+  opacity: 0.92;
+  max-width: 60ch;
+}
+.memorial-root.mv3 .mv3-historia p {
+  margin-top: 1em;
+}
+.memorial-root.mv3 .mv3-historia p:first-child {
+  margin-top: 0;
+}
+.memorial-root.mv3 .mv3-historia p:first-child::first-letter {
+  font-family: var(--g);
+  float: left;
+  font-size: 3.1em;
+  line-height: 0.82;
+  padding: 6px 10px 0 0;
+  color: var(--brass-e);
+  font-weight: 500;
+}
+.memorial-root.mv3 .mv3-historia.corta {
+  -webkit-mask-image: linear-gradient(180deg, #000 68%, transparent);
+  mask-image: linear-gradient(180deg, #000 68%, transparent);
+  max-height: 19em;
+  overflow: hidden;
+}
+.memorial-root.mv3 .mv3-lermais {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--a);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--brass-e);
+  background: none;
+  border: 0;
+  cursor: pointer;
+  margin-top: 16px;
+  padding: 0;
+}
+
+/* ---- álbum ---- */
+.memorial-root.mv3 .mv3-galeria {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+@media (min-width: 520px) {
+  .memorial-root.mv3 .mv3-galeria {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+.memorial-root.mv3 .mv3-galeria figure {
+  aspect-ratio: 1;
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.memorial-root.mv3 .mv3-galeria img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- livro de homenagens: contagem + compositor + vela + mural ---- */
+.memorial-root.mv3 .mv3-contagem {
+  font-family: var(--g);
+  font-size: 0.98rem;
+  color: var(--ink);
+  opacity: 0.72;
+  margin: 2px 0 20px;
+}
+.memorial-root.mv3 .mv3-contagem b {
+  opacity: 1;
+  font-weight: 500;
+}
+.memorial-root.mv3 .mv3-compor {
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: var(--card-shadow);
+}
+.memorial-root.mv3 .mv3-dica {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-family: var(--a);
+  font-size: 0.86rem;
+  color: var(--sage-ink);
+  background: var(--sage-w);
+  border: 1px solid var(--sage-line);
+  border-radius: 11px;
+  padding: 10px 13px;
+  margin-bottom: 14px;
+  line-height: 1.5;
+}
+.memorial-root.mv3 .mv3-compor label {
+  display: block;
+  margin-top: 12px;
+}
+.memorial-root.mv3 .mv3-compor label:first-of-type {
+  margin-top: 0;
+}
+.memorial-root.mv3 .mv3-compor .sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.memorial-root.mv3 .mv3-compor textarea,
+.memorial-root.mv3 .mv3-compor input[type='text'] {
+  width: 100%;
+  font-family: var(--g);
+  font-size: 1.04rem;
+  color: var(--ink);
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  border-radius: 12px;
+  padding: 12px 14px;
+  min-height: 50px;
+}
+.memorial-root.mv3 .mv3-compor textarea {
+  min-height: 96px;
+  line-height: 1.55;
+  resize: vertical;
+}
+.memorial-root.mv3 .mv3-erro {
+  display: block;
+  color: #8c2f2f;
+  font-family: var(--a);
+  font-size: 0.76rem;
+  margin-top: 6px;
+}
+.memorial-root.mv3 .mv3-vela-rot {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+  opacity: 0.78;
+  margin: 18px 0 10px;
+}
+.memorial-root.mv3 .mv3-vela-toggle {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  cursor: pointer;
+}
+.memorial-root.mv3 .mv3-vela-toggle input {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  accent-color: var(--brass-e);
+}
+.memorial-root.mv3 .mv3-vela-toggle .tt {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+.memorial-root.mv3 .mv3-vela-toggle .ds {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.76rem;
+  opacity: 0.6;
+  margin-top: 2px;
+}
+.memorial-root.mv3 .mv3-nota-priv {
+  font-family: var(--a);
+  font-size: 0.8rem;
+  color: var(--ink);
+  opacity: 0.62;
+  margin-top: 14px;
+  line-height: 1.6;
+}
+.memorial-root.mv3 .mv3-nota-priv a {
+  color: var(--brass-e);
+  opacity: 1;
+}
+.memorial-root.mv3 .mv3-enviar {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+/* mural — cartões em colunas estilo álbum de recados */
+.memorial-root.mv3 .mv3-mural {
+  margin-top: 24px;
+  column-count: 2;
+  column-gap: 16px;
+}
+@media (max-width: 640px) {
+  .memorial-root.mv3 .mv3-mural {
+    column-count: 1;
+  }
+}
+.memorial-root.mv3 .mv3-msg {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  display: flex;
+  gap: 14px;
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 0 0 16px;
+  box-shadow: var(--card-shadow);
+}
+.memorial-root.mv3 .mv3-msg.vela {
+  border-color: var(--marca-d);
+}
+.memorial-root.mv3 .mv3-av {
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--brass);
+  display: grid;
+  place-items: center;
+  font-family: var(--a);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+.memorial-root.mv3 .mv3-msg.vela .mv3-av {
+  background: var(--vellum);
+  color: var(--brass-e);
+  border: 1px solid var(--brass-e);
+}
+.memorial-root.mv3 .mv3-msg-quem {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--sage-ink);
+}
+.memorial-root.mv3 .mv3-msg-quando {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.74rem;
+  opacity: 0.55;
+  margin-top: 2px;
+}
+.memorial-root.mv3 .mv3-msg-txt {
+  font-family: var(--read);
+  font-size: 1.02rem;
+  line-height: 1.58;
+  color: var(--ink);
+  margin-top: 8px;
+}
+.memorial-root.mv3 .mv3-msg-txt.acendeu {
+  font-family: var(--a);
+  font-size: 0.82rem;
+  font-style: italic;
+  opacity: 0.65;
+  color: var(--brass-e);
+}
+.memorial-root.mv3 .mv3-vazio {
+  font-family: var(--a);
+  font-size: 0.86rem;
+  opacity: 0.58;
+  padding: 20px 0;
+  line-height: 1.6;
+}
+
+/* ---- compartilhar ---- */
+.memorial-root.mv3 .mv3-duo {
+  display: grid;
+  gap: 11px;
+  margin-top: 4px;
+}
+@media (min-width: 480px) {
+  .memorial-root.mv3 .mv3-duo {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.memorial-root.mv3 .mv3-duo .mv3-btn {
+  width: 100%;
+  justify-content: center;
+}
+
+/* ---- autorização / corrigir (rodapé de conteúdo) ---- */
+.memorial-root.mv3 .mv3-autor {
+  display: flex;
+  gap: 11px;
+  align-items: flex-start;
+  background: var(--papel);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  padding: 16px 18px;
+  margin: 8px 0 40px;
+  font-family: var(--a);
+  font-size: 0.84rem;
+  color: var(--ink);
+  opacity: 0.85;
+  line-height: 1.65;
+}
+.memorial-root.mv3 .mv3-autor b {
+  opacity: 1;
+  font-weight: 700;
+}
+.memorial-root.mv3 .mv3-autor a {
+  color: var(--brass-e);
+  text-decoration: none;
+  border-bottom: 1px solid var(--marca-d);
+}
+
+/* ---- barra de prévia ---- */
+.memorial-root.mv3 .mv3-preview {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 24px 60px;
+}
+.memorial-root.mv3 .mv3-preview .mv3-aviso {
+  background: var(--vellum);
+  border: 1px solid var(--linha);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  font-family: var(--a);
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+.memorial-root.mv3 .mv3-preview .mv3-aviso b {
+  color: var(--brass-e);
+}
+.memorial-root.mv3 .mv3-preview .mv3-btn {
+  width: 100%;
+  justify-content: center;
+  margin-top: 12px;
+  border-radius: 999px;
+}
+.memorial-root.mv3 .mv3-preview .mv3-btn:first-of-type {
+  margin-top: 0;
+}
+
+/* ---- CTA fixo mobile ---- */
+.memorial-root.mv3 .mv3-mobicta {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 40;
+  padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+  background: color-mix(in srgb, var(--papel) 92%, transparent);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--linha);
+}
+.memorial-root.mv3 .mv3-mobicta .mv3-btn {
+  width: 100%;
+  justify-content: center;
+}
+@media (max-width: 720px) {
+  .memorial-root.mv3 .mv3-mobicta {
+    display: block;
+  }
+  .memorial-root.mv3 {
+    padding-bottom: 74px;
+  }
+}
+
+/* ---- chama de vela: mesmo componente/lógica, realce dourado (v3) ---- */
+.memorial-root.mv3 .chama i {
+  box-shadow:
+    0 0 8px 2px rgba(200, 160, 78, 0.55),
+    0 0 18px 6px rgba(200, 160, 78, 0.38);
 }
