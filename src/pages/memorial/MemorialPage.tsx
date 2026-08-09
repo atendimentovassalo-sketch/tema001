@@ -19,6 +19,7 @@ import {
 } from './format'
 import { SiteShell } from '@/components/SiteChrome'
 import './memorial.css'
+import MemorialLegado from './MemorialLegado'
 
 const ROT: Record<string, string> = {
   velorio: 'Velório',
@@ -70,7 +71,7 @@ function partesCalendario(iso: string | null): { mes: string; dia: string } | nu
   return { mes: g('month').replace('.', ''), dia: g('day') }
 }
 
-export default function MemorialPage({
+function MemorialModerno({
   memorialOverride,
   preview = false,
 }: {
@@ -629,4 +630,26 @@ export default function MemorialPage({
     </div>
     </SiteShell>
   )
+}
+
+
+/* ------------------------------------------------------------------ *
+ * Seletor de modelo: os memoriais ja publicados no visual antigo (lista
+ * abaixo) continuam no MemorialLegado; todos os novos usam o modelo novo.
+ * Nao ha campo de data de criacao na API, por isso a selecao e por slug.
+ * Para migrar um antigo ao novo, basta remove-lo desta lista.
+ * ------------------------------------------------------------------ */
+const MEMORIAIS_LEGADO = new Set<string>([
+  'amalia-teresa-justen',
+  'marli-cordeiro-de-almeida',
+])
+
+export default function MemorialPage(
+  props: { memorialOverride?: Memorial; preview?: boolean } = {},
+) {
+  const { slug } = useParams()
+  if (!props.memorialOverride && slug && MEMORIAIS_LEGADO.has(slug)) {
+    return <MemorialLegado {...props} />
+  }
+  return <MemorialModerno {...props} />
 }
