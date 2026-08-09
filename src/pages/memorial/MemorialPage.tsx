@@ -229,7 +229,7 @@ function MemorialModerno({
   }
 
   return (
-    <SiteShell>
+    <SiteShell minimal>
     <div
       className="memorial-root mv3"
       style={{ ['--marca' as string]: f.corMarca }}

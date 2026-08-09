@@ -142,14 +142,87 @@ export function SiteBarras() {
   )
 }
 
-/** Casca completa: cabeçalho e rodapé do site em volta do conteúdo do app. */
+/* Cabeçalho mínimo: só o nome da casa, discreto, não fixo.
+ * Usado no memorial — página íntima da família, sem nav/telefone/cidades. */
+function SiteHeaderMinimo() {
+  return (
+    <header className="hdr" style={{ position: 'static' }}>
+      <div className="w" style={{ justifyContent: 'center' }}>
+        <a className="mark" href="/" style={{ textAlign: 'center' }}>
+          Funerária São Francisco
+        </a>
+      </div>
+    </header>
+  )
+}
+
+/* Rodapé mínimo: uma assinatura discreta, sem colunas de marketing. */
+function SiteFooterMinimo() {
+  return (
+    <footer
+      style={{
+        borderTop: '1px solid var(--hair, #E4E0D6)',
+        padding: '48px 20px',
+        textAlign: 'center',
+        marginTop: 'clamp(48px, 8vw, 96px)',
+      }}
+    >
+      <p
+        style={{
+          fontFamily: 'var(--display, Fraunces, Georgia, serif)',
+          fontSize: '1.05rem',
+          color: 'var(--ink, #1A1712)',
+          margin: 0,
+        }}
+      >
+        Funerária São Francisco
+      </p>
+      <p style={{ fontSize: '.85rem', color: 'var(--muted, #6b6459)', margin: '6px 0 0' }}>
+        Catanduvas · Ibema · Três Barras do Paraná
+      </p>
+      <p style={{ fontSize: '.78rem', color: 'var(--muted, #6b6459)', margin: '16px 0 0' }}>
+        <a href="/privacidade" style={{ color: 'inherit' }}>
+          Privacidade
+        </a>{' '}
+        ·{' '}
+        <a href="/termos" style={{ color: 'inherit' }}>
+          Termos
+        </a>
+      </p>
+    </footer>
+  )
+}
+
+/** Casca completa: cabeçalho e rodapé do site em volta do conteúdo do app.
+ *  minimal=true → versão íntima (memorial): topo só com o nome, rodapé discreto,
+ *  e apenas o botão flutuante do WhatsApp (sem barra dupla nem menu). */
 export function SiteShell({
   children,
   aqui,
+  minimal,
 }: {
   children: ReactNode
   aqui?: 'obituario'
+  minimal?: boolean
 }) {
+  if (minimal) {
+    return (
+      <div className="sfc">
+        <SiteHeaderMinimo />
+        {children}
+        <SiteFooterMinimo />
+        <a
+          className="wa-float"
+          href={ZAP}
+          target="_blank"
+          rel="noopener"
+          aria-label="Falar com a Funerária São Francisco no WhatsApp"
+        >
+          <IconeWhatsapp />
+        </a>
+      </div>
+    )
+  }
   return (
     <div className="sfc">
       <SiteHeader aqui={aqui} />
