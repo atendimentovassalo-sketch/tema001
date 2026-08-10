@@ -77,9 +77,17 @@ export default function Obituario() {
       className="memorial-root"
       style={{ ['--marca' as string]: f.corMarca }}
     >
-      <section className="hero" style={{ paddingBottom: 56 }}>
-        <p className="eti">{f.cidade} e região</p>
-        <h1 style={{ maxWidth: 'none' }}>Obituário</h1>
+      <section
+        style={{
+          padding: 'clamp(40px,6vw,72px) 0 24px',
+          textAlign: 'center',
+          background: 'transparent',
+        }}
+      >
+        <p className="eti" style={{ color: 'var(--bordo,#8A6828)' }}>
+          {f.cidade} e região
+        </p>
+        <h1 style={{ maxWidth: 'none', color: 'var(--ink,#1A1712)' }}>Obituário</h1>
       </section>
 
       <div className="corpo obit-corpo">

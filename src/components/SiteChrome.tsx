@@ -22,39 +22,43 @@ function IconeWhatsapp() {
   )
 }
 
+const NAV_CSS = `
+.hdr .nav-areas{position:relative;display:inline-flex;align-items:center}
+.hdr .nav-areas>summary{display:inline-flex;align-items:center;list-style:none;cursor:pointer;font-family:var(--sans,Figtree,system-ui,sans-serif)!important;font-size:.96rem!important;font-weight:450!important;letter-spacing:0!important;color:var(--ink,#1A1712);padding:0 0 4px!important;border-bottom:1px solid transparent;white-space:nowrap}
+.hdr .nav-areas>summary::-webkit-details-marker{display:none}
+.hdr .nav-areas>summary::marker{content:''}
+.hdr .nav-areas>summary::after{content:'\\25BE'!important;font-family:var(--sans,Figtree,system-ui,sans-serif)!important;font-size:.72em!important;font-weight:400!important;color:var(--muted,#565049)!important;margin-left:7px}
+.hdr .nav-areas[open]>summary{border-color:var(--bordo,#8A6828)}
+.hdr .nav-areas-menu{position:absolute;top:calc(100% + 10px);left:0;background:var(--card,#fff);border:1px solid var(--hair,#E4E0D6);border-radius:12px;padding:8px;min-width:210px;box-shadow:0 16px 36px -14px rgba(0,0,0,.28);z-index:120;display:flex;flex-direction:column;gap:2px}
+.hdr .nav-areas-menu a{display:block;text-align:left;padding:9px 12px;border-radius:8px;text-decoration:none;font-size:.94rem;color:var(--ink,#1A1712);border:0}
+.hdr .nav-areas-menu a:hover{background:var(--p2,#F3F0E8);border:0}
+@media(max-width:1060px){.hdr .w{flex-wrap:wrap;justify-content:center;row-gap:10px}.hdr .nav{display:flex!important;flex-wrap:wrap;justify-content:center;gap:12px 18px;width:100%}}
+`
+
 export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
   return (
     <>
-      <div className="util">
-        <div className="w">
-          <span>Assistência funeral</span>
-          <span className="sp" aria-hidden="true" />
-          <span>Plantão 24 horas, todos os dias</span>
-          <a href={`tel:${TEL}`}>{TEL_LEGIVEL}</a>
-        </div>
-      </div>
+      <style dangerouslySetInnerHTML={{ __html: NAV_CSS }} />
       <header className="hdr">
         <div className="w">
           <a className="mark" href="/">
-            <img
-              src="/logo.png"
-              alt="Funerária São Francisco — Catanduvas/PR"
-              style={{ height: 48, width: 'auto', maxWidth: 160 }}
-            />
+            Funerária São Francisco
           </a>
           <nav className="nav" aria-label="Navegação principal">
-            <a href="/obituario" aria-current={aqui === 'obituario' ? 'page' : undefined}>
-              Obituário
-            </a>
-            <a href="/#horas">Primeiras horas</a>
-            <a href="/#cuidados">Como cuidamos</a>
-            <a href="/#casa">A funerária</a>
+            <a href="/">Home</a>
             <a href="/planos">Planos</a>
-            <a href="/#duvidas">Dúvidas</a>
+            <a href="/obituario" aria-current={aqui === 'obituario' ? 'page' : undefined}>
+              Obituários
+            </a>
+            <details className="nav-areas">
+              <summary>Áreas atendidas</summary>
+              <div className="nav-areas-menu">
+                <a href="/cidade-catanduvas">Catanduvas</a>
+                <a href="/cidade-ibema">Ibema</a>
+                <a href="/cidade-tres-barras-do-parana">Três Barras do Paraná</a>
+              </div>
+            </details>
           </nav>
-          <a className="btn btn--sm" href={`tel:${TEL}`}>
-            Ligar agora
-          </a>
         </div>
       </header>
     </>
@@ -81,11 +85,12 @@ export function SiteFooter() {
           </div>
           <div>
             <h2>Navegar</h2>
-            <a href="/#horas">Primeiras horas</a>
-            <a href="/obituario">Obituário</a>
-            <a href="/#cuidados">Como cuidamos</a>
-            <a href="/#casa">A funerária</a>
+            <a href="/">Home</a>
             <a href="/planos">Planos</a>
+            <a href="/obituario">Obituários</a>
+            <a href="/cidade-catanduvas">Catanduvas</a>
+            <a href="/cidade-ibema">Ibema</a>
+            <a href="/cidade-tres-barras-do-parana">Três Barras do Paraná</a>
           </div>
           <div>
             <h2>Contato</h2>
@@ -120,15 +125,6 @@ export function SiteFooter() {
 export function SiteBarras() {
   return (
     <>
-      <div className="callbar" role="complementary" aria-label="Ligar para o plantão">
-        <a className="lig" href={`tel:${TEL}`}>
-          <b>{TEL_LEGIVEL}</b>
-          <span>Ligar agora · 24 horas</span>
-        </a>
-        <a className="zap" href={ZAP}>
-          WhatsApp
-        </a>
-      </div>
       <a
         className="wa-float"
         href={ZAP}
