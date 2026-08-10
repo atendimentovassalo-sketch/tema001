@@ -3,11 +3,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
-import Index from './pages/Index'
 import NotFound from './pages/NotFound'
-import Layout from './components/Layout'
-import BlogHome from './pages/blog/BlogHome'
-import BlogPost from './pages/blog/BlogPost'
 import MemorialPage from './pages/memorial/MemorialPage'
 import NovoMemorial from './pages/memorial/NovoMemorial'
 import Obituario from './pages/memorial/Obituario'
@@ -32,13 +28,7 @@ const App = () => (
       <Toaster />
       <Sonner />
       <Routes>
-        <Route element={<Layout />}>
-          <Route path="/" element={<Index />} />
-          {/* Blog Routes */}
-          <Route path="/blog" element={<BlogHome />} />
-          <Route path="/blog/:slug" element={<BlogPost />} />
-        </Route>
-        {/* Memorial (tema próprio, fora do Layout iGreen) */}
+        {/* Memorial (tema próprio) */}
         <Route path="/funeraria" element={<HomeV2 />} />
         <Route path="/obituario" element={<Obituario />} />
         <Route path="/m/:slug" element={<MemorialPage />} />
