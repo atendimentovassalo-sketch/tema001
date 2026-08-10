@@ -162,7 +162,7 @@ export default function Obituario() {
         )}
 
         <p className="corrigir">
-          <Link to="/funeraria">Voltar ao início</Link>
+          <a href="/">Voltar ao início</a>
         </p>
       </div>
 

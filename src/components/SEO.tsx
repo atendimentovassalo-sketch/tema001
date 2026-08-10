@@ -8,7 +8,7 @@ interface SEOProps {
 export function SEO({ title, description }: SEOProps) {
   useEffect(() => {
     // Update Title
-    document.title = `${title} | iGreen Energy`
+    document.title = `${title} | Funerária São Francisco`
 
     // Update Meta Description
     if (description) {
