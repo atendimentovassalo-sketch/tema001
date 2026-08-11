@@ -29,14 +29,14 @@ export default function LegalLayout({
     <div className="memorial-root">
       <header className="topo">
         <div className="topo-in">
-          <Link className="wm" to="/funeraria">
+          <a className="wm"  href="/">
             {f?.nome ?? 'Funerária'}
             {f && (
               <small>
                 {f.cidade} · {f.uf}
               </small>
             )}
-          </Link>
+          </a>
           {f && (
             <a className="tel" href={`tel:${f.telefone}`}>
               <span>
@@ -52,9 +52,9 @@ export default function LegalLayout({
         <p className="legal-atualizado">Atualizado em {atualizadoEm}</p>
         <h1>{titulo}</h1>
         {children}
-        <Link className="legal-voltar" to="/funeraria">
+        <a className="legal-voltar"  href="/">
           ← Voltar ao site
-        </Link>
+        </a>
       </div>
 
       <footer className="rodape">

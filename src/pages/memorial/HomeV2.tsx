@@ -112,12 +112,12 @@ export default function HomeV2() {
       {/* barra */}
       <header className="bar">
         <div className="bar-in">
-          <Link to="/funeraria" className="brand">
+          <a  className="brand" href="/">
             {f.nome}
             <small>
               {f.cidade} · {f.uf}
             </small>
-          </Link>
+          </a>
           <a className="fone" href={telHref}>
             <em>Atendimento 24 horas</em>
             <b className="num">{f.telefone}</b>

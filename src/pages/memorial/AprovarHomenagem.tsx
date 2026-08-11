@@ -1,7 +1,7 @@
 /* Tela de aprovação por link (o responsável abre pelo WhatsApp quando a família
  * modera). O :token identifica a homenagem pendente no backend. */
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { toast } from 'sonner'
 import { fetchAprovacao, decidirAprovacao, type AprovacaoInfo } from './api'
 import { iniciais, tempoRelativo } from './format'
@@ -65,7 +65,7 @@ export default function AprovarHomenagem() {
         {estado === 'invalido' && (
           <div className="aviso" style={{ marginTop: 8 }}>
             <b>Link inválido ou já utilizado.</b> Esta mensagem pode já ter sido
-            aprovada ou recusada. <Link to="/funeraria">Ir ao site</Link>.
+            aprovada ou recusada. <a  href="/">Ir ao site</a>.
           </div>
         )}
 

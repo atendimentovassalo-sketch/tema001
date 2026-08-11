@@ -100,9 +100,9 @@ export default function AdminLogin() {
           </Link>
         )}
 
-        <Link className="adm-voltar" to="/funeraria">
+        <a className="adm-voltar"  href="/">
           ← Voltar ao site
-        </Link>
+        </a>
       </div>
     </div>
   )
