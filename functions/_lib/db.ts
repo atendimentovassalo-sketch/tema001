@@ -304,7 +304,7 @@ export async function getMemorialPublico(
   slug: string,
 ): Promise<MemorialDTO | null> {
   const m = await env.DB.prepare(
-    `SELECT * FROM memorial WHERE tenant_id = ? AND slug = ? LIMIT 1`,
+    `SELECT * FROM memorial WHERE tenant_id = ? AND slug = ? AND status = 'publicado' LIMIT 1`,
   )
     .bind(tenant.id, slug)
     .first<MemorialRow>()
