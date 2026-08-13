@@ -2,7 +2,26 @@
 
 > Ponto de entrada para qualquer pessoa/IA. Diz **o que é**, **como está montado**, **o que está feito**,
 > **o que falta** e **como foi feito**. Sem segredos (tokens/e-mails ficam no handoff interno).
-> **Atualizado:** 06/08/2026 · **Estado:** 🟢 em produção, 1º cliente ativo · guarda-chuva `obituario.com.br` nas fases U0–U1.
+> **Atualizado:** 06/08/2026 (correção pontual em 13/08 — ver aviso abaixo) · **Estado:** 🟢 em produção, 1º cliente ativo · guarda-chuva `obituario.com.br` nas fases U0–U1.
+
+> ⚠️ **Aviso de 13/08/2026 — este documento não foi reescrito, só corrigido em 4 pontos. Fonte de
+> verdade real é `SAAS-FUNERARIAS/DECISOES.md`.**
+> 1. **Domínio do guarda-chuva:** o `obituario.com.br` de terceiro descrito abaixo (D12, §5) **não é
+>    mais o plano**. Fechado em 11/08: o domínio é `obitos.com.br` (produto "Óbitos"), registrado
+>    07/08/2026 — a espera pelo drop foi encerrada. `obtuario.com.br` segue só como redirect
+>    defensivo, nunca marca. A regra de não chumbar domínio no código continua valendo.
+> 2. **Modelo de publicação:** o "Modelo B" descrito no §5 (obituário só no guarda-chuva, sem espelho
+>    no domínio da funerária) foi **substituído pelo Modelo A em 11/08** — espelho no domínio da
+>    funerária + `rel=canonical` para o guarda-chuva. Todo o §5 abaixo descreve a arquitetura antiga;
+>    tratar como histórico até este documento ser reescrito por inteiro.
+> 3. **"Modelo A" é ambíguo neste próprio arquivo:** onde §5 diz "Modelo A (D1 único + isolamento
+>    lógico...)" (decisão de 05/08), leia **"D1 único com isolamento lógico"** — desde 11/08 o rótulo
+>    "Modelo A" pertence ao modelo de publicação do item 2 acima, não ao isolamento do banco.
+> 4. **Segurança (13/08):** `functions/_lib/db.ts`, `getMemorialPublico` não filtrava
+>    `status = 'publicado'` — um memorial em rascunho era servido por `GET /api/memoriais/:slug` para
+>    quem soubesse o slug. **Corrigido e em produção em 13/08:** commit `62e1062`, PR #3, merge
+>    `0060116` na `main`, deploy Cloudflare Pages concluído. Único chamador verificado:
+>    `functions/api/memoriais/[slug].ts`.
 
 ## 1. Visão
 
