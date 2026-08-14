@@ -2,7 +2,47 @@
 
 > Ponto de entrada para qualquer pessoa/IA. Diz **o que é**, **como está montado**, **o que está feito**,
 > **o que falta** e **como foi feito**. Sem segredos (tokens/e-mails ficam no handoff interno).
-> **Atualizado:** 06/08/2026 · **Estado:** 🟢 em produção, 1º cliente ativo · guarda-chuva `obituario.com.br` nas fases U0–U1.
+> **Atualizado:** 06/08/2026 (correções pontuais em 13/08 e 14/08 — ver avisos abaixo) · **Estado:** 🟢 em produção, 1º cliente ativo · guarda-chuva `obituario.com.br` nas fases U0–U1.
+
+> ⚠️ **Aviso de 13/08/2026 — este documento não foi reescrito, só corrigido em 4 pontos. Fonte de
+> verdade real é `SAAS-FUNERARIAS/DECISOES.md`.**
+> 1. **Domínio do guarda-chuva:** o `obituario.com.br` de terceiro descrito abaixo (D12, §5) **não é
+>    mais o plano**. Fechado em 11/08: o domínio é `obitos.com.br` (produto "Óbitos"), registrado
+>    07/08/2026 — a espera pelo drop foi encerrada. `obtuario.com.br` segue só como redirect
+>    defensivo, nunca marca. A regra de não chumbar domínio no código continua valendo.
+> 2. **Modelo de publicação:** o "Modelo B" descrito no §5 (obituário só no guarda-chuva, sem espelho
+>    no domínio da funerária) foi **substituído pelo Modelo A em 11/08** — espelho no domínio da
+>    funerária + `rel=canonical` para o guarda-chuva. Todo o §5 abaixo descreve a arquitetura antiga;
+>    tratar como histórico até este documento ser reescrito por inteiro.
+> 3. **"Modelo A" é ambíguo neste próprio arquivo:** onde §5 diz "Modelo A (D1 único + isolamento
+>    lógico...)" (decisão de 05/08), leia **"D1 único com isolamento lógico"** — desde 11/08 o rótulo
+>    "Modelo A" pertence ao modelo de publicação do item 2 acima, não ao isolamento do banco.
+> 4. **Segurança (13/08):** `functions/_lib/db.ts`, `getMemorialPublico` não filtrava
+>    `status = 'publicado'` — um memorial em rascunho era servido por `GET /api/memoriais/:slug` para
+>    quem soubesse o slug. Corrigido localmente em 13/08 (uma linha, único chamador verificado:
+>    `functions/api/memoriais/[slug].ts`) — **ainda não commitado nem enviado (push)**, confirmar
+>    antes de assumir que já está em produção.
+
+> ⚠️ **Aviso de 14/08/2026 — sessão de ferramental (skill + higiene de repo), sem mexer em produção:**
+> 1. **Nova skill `verifica-memorial`** adicionada ao repo em `.claude/skills/verifica-memorial/`
+>    (`SKILL.md` + `verifica_memorial.py`). Confere uma página de memorial contra o
+>    `SAAS-FUNERARIAS/DECISOES.md` antes de publicar (reporta BLOQUEIA / CORRIGE / AVISA por arquivo:linha).
+>    **Commitada e enviada:** `umbrella-u1` = `1be4f15`, em sincronia com `origin`. Checker testado contra
+>    `memorial-v5.html` → `0 BLOQUEIA · 4 CORRIGE · 1 AVISA · PUBLICA`. Roda em Python 3 puro (sem
+>    dependências); no Windows usar `python`, não `python3`.
+> 2. **Inconsistência de fim de linha (CRLF) entre ambientes — diagnosticada, não é emergência.** O repo tem
+>    134 arquivos idênticos exceto pelo fim de linha (disco CRLF vs. índice LF) e **não tem `.gitattributes`**.
+>    No **Git for Windows** (esta máquina, Claude Code) `core.autocrlf=true` no nível system → `git status`
+>    mostra ~1 arquivo e `git add -A` **é seguro** (normaliza no stage). No **git do lado Linux** (sessões de
+>    nuvem/device_bash) o autocrlf não está setado → `git status` mostra 135 e `git add -A` **commitaria os
+>    134 em churn**, disparando deploy do Pages sobre nada. **Regra prática:** enquanto não houver
+>    `.gitattributes`, git nesse repo só pelo Claude Code (Windows); em sessão Linux, escopo travado
+>    (`git add <caminho>`, nunca `-A`/`.`). Correção definitiva escrita, **não executada**, em
+>    `SAAS-FUNERARIAS/PROCEDIMENTO-normalizar-CRLF.md` (rodar só em janela sem deploy; lista de binários já
+>    auditada em 14/08 — só `.png` e `.ico` versionados, ambos cobertos).
+> 3. **`ESTADO-DO-PROJETO.md` (este arquivo)** segue modificado e **fora** do commit `1be4f15` — o commit
+>    entrou só com a skill, de propósito, para não arrastar a churn. Decidir separadamente quando/como commitar
+>    este arquivo (idealmente pelo Windows, ou depois da normalização).
 
 ## 1. Visão
 
@@ -40,6 +80,8 @@ Tudo fora disso cai no site estático (peça 1). **As peças 1 e 2 são deploys 
 - Entrega à Jessica 04/08: dados de teste limpos, **1ª nota real publicada** (Amalia Teresa Justen); R2 exercitado em prod.
 - **Correção da marca no Worker** (04/08): era "Funerária Demonstração" + `og:image` de terceiro (Skip) →
   agora marca São Francisco por tenant, com **prévia individual por nota** usando a foto do falecido.
+- **Skill `verifica-memorial` no repo** (14/08, commit `1be4f15`): gate de conferência de página de memorial
+  contra o `DECISOES.md` antes de publicar (ver aviso de 14/08 no topo).
 
 ## 5. Pendências / próximos passos
 
