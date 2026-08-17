@@ -542,3 +542,122 @@
   border-radius: 9px;
   box-sizing: content-box;
 }
+
+/* ================= GESTÃO (clientes + financeiro) =================
+   Módulo de 17/08/2026. Reusa os tokens e os botões do painel de propósito:
+   é a mesma pessoa, no mesmo painel, no mesmo dia — não é outro produto. */
+
+.adm .ges-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px 18px;
+  align-items: end;
+}
+.adm .ges-campo-largo { grid-column: 1 / -1; }
+
+.adm .ges-campo { display: flex; flex-direction: column; gap: 6px; }
+.adm .ges-campo > span {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+.adm .ges-campo input,
+.adm .ges-campo select,
+.adm .ges-campo textarea {
+  font: inherit;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 10px 12px;
+  width: 100%;
+}
+.adm .ges-campo textarea { resize: vertical; }
+.adm .ges-campo input:focus-visible,
+.adm .ges-campo select:focus-visible,
+.adm .ges-campo textarea:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.adm .ges-check {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 0.94rem;
+}
+.adm .ges-check input { width: 17px; height: 17px; accent-color: var(--ink); }
+
+.adm .ges-form-acoes {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.adm .ges-busca {
+  font: inherit;
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 14px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: var(--cream);
+}
+
+.adm .ges-lista { list-style: none; margin: 0; padding: 0; }
+.adm .ges-lista > li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.adm .ges-lista > li:last-child { border-bottom: 0; }
+.adm .ges-lista-txt { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.adm .ges-meta,
+.adm .ges-plano { font-size: 0.84rem; color: var(--muted); }
+.adm .ges-plano { color: var(--sage); }
+
+.adm .ges-valor { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.adm .ges-valor-in { color: #2f5d3a; }
+.adm .ges-valor-out { color: #8a3a2f; }
+
+.adm .ges-mes { display: flex; gap: 8px; align-items: center; }
+
+.adm .ges-cartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 14px;
+}
+.adm .ges-cartao {
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 16px;
+  background: var(--cream);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.adm .ges-cartao-saldo { background: var(--paper); border-color: var(--ink); }
+.adm .ges-cartao-rot {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sage);
+}
+.adm .ges-cartao-val {
+  font-size: 1.32rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 640px) {
+  .adm .ges-lista > li { align-items: flex-start; }
+  .adm .ges-form { grid-template-columns: 1fr; }
+}

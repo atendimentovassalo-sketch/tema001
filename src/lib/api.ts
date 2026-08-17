@@ -39,6 +39,8 @@ export const api = {
     req<T>(url, { method: 'POST', ...comJson(body) }),
   put: <T>(url: string, body?: unknown) =>
     req<T>(url, { method: 'PUT', ...comJson(body) }),
+  patch: <T>(url: string, body?: unknown) =>
+    req<T>(url, { method: 'PATCH', ...comJson(body) }),
   del: <T>(url: string) => req<T>(url, { method: 'DELETE' }),
   /** Upload de imagem (bytes crus). Retorna a URL servível. */
   upload: (url: string, blob: Blob) =>

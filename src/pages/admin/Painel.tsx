@@ -100,6 +100,12 @@ export default function AdminPainel() {
             <small>{usuario.nome}</small>
           </div>
           <div className="adm-top-acoes">
+            <Link className="adm-sair" to="/admin/clientes">
+              Clientes
+            </Link>
+            <Link className="adm-sair" to="/admin/financeiro">
+              Financeiro
+            </Link>
             <Link className="adm-sair" to="/admin/usuarios">
               Usuários
             </Link>

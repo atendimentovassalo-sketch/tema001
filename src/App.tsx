@@ -13,6 +13,8 @@ import AdminLogin from './pages/admin/Login'
 import AdminPainel from './pages/admin/Painel'
 import AdminConfig from './pages/admin/Configuracoes'
 import AdminUsuarios from './pages/admin/Usuarios'
+import AdminClientes from './pages/admin/Clientes'
+import AdminFinanceiro from './pages/admin/Financeiro'
 import AdminRecuperar from './pages/admin/Recuperar'
 import Privacidade from './pages/legal/Privacidade'
 import Termos from './pages/legal/Termos'
@@ -40,6 +42,8 @@ const App = () => (
         <Route path="/admin" element={<AdminPainel />} />
         <Route path="/admin/config" element={<AdminConfig />} />
         <Route path="/admin/usuarios" element={<AdminUsuarios />} />
+        <Route path="/admin/clientes" element={<AdminClientes />} />
+        <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
         {/* Páginas legais (LGPD) */}
         <Route path="/privacidade" element={<Privacidade />} />
         <Route path="/termos" element={<Termos />} />

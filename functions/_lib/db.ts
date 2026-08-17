@@ -1090,3 +1090,375 @@ export async function getHomenagemDoTenant(
       .first<{ id: string }>()) ?? null
   )
 }
+
+/* ---------- gestão: clientes e financeiro ---------- */
+/* Módulo autorizado em 17/08/2026 com fronteira explícita: sem nada fiscal e
+ * sem estoque. Ver migrations/0008_gestao.sql para as decisões do esquema.
+ * Toda consulta aqui filtra por tenant_id — é o dado mais sensível do produto. */
+
+export interface ClienteDTO {
+  id: string
+  nome: string
+  telefone: string | null
+  documento: string | null
+  endereco: string | null
+  observacao: string | null
+  planoAtivo: boolean
+  planoValorCentavos: number | null
+  planoDiaVencimento: number | null
+  planoInicio: string | null
+  ativo: boolean
+  criadoEmISO: string
+}
+
+interface ClienteRow {
+  id: string
+  nome: string
+  telefone: string | null
+  documento: string | null
+  endereco: string | null
+  observacao: string | null
+  plano_ativo: number
+  plano_valor_centavos: number | null
+  plano_dia_vencimento: number | null
+  plano_inicio: string | null
+  ativo: number
+  criado_em: string
+}
+
+function toClienteDTO(r: ClienteRow): ClienteDTO {
+  return {
+    id: r.id,
+    nome: r.nome,
+    telefone: r.telefone,
+    documento: r.documento,
+    endereco: r.endereco,
+    observacao: r.observacao,
+    planoAtivo: !!r.plano_ativo,
+    planoValorCentavos: r.plano_valor_centavos,
+    planoDiaVencimento: r.plano_dia_vencimento,
+    planoInicio: r.plano_inicio,
+    ativo: !!r.ativo,
+    criadoEmISO: r.criado_em,
+  }
+}
+
+export interface ClienteInput {
+  nome: string
+  telefone: string | null
+  documento: string | null
+  endereco: string | null
+  observacao: string | null
+  planoAtivo: boolean
+  planoValorCentavos: number | null
+  planoDiaVencimento: number | null
+  planoInicio: string | null
+}
+
+export async function listClientes(
+  env: Env,
+  tenantId: string,
+  incluirInativos = false,
+): Promise<ClienteDTO[]> {
+  const rows = await env.DB.prepare(
+    `SELECT * FROM cliente
+      WHERE tenant_id = ? ${incluirInativos ? '' : 'AND ativo = 1'}
+      ORDER BY nome COLLATE NOCASE`,
+  )
+    .bind(tenantId)
+    .all<ClienteRow>()
+  return rows.results.map(toClienteDTO)
+}
+
+export async function getCliente(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<ClienteDTO | null> {
+  const row = await env.DB.prepare(
+    `SELECT * FROM cliente WHERE tenant_id = ? AND id = ? LIMIT 1`,
+  )
+    .bind(tenantId, id)
+    .first<ClienteRow>()
+  return row ? toClienteDTO(row) : null
+}
+
+export async function inserirCliente(
+  env: Env,
+  tenantId: string,
+  d: ClienteInput,
+): Promise<string> {
+  const id = crypto.randomUUID()
+  await env.DB.prepare(
+    `INSERT INTO cliente
+       (id, tenant_id, nome, telefone, documento, endereco, observacao,
+        plano_ativo, plano_valor_centavos, plano_dia_vencimento, plano_inicio)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      id, tenantId, d.nome, d.telefone, d.documento, d.endereco, d.observacao,
+      d.planoAtivo ? 1 : 0, d.planoValorCentavos, d.planoDiaVencimento, d.planoInicio,
+    )
+    .run()
+  return id
+}
+
+export async function atualizarCliente(
+  env: Env,
+  tenantId: string,
+  id: string,
+  d: ClienteInput,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `UPDATE cliente
+        SET nome = ?, telefone = ?, documento = ?, endereco = ?, observacao = ?,
+            plano_ativo = ?, plano_valor_centavos = ?, plano_dia_vencimento = ?,
+            plano_inicio = ?
+      WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(
+      d.nome, d.telefone, d.documento, d.endereco, d.observacao,
+      d.planoAtivo ? 1 : 0, d.planoValorCentavos, d.planoDiaVencimento, d.planoInicio,
+      tenantId, id,
+    )
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+/** Arquivar, nunca apagar: o cliente tem lançamentos e histórico atrelados. */
+export async function arquivarCliente(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `UPDATE cliente SET ativo = 0, plano_ativo = 0 WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(tenantId, id)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+/* ----- financeiro ----- */
+
+export interface LancamentoDTO {
+  id: string
+  clienteId: string | null
+  clienteNome: string | null
+  tipo: 'entrada' | 'saida'
+  categoria: string
+  descricao: string | null
+  valorCentavos: number
+  competencia: string
+  vencimento: string | null
+  pagoEm: string | null
+  criadoEmISO: string
+}
+
+interface LancamentoRow {
+  id: string
+  cliente_id: string | null
+  cliente_nome: string | null
+  tipo: 'entrada' | 'saida'
+  categoria: string
+  descricao: string | null
+  valor_centavos: number
+  competencia: string
+  vencimento: string | null
+  pago_em: string | null
+  criado_em: string
+}
+
+function toLancamentoDTO(r: LancamentoRow): LancamentoDTO {
+  return {
+    id: r.id,
+    clienteId: r.cliente_id,
+    clienteNome: r.cliente_nome,
+    tipo: r.tipo,
+    categoria: r.categoria,
+    descricao: r.descricao,
+    valorCentavos: r.valor_centavos,
+    competencia: r.competencia,
+    vencimento: r.vencimento,
+    pagoEm: r.pago_em,
+    criadoEmISO: r.criado_em,
+  }
+}
+
+const SELECT_LANCAMENTO = `
+  SELECT l.id, l.cliente_id, c.nome AS cliente_nome, l.tipo, l.categoria,
+         l.descricao, l.valor_centavos, l.competencia, l.vencimento,
+         l.pago_em, l.criado_em
+    FROM lancamento l
+    LEFT JOIN cliente c ON c.id = l.cliente_id AND c.tenant_id = l.tenant_id`
+
+export async function listLancamentos(
+  env: Env,
+  tenantId: string,
+  competencia: string,
+): Promise<LancamentoDTO[]> {
+  const rows = await env.DB.prepare(
+    `${SELECT_LANCAMENTO}
+      WHERE l.tenant_id = ? AND l.competencia = ?
+      ORDER BY (l.pago_em IS NOT NULL), l.vencimento IS NULL, l.vencimento, l.criado_em`,
+  )
+    .bind(tenantId, competencia)
+    .all<LancamentoRow>()
+  return rows.results.map(toLancamentoDTO)
+}
+
+/** Em aberto de qualquer mês, vencidos primeiro — é a tela que a dona olha. */
+export async function listEmAberto(
+  env: Env,
+  tenantId: string,
+  limite = 200,
+): Promise<LancamentoDTO[]> {
+  const rows = await env.DB.prepare(
+    `${SELECT_LANCAMENTO}
+      WHERE l.tenant_id = ? AND l.pago_em IS NULL
+      ORDER BY l.vencimento IS NULL, l.vencimento, l.competencia
+      LIMIT ?`,
+  )
+    .bind(tenantId, limite)
+    .all<LancamentoRow>()
+  return rows.results.map(toLancamentoDTO)
+}
+
+export interface LancamentoInput {
+  clienteId: string | null
+  tipo: 'entrada' | 'saida'
+  categoria: string
+  descricao: string | null
+  valorCentavos: number
+  competencia: string
+  vencimento: string | null
+  pagoEm: string | null
+}
+
+export async function inserirLancamento(
+  env: Env,
+  tenantId: string,
+  d: LancamentoInput,
+): Promise<string> {
+  const id = crypto.randomUUID()
+  await env.DB.prepare(
+    `INSERT INTO lancamento
+       (id, tenant_id, cliente_id, tipo, categoria, descricao, valor_centavos,
+        competencia, vencimento, pago_em)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+  )
+    .bind(
+      id, tenantId, d.clienteId, d.tipo, d.categoria, d.descricao,
+      d.valorCentavos, d.competencia, d.vencimento, d.pagoEm,
+    )
+    .run()
+  return id
+}
+
+/** Marca pago (data 'AAAA-MM-DD') ou reabre (null). */
+export async function definirPagamento(
+  env: Env,
+  tenantId: string,
+  id: string,
+  pagoEm: string | null,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `UPDATE lancamento SET pago_em = ? WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(pagoEm, tenantId, id)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+export async function excluirLancamento(
+  env: Env,
+  tenantId: string,
+  id: string,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `DELETE FROM lancamento WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(tenantId, id)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+/** Gera as mensalidades do mês para todo plano ativo. Repetível: o índice único
+ *  parcial (ver migration 0008, decisão 5) recusa a segunda geração do mesmo
+ *  mês, então clicar duas vezes não duplica cobrança. */
+export async function gerarMensalidades(
+  env: Env,
+  tenantId: string,
+  competencia: string,
+): Promise<number> {
+  const clientes = await env.DB.prepare(
+    `SELECT id, plano_valor_centavos, plano_dia_vencimento
+       FROM cliente
+      WHERE tenant_id = ? AND ativo = 1 AND plano_ativo = 1
+        AND plano_valor_centavos IS NOT NULL`,
+  )
+    .bind(tenantId)
+    .all<{ id: string; plano_valor_centavos: number; plano_dia_vencimento: number | null }>()
+
+  let criados = 0
+  for (const c of clientes.results) {
+    const dia = String(c.plano_dia_vencimento ?? 10).padStart(2, '0')
+    const r = await env.DB.prepare(
+      `INSERT OR IGNORE INTO lancamento
+         (id, tenant_id, cliente_id, tipo, categoria, descricao, valor_centavos,
+          competencia, vencimento, pago_em)
+       VALUES (?, ?, ?, 'entrada', 'mensalidade', 'Mensalidade do plano', ?, ?, ?, NULL)`,
+    )
+      .bind(
+        crypto.randomUUID(), tenantId, c.id, c.plano_valor_centavos,
+        competencia, `${competencia}-${dia}`,
+      )
+      .run()
+    criados += r.meta.changes ?? 0
+  }
+  return criados
+}
+
+export interface ResumoFinanceiro {
+  competencia: string
+  entradasCentavos: number
+  saidasCentavos: number
+  recebidoCentavos: number
+  aReceberCentavos: number
+  clientesComPlano: number
+}
+
+export async function getResumoFinanceiro(
+  env: Env,
+  tenantId: string,
+  competencia: string,
+): Promise<ResumoFinanceiro> {
+  const t = await env.DB.prepare(
+    `SELECT
+       COALESCE(SUM(CASE WHEN tipo = 'entrada' THEN valor_centavos END), 0) AS entradas,
+       COALESCE(SUM(CASE WHEN tipo = 'saida'   THEN valor_centavos END), 0) AS saidas,
+       COALESCE(SUM(CASE WHEN tipo = 'entrada' AND pago_em IS NOT NULL
+                         THEN valor_centavos END), 0) AS recebido,
+       COALESCE(SUM(CASE WHEN tipo = 'entrada' AND pago_em IS NULL
+                         THEN valor_centavos END), 0) AS a_receber
+     FROM lancamento WHERE tenant_id = ? AND competencia = ?`,
+  )
+    .bind(tenantId, competencia)
+    .first<{ entradas: number; saidas: number; recebido: number; a_receber: number }>()
+
+  const p = await env.DB.prepare(
+    `SELECT count(*) AS n FROM cliente
+      WHERE tenant_id = ? AND ativo = 1 AND plano_ativo = 1`,
+  )
+    .bind(tenantId)
+    .first<{ n: number }>()
+
+  return {
+    competencia,
+    entradasCentavos: t?.entradas ?? 0,
+    saidasCentavos: t?.saidas ?? 0,
+    recebidoCentavos: t?.recebido ?? 0,
+    aReceberCentavos: t?.a_receber ?? 0,
+    clientesComPlano: p?.n ?? 0,
+  }
+}
