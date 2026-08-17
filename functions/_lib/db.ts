@@ -544,6 +544,55 @@ export async function deletarSessao(env: Env, token: string): Promise<void> {
   await env.DB.prepare(`DELETE FROM sessao WHERE id = ?`).bind(token).run()
 }
 
+/* ----- rate-limit do login (força bruta) ----- */
+
+/** Quantas tentativas FALHADAS este par (IP, e-mail) somou nos últimos N segundos. */
+export async function contarFalhasLoginRecentes(
+  env: Env,
+  ipHashValor: string,
+  emailHashValor: string,
+  segundos: number,
+): Promise<number> {
+  const row = await env.DB.prepare(
+    `SELECT count(*) AS n FROM login_tentativa
+     WHERE ip_hash = ? AND email_hash = ? AND criado_em > datetime('now', ?)`,
+  )
+    .bind(ipHashValor, emailHashValor, `-${segundos} seconds`)
+    .first<{ n: number }>()
+  return row?.n ?? 0
+}
+
+/** Registra uma tentativa que falhou e aproveita para varrer linhas velhas. */
+export async function registrarFalhaLogin(
+  env: Env,
+  ipHashValor: string,
+  emailHashValor: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO login_tentativa (id, ip_hash, email_hash) VALUES (?, ?, ?)`,
+  )
+    .bind(crypto.randomUUID(), ipHashValor, emailHashValor)
+    .run()
+  // limpeza oportunista: a tabela só serve à janela de minutos, não é auditoria.
+  // Roda só no caminho de falha, que é raro — não onera o login que dá certo.
+  await env.DB.prepare(
+    `DELETE FROM login_tentativa WHERE criado_em < datetime('now', '-1 day')`,
+  ).run()
+}
+
+/** Zera o histórico de falhas do par após um login bem-sucedido. */
+export async function limparFalhasLogin(
+  env: Env,
+  ipHashValor: string,
+  emailHashValor: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `DELETE FROM login_tentativa WHERE ip_hash = ? AND email_hash = ?`,
+  )
+    .bind(ipHashValor, emailHashValor)
+    .run()
+}
+
 /* ----- administração de usuários da funerária ----- */
 
 export interface UsuarioAdminDTO {
