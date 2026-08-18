@@ -1482,13 +1482,28 @@
   border-left: 0;
 }
 .memorial-root.mv3 .mv3-contador b {
-  display: block;
+  /* flex, e não block, para a chama caber ao lado do número sem alterar a
+     altura da linha — é o que mantém os três números na mesma altura. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   font-family: var(--g);
   font-size: 1.7rem;
   line-height: 1;
   color: var(--brass-e);
 }
-.memorial-root.mv3 .mv3-contador span {
+.memorial-root.mv3 .mv3-cel-vela .chama {
+  /* em em, para crescer junto com o número; e sempre menor que a caixa dele
+     (0,86em contra 1em de entrelinha), para nunca ser a chama a definir a
+     altura da linha — se fosse, o desalinhamento voltava. */
+  width: 0.6em;
+  height: 0.86em;
+}
+/* `> div > span` e nao `span`: a chama tambem e um <span>, mas mora dentro do
+   <b> do numero. Sem o filho direto ela herdava a margem e a opacidade do
+   rotulo — e eram esses 5 px de margem que desalinhavam a celula das velas. */
+.memorial-root.mv3 .mv3-contador > div > span {
   font-family: var(--a);
   font-size: 0.6rem;
   font-weight: 600;
@@ -1501,10 +1516,7 @@
 .memorial-root.mv3 .mv3-cel-vela b {
   color: var(--marca);
 }
-.memorial-root.mv3 .mv3-cel-vela .chama-g {
-  margin: 0 auto 6px;
-  display: block;
-}
+
 
 /* ---- eventos: onde e quando ---- */
 .memorial-root.mv3 .mv3-eventos {
@@ -2034,8 +2046,10 @@
   .memorial-root.mv3 .mv3-hero {
     padding-block: 10px 22px;
   }
+  /* O retrato tinha encolhido para 36vw só para o contador caber. Com a chama
+     na linha do número o contador ficou 31 px mais baixo e o retrato pôde
+     voltar ao tamanho cheio — a foto é o que a pessoa veio ver. */
   .memorial-root.mv3 .mv3-portrait {
-    width: 36vw;
     margin-bottom: 14px;
   }
   .memorial-root.mv3 .mv3-datas { margin-top: 12px; }
@@ -2049,12 +2063,7 @@
   /* o contador some 40 px sem perder nenhum dos três números */
   .memorial-root.mv3 .mv3-contador > div { padding: 9px 6px; }
   .memorial-root.mv3 .mv3-contador b { font-size: 1.38rem; }
-  .memorial-root.mv3 .mv3-contador span { margin-top: 5px; }
-  .memorial-root.mv3 .mv3-cel-vela .chama-g {
-    width: 18px;
-    height: 26px;
-    margin-bottom: 4px;
-  }
+  .memorial-root.mv3 .mv3-contador > div > span { margin-top: 5px; }
 
   /* ---- fim da página ----
      Sobravam uns 200 px de nada entre a caixa de autorização e o rodapé: o

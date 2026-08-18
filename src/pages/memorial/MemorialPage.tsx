@@ -356,8 +356,13 @@ function MemorialModerno({
             {/* contador: velas · mensagens · visitas */}
             <div className="mv3-contador">
               <div className="mv3-cel-vela">
-                <Chama grande />
-                <b className="num">{totalVelas}</b>
+                {/* A chama fica NA LINHA do número, não acima: acima, ela
+                    empurrava "6 / VELAS ACESAS" para baixo e os três números do
+                    contador não se alinhavam entre si. */}
+                <b className="num">
+                  <Chama />
+                  {totalVelas}
+                </b>
                 <span>{totalVelas === 1 ? 'vela acesa' : 'velas acesas'}</span>
               </div>
               <div>
