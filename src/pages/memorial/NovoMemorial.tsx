@@ -22,6 +22,7 @@ import { useSessao } from '../admin/auth'
 import { idadeEm, iniciais } from './format'
 import { recortar45 } from './image'
 import { SiteHeader } from '@/components/SiteChrome'
+import PreviaMemorial from './PreviaMemorial'
 import './memorial.css'
 
 /** Converte data URL (JPEG do recorte) em Blob SEM fetch — a CSP
@@ -116,6 +117,10 @@ export default function NovoMemorial() {
 
   const moderar = watch('moderarMensagens')
   const nomeAtual = watch('nomeCompleto')
+  /* Um único `watch()` sem argumento devolve o formulário inteiro e re-renderiza
+   * a cada tecla — é o que faz a prévia acompanhar a digitação. O custo é
+   * aceitável porque a prévia é um punhado de parágrafos, não a página real. */
+  const tudo = watch()
 
   const [foto, setFoto] = useState<string | null>(null)
   const [fotoProcessando, setFotoProcessando] = useState(false)
@@ -133,7 +138,8 @@ export default function NovoMemorial() {
       .then((c) => {
         setCfg(c)
         if (!editId) {
-          if (c.velorioLocalPadrao) setValue('velorioLocal', c.velorioLocalPadrao)
+          if (c.velorioLocalPadrao)
+            setValue('velorioLocal', c.velorioLocalPadrao)
           if (c.velorioEnderecoPadrao)
             setValue('velorioEndereco', c.velorioEnderecoPadrao)
           if (c.sepultamentoLocalPadrao)
@@ -267,7 +273,9 @@ export default function NovoMemorial() {
       navigate('/admin')
     } catch (err) {
       toast.error(
-        err instanceof ApiError ? err.message : 'Não foi possível salvar agora.',
+        err instanceof ApiError
+          ? err.message
+          : 'Não foi possível salvar agora.',
       )
       setPublicando(false)
     }
@@ -283,286 +291,311 @@ export default function NovoMemorial() {
     <div className="memorial-root">
       <SiteHeader />
 
-      <div className="form">
-        <p className="eti" style={{ color: 'var(--brass-e)' }}>
-          {editId ? 'Editar nota de falecimento' : 'Nova nota de falecimento'}
-        </p>
+      <div className="edit-wrap">
+        <div className="form">
+          <p className="eti" style={{ color: 'var(--brass-e)' }}>
+            {editId ? 'Editar nota de falecimento' : 'Nova nota de falecimento'}
+          </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} noValidate>
-          <label>
-            <span className="rot">Nome completo</span>
-            <input type="text" {...register('nomeCompleto')} />
-            {errors.nomeCompleto && (
-              <span className="erro">{errors.nomeCompleto.message}</span>
-            )}
-          </label>
-
-          <label>
-            <span className="rot">Como era conhecido</span>
-            <input
-              type="text"
-              placeholder="opcional"
-              {...register('apelido')}
-            />
-            <span className="dica">Aparece abaixo do nome. Ex.: Dona Nair</span>
-          </label>
-
-          <div className="par">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate>
             <label>
-              <span className="rot">Nascimento</span>
-              <input type="date" {...register('nascimento')} />
-            </label>
-            <label>
-              <span className="rot">Cidade de nascimento</span>
-              <input
-                type="text"
-                placeholder="Ex.: Catanduvas · PR"
-                {...register('cidadeNascimento')}
-              />
-            </label>
-          </div>
-
-          <div className="par">
-            <label>
-              <span className="rot">Falecimento</span>
-              <input type="date" {...register('falecimento')} />
-              {errors.falecimento && (
-                <span className="erro">{errors.falecimento.message}</span>
+              <span className="rot">Nome completo</span>
+              <input type="text" {...register('nomeCompleto')} />
+              {errors.nomeCompleto && (
+                <span className="erro">{errors.nomeCompleto.message}</span>
               )}
             </label>
+
             <label>
-              <span className="rot">Cidade de falecimento</span>
+              <span className="rot">Como era conhecido</span>
               <input
                 type="text"
                 placeholder="opcional"
-                {...register('cidadeFalecimento')}
+                {...register('apelido')}
               />
-            </label>
-          </div>
-
-          <label>
-            <span className="rot">Epitáfio</span>
-            <input
-              type="text"
-              placeholder="Uma frase que resume — opcional"
-              {...register('epitafio')}
-            />
-            <span className="dica">
-              Uma linha, no topo da página e no card de compartilhamento.
-            </span>
-            {errors.epitafio && (
-              <span className="erro">{errors.epitafio.message}</span>
-            )}
-          </label>
-
-          {/* Foto — recorte 4:5 no navegador */}
-          <label>
-            <span className="rot">Foto</span>
-            <div className="foto-campo">
-              <div className="foto-previa">
-                {foto ? (
-                  <img src={foto} alt="Prévia da foto" />
-                ) : (
-                  <span className="mono">
-                    {iniciais(nomeAtual || '') || '—'}
-                  </span>
-                )}
-              </div>
-              <div className="foto-acoes">
-                <input
-                  id="foto-input"
-                  type="file"
-                  accept="image/*"
-                  onChange={onFoto}
-                  style={{ display: 'none' }}
-                />
-                <label htmlFor="foto-input" className="foto-btn">
-                  {fotoProcessando
-                    ? 'Processando…'
-                    : foto
-                      ? 'Trocar foto'
-                      : 'Escolher foto'}
-                </label>
-                {foto && (
-                  <button
-                    type="button"
-                    className="foto-btn vazio"
-                    onClick={() => setFoto(null)}
-                  >
-                    Remover
-                  </button>
-                )}
-                <span className="dica">
-                  Recortamos em 4:5 automaticamente. Sem foto, publicamos com as
-                  iniciais.
-                </span>
-              </div>
-            </div>
-          </label>
-
-          {/* Eventos */}
-          <div className="grupo">
-            <span className="eti">Onde e quando</span>
-            <label>
-              <span className="rot">Velório — local</span>
-              <input type="text" {...register('velorioLocal')} />
-              {errors.velorioLocal && (
-                <span className="erro">{errors.velorioLocal.message}</span>
-              )}
-            </label>
-            <label>
-              <span className="rot">Velório — endereço</span>
-              <input type="text" {...register('velorioEndereco')} />
-            </label>
-            <label>
-              <span className="rot">Velório — início</span>
-              <input type="datetime-local" {...register('velorioInicio')} />
-            </label>
-            <label>
-              <span className="rot">Sepultamento — local</span>
-              <input type="text" {...register('sepLocal')} />
-            </label>
-            <label>
-              <span className="rot">Sepultamento — horário</span>
-              <input type="datetime-local" {...register('sepInicio')} />
               <span className="dica">
-                Em branco = publicamos “a confirmar”.
+                Aparece abaixo do nome. Ex.: Dona Nair
               </span>
             </label>
-          </div>
 
-          {/* História opcional */}
-          <div className="grupo">
-            <span className="eti">A história (opcional)</span>
-            <p className="dica">
-              Só publicamos se a família enviar o texto. Cole aqui o que a
-              família mandou — se não houver, a seção não aparece na página.
-            </p>
-            <label>
-              <textarea
-                placeholder="Texto biográfico enviado pela família"
-                {...register('historia')}
-              />
-            </label>
-          </div>
+            <div className="par">
+              <label>
+                <span className="rot">Nascimento</span>
+                <input type="date" {...register('nascimento')} />
+              </label>
+              <label>
+                <span className="rot">Cidade de nascimento</span>
+                <input
+                  type="text"
+                  placeholder="Ex.: Catanduvas · PR"
+                  {...register('cidadeNascimento')}
+                />
+              </label>
+            </div>
 
-          {/* Mensagem do WhatsApp (opcional, sobrescreve o modelo) */}
-          <div className="grupo">
-            <span className="eti">Mensagem do WhatsApp (opcional)</span>
-            <p className="dica">
-              Texto que acompanha o link ao compartilhar esta nota. Em branco =
-              usa o modelo padrão da funerária (defina em Configurações).
-            </p>
-            <label>
-              <textarea
-                placeholder={cfg.whatsappTemplate || TEMPLATE_WHATSAPP_PADRAO}
-                {...register('whatsappTexto')}
-              />
-            </label>
-          </div>
-
-          {/* Autorização */}
-          <div className="grupo">
-            <span className="eti">Autorização da família</span>
-            <p className="dica">
-              Quem autoriza a publicação do nome, da foto e das homenagens.
-            </p>
+            <div className="par">
+              <label>
+                <span className="rot">Falecimento</span>
+                <input type="date" {...register('falecimento')} />
+                {errors.falecimento && (
+                  <span className="erro">{errors.falecimento.message}</span>
+                )}
+              </label>
+              <label>
+                <span className="rot">Cidade de falecimento</span>
+                <input
+                  type="text"
+                  placeholder="opcional"
+                  {...register('cidadeFalecimento')}
+                />
+              </label>
+            </div>
 
             <label>
-              <span className="rot">Autorizado por (nome)</span>
+              <span className="rot">Epitáfio</span>
               <input
                 type="text"
-                placeholder="Ex.: Maria de Souza (filha)"
-                {...register('autorizadoPor')}
+                placeholder="Uma frase que resume — opcional"
+                {...register('epitafio')}
               />
               <span className="dica">
-                Aparece no rodapé: “Publicação autorizada por…”.
+                Uma linha, no topo da página e no card de compartilhamento.
               </span>
-              {errors.autorizadoPor && (
-                <span className="erro">{errors.autorizadoPor.message}</span>
+              {errors.epitafio && (
+                <span className="erro">{errors.epitafio.message}</span>
               )}
             </label>
-          </div>
 
-          {/* Moderação de mensagens — opcional */}
-          <div className="grupo">
-            <span className="eti">Mensagens de homenagem</span>
-            <p className="dica">
-              Por padrão, as mensagens aparecem na hora. A maioria das famílias
-              não precisa revisar. Ligue abaixo só se a família preferir aprovar
-              cada mensagem antes de publicar.
-            </p>
-
-            <label className="velacheck">
-              <input type="checkbox" {...register('moderarMensagens')} />
-              <span>
-                <span className="tt">
-                  Revisar as mensagens antes de publicar
-                </span>
-                <span className="ds">
-                  Cada mensagem fica em espera até a família aprovar. As velas
-                  continuam entrando na hora, sem aprovação.
-                </span>
-              </span>
+            {/* Foto — recorte 4:5 no navegador */}
+            <label>
+              <span className="rot">Foto</span>
+              <div className="foto-campo">
+                <div className="foto-previa">
+                  {foto ? (
+                    <img src={foto} alt="Prévia da foto" />
+                  ) : (
+                    <span className="mono">
+                      {iniciais(nomeAtual || '') || '—'}
+                    </span>
+                  )}
+                </div>
+                <div className="foto-acoes">
+                  <input
+                    id="foto-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={onFoto}
+                    style={{ display: 'none' }}
+                  />
+                  <label htmlFor="foto-input" className="foto-btn">
+                    {fotoProcessando
+                      ? 'Processando…'
+                      : foto
+                        ? 'Trocar foto'
+                        : 'Escolher foto'}
+                  </label>
+                  {foto && (
+                    <button
+                      type="button"
+                      className="foto-btn vazio"
+                      onClick={() => setFoto(null)}
+                    >
+                      Remover
+                    </button>
+                  )}
+                  <span className="dica">
+                    Recortamos em 4:5 automaticamente. Sem foto, publicamos com
+                    as iniciais.
+                  </span>
+                </div>
+              </div>
             </label>
 
-            {moderar && (
-              <>
-                <div className="par">
-                  <label>
-                    <span className="rot">Responsável pelas aprovações</span>
-                    <input
-                      type="text"
-                      placeholder="Nome do familiar"
-                      {...register('aprovadorNome')}
-                    />
-                  </label>
-                  <label className="zap">
-                    <span className="rot">WhatsApp do responsável</span>
-                    <input
-                      type="tel"
-                      inputMode="tel"
-                      placeholder="(45) 90000-0000"
-                      {...register('aprovadorWhatsapp')}
-                    />
-                    {errors.aprovadorWhatsapp && (
-                      <span className="erro">
-                        {errors.aprovadorWhatsapp.message}
-                      </span>
-                    )}
-                  </label>
-                </div>
-                <p className="dica">
-                  É neste WhatsApp que chega o link para{' '}
-                  <b>aprovar ou recusar</b> cada mensagem, em um toque.
-                </p>
-              </>
-            )}
-          </div>
+            {/* Eventos */}
+            <div className="grupo">
+              <span className="eti">Onde e quando</span>
+              <label>
+                <span className="rot">Velório — local</span>
+                <input type="text" {...register('velorioLocal')} />
+                {errors.velorioLocal && (
+                  <span className="erro">{errors.velorioLocal.message}</span>
+                )}
+              </label>
+              <label>
+                <span className="rot">Velório — endereço</span>
+                <input type="text" {...register('velorioEndereco')} />
+              </label>
+              <label>
+                <span className="rot">Velório — início</span>
+                <input type="datetime-local" {...register('velorioInicio')} />
+              </label>
+              <label>
+                <span className="rot">Sepultamento — local</span>
+                <input type="text" {...register('sepLocal')} />
+              </label>
+              <label>
+                <span className="rot">Sepultamento — horário</span>
+                <input type="datetime-local" {...register('sepInicio')} />
+                <span className="dica">
+                  Em branco = publicamos “a confirmar”.
+                </span>
+              </label>
+            </div>
 
-          <div className="aviso">
-            <b>Salve como rascunho para conferir a página antes de publicar.</b>{' '}
-            A conferência do nome e dos horários é sua — e a autorização da
-            família precisa estar registrada acima.
-          </div>
-          <div className="duo">
-            <button
-              className="acao"
-              type="submit"
-              disabled={isSubmitting || publicando}
-            >
-              {isSubmitting && !publicando ? 'Salvando…' : 'Salvar rascunho'}
-            </button>
-            <button
-              className="acao primaria"
-              type="button"
-              disabled={isSubmitting || publicando}
-              onClick={handleSubmit((d) => salvar(d, true))}
-            >
-              {publicando ? 'Publicando…' : 'Salvar e publicar'}
-            </button>
-          </div>
-        </form>
+            {/* História opcional */}
+            <div className="grupo">
+              <span className="eti">A história (opcional)</span>
+              <p className="dica">
+                Só publicamos se a família enviar o texto. Cole aqui o que a
+                família mandou — se não houver, a seção não aparece na página.
+              </p>
+              <label>
+                <textarea
+                  placeholder="Texto biográfico enviado pela família"
+                  {...register('historia')}
+                />
+              </label>
+            </div>
+
+            {/* Mensagem do WhatsApp (opcional, sobrescreve o modelo) */}
+            <div className="grupo">
+              <span className="eti">Mensagem do WhatsApp (opcional)</span>
+              <p className="dica">
+                Texto que acompanha o link ao compartilhar esta nota. Em branco
+                = usa o modelo padrão da funerária (defina em Configurações).
+              </p>
+              <label>
+                <textarea
+                  placeholder={cfg.whatsappTemplate || TEMPLATE_WHATSAPP_PADRAO}
+                  {...register('whatsappTexto')}
+                />
+              </label>
+            </div>
+
+            {/* Autorização */}
+            <div className="grupo">
+              <span className="eti">Autorização da família</span>
+              <p className="dica">
+                Quem autoriza a publicação do nome, da foto e das homenagens.
+              </p>
+
+              <label>
+                <span className="rot">Autorizado por (nome)</span>
+                <input
+                  type="text"
+                  placeholder="Ex.: Maria de Souza (filha)"
+                  {...register('autorizadoPor')}
+                />
+                <span className="dica">
+                  Aparece no rodapé: “Publicação autorizada por…”.
+                </span>
+                {errors.autorizadoPor && (
+                  <span className="erro">{errors.autorizadoPor.message}</span>
+                )}
+              </label>
+            </div>
+
+            {/* Moderação de mensagens — opcional */}
+            <div className="grupo">
+              <span className="eti">Mensagens de homenagem</span>
+              <p className="dica">
+                Por padrão, as mensagens aparecem na hora. A maioria das
+                famílias não precisa revisar. Ligue abaixo só se a família
+                preferir aprovar cada mensagem antes de publicar.
+              </p>
+
+              <label className="velacheck">
+                <input type="checkbox" {...register('moderarMensagens')} />
+                <span>
+                  <span className="tt">
+                    Revisar as mensagens antes de publicar
+                  </span>
+                  <span className="ds">
+                    Cada mensagem fica em espera até a família aprovar. As velas
+                    continuam entrando na hora, sem aprovação.
+                  </span>
+                </span>
+              </label>
+
+              {moderar && (
+                <>
+                  <div className="par">
+                    <label>
+                      <span className="rot">Responsável pelas aprovações</span>
+                      <input
+                        type="text"
+                        placeholder="Nome do familiar"
+                        {...register('aprovadorNome')}
+                      />
+                    </label>
+                    <label className="zap">
+                      <span className="rot">WhatsApp do responsável</span>
+                      <input
+                        type="tel"
+                        inputMode="tel"
+                        placeholder="(45) 90000-0000"
+                        {...register('aprovadorWhatsapp')}
+                      />
+                      {errors.aprovadorWhatsapp && (
+                        <span className="erro">
+                          {errors.aprovadorWhatsapp.message}
+                        </span>
+                      )}
+                    </label>
+                  </div>
+                  <p className="dica">
+                    É neste WhatsApp que chega o link para{' '}
+                    <b>aprovar ou recusar</b> cada mensagem, em um toque.
+                  </p>
+                </>
+              )}
+            </div>
+
+            <div className="aviso">
+              <b>
+                Salve como rascunho para conferir a página antes de publicar.
+              </b>{' '}
+              A conferência do nome e dos horários é sua — e a autorização da
+              família precisa estar registrada acima.
+            </div>
+            <div className="duo">
+              <button
+                className="acao"
+                type="submit"
+                disabled={isSubmitting || publicando}
+              >
+                {isSubmitting && !publicando ? 'Salvando…' : 'Salvar rascunho'}
+              </button>
+              <button
+                className="acao primaria"
+                type="button"
+                disabled={isSubmitting || publicando}
+                onClick={handleSubmit((d) => salvar(d, true))}
+              >
+                {publicando ? 'Publicando…' : 'Salvar e publicar'}
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <PreviaMemorial
+          d={{
+            nomeCompleto: tudo.nomeCompleto,
+            apelido: tudo.apelido,
+            nascimento: tudo.nascimento,
+            falecimento: tudo.falecimento,
+            cidadeNascimento: tudo.cidadeNascimento,
+            cidadeFalecimento: tudo.cidadeFalecimento,
+            epitafio: tudo.epitafio,
+            historia: tudo.historia,
+            velorioLocal: tudo.velorioLocal,
+            velorioEndereco: tudo.velorioEndereco,
+            velorioInicio: tudo.velorioInicio,
+            sepLocal: tudo.sepLocal,
+            sepInicio: tudo.sepInicio,
+            fotoUrl: foto,
+          }}
+        />
       </div>
     </div>
   )

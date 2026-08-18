@@ -2007,3 +2007,77 @@
     0 0 8px 2px rgba(200, 160, 78, 0.55),
     0 0 18px 6px rgba(200, 160, 78, 0.38);
 }
+
+/* ================= EDITOR COM PRÉVIA AO LADO (18/08/2026) =================
+   Quem preenche está com a família na frente; conferir a página não pode custar
+   salvar, abrir outra aba e voltar. */
+.memorial-root .edit-wrap {
+  display: grid;
+  grid-template-columns: minmax(0, 600px) minmax(0, 380px);
+  gap: 28px;
+  align-items: start;
+  justify-content: center;
+  padding: 0 20px;
+}
+.memorial-root .edit-wrap > .form { padding-left: 0; padding-right: 0; }
+
+.memorial-root .prv { position: sticky; top: 84px; }
+.memorial-root .prv-rot {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--brass-e, #8A6828);
+  margin: 26px 0 8px;
+}
+.memorial-root .prv-folha {
+  background: #fff;
+  border: 1px solid var(--hair, #E4E0D6);
+  border-radius: 6px;
+  padding: 24px 22px;
+  text-align: center;
+}
+.memorial-root .prv-vazia { color: var(--muted, #565049); font-size: 0.9rem; margin: 0; }
+.memorial-root .prv-foto {
+  width: 118px;
+  height: 118px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin: 0 auto 14px;
+  display: block;
+}
+.memorial-root .prv-nome { font-size: 1.32rem; margin: 0 0 2px; line-height: 1.2; }
+.memorial-root .prv-apelido,
+.memorial-root .prv-anos { color: var(--muted, #565049); font-size: 0.92rem; margin: 0 0 4px; }
+.memorial-root .prv-epitafio { font-style: italic; margin: 14px 0 0; }
+.memorial-root .prv-bloco {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--hair, #E4E0D6);
+  text-align: left;
+  font-size: 0.9rem;
+}
+.memorial-root .prv-bloco p { margin: 0 0 8px; }
+.memorial-root .prv-end { display: block; color: var(--muted, #565049); font-size: 0.84rem; }
+.memorial-root .prv-historia {
+  margin-top: 16px;
+  text-align: left;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+  /* História longa não pode empurrar a prévia até virar rolagem infinita. */
+  max-height: 220px;
+  overflow: hidden;
+}
+.memorial-root .prv-nota {
+  font-size: 0.8rem;
+  color: var(--muted, #565049);
+  margin-top: 10px;
+  line-height: 1.5;
+}
+
+/* Abaixo de 1100px não cabem as duas colunas: a prévia vai para cima do
+   formulário, que é onde ela ainda ajuda — no celular, ver o resultado antes de
+   rolar o formulário inteiro. */
+@media (max-width: 1100px) {
+  .memorial-root .edit-wrap { grid-template-columns: minmax(0, 600px); }
+  .memorial-root .prv { position: static; }
+}

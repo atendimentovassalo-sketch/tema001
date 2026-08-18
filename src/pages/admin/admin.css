@@ -1100,3 +1100,50 @@
   padding-top: 14px;
 }
 .adm .lnk-revogar { color: #8a3a2f; border-color: #d9b5ac; }
+
+/* ---- submenu lateral (18/08/2026) ----
+   Abria abaixo e empurrava as outras opções para fora da tela. Ao lado, o menu
+   principal fica parado e a lista cresce no espaço livre. */
+.adm .cli-sub-wrap { position: relative; display: flex; flex-direction: column; }
+.adm .cli-sub-wrap > button { width: 100%; text-align: left; }
+.adm .cli-flyout {
+  position: absolute;
+  top: 0;
+  right: calc(100% + 6px);   /* à esquerda: o menu já nasce colado na borda direita */
+  z-index: 30;
+  min-width: 220px;
+  max-height: 60vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(26, 23, 18, 0.16);
+}
+.adm .cli-flyout button {
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.adm .cli-flyout button:hover { background: var(--cream); }
+
+/* No celular não há espaço lateral: volta a abrir abaixo, que é o certo ali. */
+@media (max-width: 720px) {
+  .adm .cli-flyout {
+    position: static;
+    min-width: 0;
+    box-shadow: none;
+    border: 0;
+    border-top: 1px solid var(--line-soft);
+    border-radius: 0;
+    padding: 4px 0 4px 14px;
+  }
+}

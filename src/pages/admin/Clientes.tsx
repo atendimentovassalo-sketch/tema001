@@ -560,54 +560,66 @@ ${r.url}
                                 )}
                                 {memoriais.length > 0 && (
                                   <>
-                                    <button
-                                      role="menuitem"
-                                      className="cli-menu-sep"
-                                      onClick={() =>
-                                        setSubmenu(
-                                          submenu === 'pagina'
-                                            ? null
-                                            : 'pagina',
-                                        )
-                                      }
-                                    >
-                                      Link da página do memorial ▸
-                                    </button>
-                                    {submenu === 'pagina' &&
-                                      memoriais.map((m) => (
-                                        <button
-                                          key={m.id}
-                                          role="menuitem"
-                                          className="cli-menu-sub"
-                                          onClick={() => mandarPagina(c, m)}
-                                        >
-                                          {m.nomeCompleto}
-                                        </button>
-                                      ))}
+                                    {/* Submenu abre AO LADO, não abaixo: empurrando para
+                                        baixo, a lista de memoriais afasta as outras opções
+                                        e o menu cresce até sair da tela. */}
+                                    <div className="cli-sub-wrap cli-menu-sep">
+                                      <button
+                                        role="menuitem"
+                                        onClick={() =>
+                                          setSubmenu(
+                                            submenu === 'pagina'
+                                              ? null
+                                              : 'pagina',
+                                          )
+                                        }
+                                        aria-expanded={submenu === 'pagina'}
+                                      >
+                                        Link da página do memorial ▸
+                                      </button>
+                                      {submenu === 'pagina' && (
+                                        <div className="cli-flyout" role="menu">
+                                          {memoriais.map((m) => (
+                                            <button
+                                              key={m.id}
+                                              role="menuitem"
+                                              onClick={() => mandarPagina(c, m)}
+                                            >
+                                              {m.nomeCompleto}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
 
-                                    <button
-                                      role="menuitem"
-                                      onClick={() =>
-                                        setSubmenu(
-                                          submenu === 'gestao'
-                                            ? null
-                                            : 'gestao',
-                                        )
-                                      }
-                                    >
-                                      Link de gestão (não compartilhar) ▸
-                                    </button>
-                                    {submenu === 'gestao' &&
-                                      memoriais.map((m) => (
-                                        <button
-                                          key={m.id}
-                                          role="menuitem"
-                                          className="cli-menu-sub"
-                                          onClick={() => mandarGestao(c, m)}
-                                        >
-                                          {m.nomeCompleto}
-                                        </button>
-                                      ))}
+                                    <div className="cli-sub-wrap">
+                                      <button
+                                        role="menuitem"
+                                        onClick={() =>
+                                          setSubmenu(
+                                            submenu === 'gestao'
+                                              ? null
+                                              : 'gestao',
+                                          )
+                                        }
+                                        aria-expanded={submenu === 'gestao'}
+                                      >
+                                        Link de gestão (não compartilhar) ▸
+                                      </button>
+                                      {submenu === 'gestao' && (
+                                        <div className="cli-flyout" role="menu">
+                                          {memoriais.map((m) => (
+                                            <button
+                                              key={m.id}
+                                              role="menuitem"
+                                              onClick={() => mandarGestao(c, m)}
+                                            >
+                                              {m.nomeCompleto}
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
                                   </>
                                 )}
                                 <button

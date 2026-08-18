@@ -37,7 +37,17 @@ const NAV_CSS = `
 
 export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
   return (
-    <>
+    /* O wrapper `.sfc` NÃO é decoração: todo o CSS deste cabeçalho está escopado
+     * em `.sfc .hdr`, e sem um ancestral com essa classe o cabeçalho sai CRU —
+     * marca e menu empilhados em Times New Roman. Era o que acontecia em
+     * /memorial/novo e em /aprovar/:token, que usam este componente solto em vez
+     * do SiteShell (que já traz o wrapper). Aninhar dois `.sfc` é inofensivo: as
+     * variáveis são as mesmas.
+     *
+     * `display: contents` para o wrapper não virar um bloco entre o header e o
+     * conteúdo — o `.hdr` é `position: sticky`, e um pai extra com altura
+     * própria quebraria a fixação no topo. */
+    <div className="sfc" style={{ display: 'contents' }}>
       <style dangerouslySetInnerHTML={{ __html: NAV_CSS }} />
       <header className="hdr">
         <div className="w">
@@ -47,7 +57,10 @@ export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
           <nav className="nav" aria-label="Navegação principal">
             <a href="/">Home</a>
             <a href="/planos">Planos</a>
-            <a href="/obituario" aria-current={aqui === 'obituario' ? 'page' : undefined}>
+            <a
+              href="/obituario"
+              aria-current={aqui === 'obituario' ? 'page' : undefined}
+            >
               Obituários
             </a>
             <details className="nav-areas">
@@ -55,13 +68,15 @@ export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
               <div className="nav-areas-menu">
                 <a href="/cidade-catanduvas">Catanduvas</a>
                 <a href="/cidade-ibema">Ibema</a>
-                <a href="/cidade-tres-barras-do-parana">Três Barras do Paraná</a>
+                <a href="/cidade-tres-barras-do-parana">
+                  Três Barras do Paraná
+                </a>
               </div>
             </details>
           </nav>
         </div>
       </header>
-    </>
+    </div>
   )
 }
 
@@ -173,10 +188,22 @@ function SiteFooterMinimo() {
       >
         Funerária São Francisco
       </p>
-      <p style={{ fontSize: '.85rem', color: 'var(--muted, #6b6459)', margin: '6px 0 0' }}>
+      <p
+        style={{
+          fontSize: '.85rem',
+          color: 'var(--muted, #6b6459)',
+          margin: '6px 0 0',
+        }}
+      >
         Catanduvas · Ibema · Três Barras do Paraná
       </p>
-      <p style={{ fontSize: '.78rem', color: 'var(--muted, #6b6459)', margin: '16px 0 0' }}>
+      <p
+        style={{
+          fontSize: '.78rem',
+          color: 'var(--muted, #6b6459)',
+          margin: '16px 0 0',
+        }}
+      >
         <a href="/privacidade" style={{ color: 'inherit' }}>
           Privacidade
         </a>{' '}
