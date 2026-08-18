@@ -34,6 +34,13 @@ interface Cliente {
   ativo: boolean
 }
 
+interface MemorialResumo {
+  id: string
+  slug: string
+  nomeCompleto: string
+  status: string
+}
+
 interface LancamentoAberto {
   clienteId: string | null
   valorCentavos: number
@@ -66,6 +73,8 @@ export default function AdminClientes() {
   const [abertos, setAbertos] = useState<LancamentoAberto[]>([])
   const [funeraria, setFuneraria] = useState('Funerária')
   const [diaPadrao, setDiaPadrao] = useState('10')
+  const [memoriais, setMemoriais] = useState<MemorialResumo[]>([])
+  const [submenu, setSubmenu] = useState<'pagina' | 'gestao' | null>(null)
 
   useEffect(() => {
     document.title = 'Clientes — Painel'
@@ -103,6 +112,14 @@ export default function AdminClientes() {
           setDiaPadrao(String(r.config.diaInicioCiclo))
       })
       .catch(() => {})
+    /* Os memoriais alimentam os dois modelos de link. Só os publicados: mandar
+     * para a família o link de um rascunho é mandar uma página que não abre. */
+    api
+      .get<{ memoriais: MemorialResumo[] }>('/api/admin/memoriais')
+      .then((r) =>
+        setMemoriais(r.memoriais.filter((m) => m.status === 'publicado')),
+      )
+      .catch(() => setMemoriais([]))
   }, [usuario])
 
   const porCliente = useMemo(() => {
@@ -235,6 +252,55 @@ export default function AdminClientes() {
   function abrirWhats(url: string) {
     window.open(url, '_blank', 'noopener,noreferrer')
     setMenuId(null)
+    setSubmenu(null)
+  }
+
+  /* Link da página: público, pode circular. */
+  function mandarPagina(c: Cliente, m: MemorialResumo) {
+    const url = `${window.location.origin}/m/${m.slug}`
+    const texto =
+      `Nota de falecimento de ${m.nomeCompleto}.
+
+${url}
+
+` +
+      `Pode compartilhar à vontade — com a família, com amigos, em grupos.
+
+— ${funeraria}`
+    abrirWhats(linkWhatsApp(c.telefone, texto)!)
+  }
+
+  /* Link de gestão: gera na hora (invalidando o anterior) e já monta a mensagem
+   * com o aviso. Sai daqui com o aviso embutido justamente porque este é o link
+   * que não pode circular. */
+  async function mandarGestao(c: Cliente, m: MemorialResumo) {
+    try {
+      const r = await api.post<{ ok: true; url: string; dias: number }>(
+        `/api/admin/memoriais/${m.id}/familia`,
+      )
+      const texto =
+        `Este link é para VOCÊ cuidar da página de ${m.nomeCompleto} — escrever a ` +
+        `história, acrescentar fotos e aprovar ou esconder as mensagens que ` +
+        `chegarem:
+${r.url}
+
+` +
+        `⚠️ Por favor, NÃO repasse este link em grupos nem para outras pessoas. ` +
+        `Ele não pede senha: quem tiver o endereço consegue alterar a página. ` +
+        `Guarde só com você, ou com uma pessoa da família de sua confiança.
+
+` +
+        `Para divulgar o falecimento, use o outro link, o da página em si — esse ` +
+        `pode circular à vontade.
+
+` +
+        `O acesso vale ${r.dias} dias.
+
+— ${funeraria}`
+      abrirWhats(linkWhatsApp(c.telefone, texto)!)
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Não deu para gerar o link.')
+    }
   }
 
   if (carregando || !usuario)
@@ -491,6 +557,58 @@ export default function AdminClientes() {
                                   <span className="cli-menu-vazio">
                                     Nada em aberto para cobrar.
                                   </span>
+                                )}
+                                {memoriais.length > 0 && (
+                                  <>
+                                    <button
+                                      role="menuitem"
+                                      className="cli-menu-sep"
+                                      onClick={() =>
+                                        setSubmenu(
+                                          submenu === 'pagina'
+                                            ? null
+                                            : 'pagina',
+                                        )
+                                      }
+                                    >
+                                      Link da página do memorial ▸
+                                    </button>
+                                    {submenu === 'pagina' &&
+                                      memoriais.map((m) => (
+                                        <button
+                                          key={m.id}
+                                          role="menuitem"
+                                          className="cli-menu-sub"
+                                          onClick={() => mandarPagina(c, m)}
+                                        >
+                                          {m.nomeCompleto}
+                                        </button>
+                                      ))}
+
+                                    <button
+                                      role="menuitem"
+                                      onClick={() =>
+                                        setSubmenu(
+                                          submenu === 'gestao'
+                                            ? null
+                                            : 'gestao',
+                                        )
+                                      }
+                                    >
+                                      Link de gestão (não compartilhar) ▸
+                                    </button>
+                                    {submenu === 'gestao' &&
+                                      memoriais.map((m) => (
+                                        <button
+                                          key={m.id}
+                                          role="menuitem"
+                                          className="cli-menu-sub"
+                                          onClick={() => mandarGestao(c, m)}
+                                        >
+                                          {m.nomeCompleto}
+                                        </button>
+                                      ))}
+                                  </>
                                 )}
                                 <button
                                   role="menuitem"

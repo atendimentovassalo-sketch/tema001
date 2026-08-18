@@ -1672,10 +1672,31 @@ export async function removerFotoPelaFamilia(
   memorialId: string,
   fotoId: string,
 ): Promise<boolean> {
-  const r = await env.DB.prepare(
-    `DELETE FROM foto WHERE id = ? AND memorial_id = ?`,
+  /* Precisa da URL ANTES de apagar a linha, para apagar também o objeto no R2.
+   * Sem isso a foto sai da galeria e continua acessível para sempre por quem
+   * tiver o endereço — e quem apaga uma foto de um velório está justamente
+   * pedindo que ela suma. */
+  const row = await env.DB.prepare(
+    `SELECT url FROM foto WHERE id = ? AND memorial_id = ? LIMIT 1`,
   )
     .bind(fotoId, memorialId)
+    .first<{ url: string }>()
+  if (!row) return false
+
+  await env.DB.prepare(`DELETE FROM foto WHERE id = ? AND memorial_id = ?`)
+    .bind(fotoId, memorialId)
     .run()
-  return (r.meta.changes ?? 0) > 0
+
+  /* Só apaga do R2 o que este produto guardou lá (/api/fotos/<chave>). URL
+   * externa não é nossa para apagar. Falha aqui não desfaz a remoção da
+   * galeria: o que a família pediu já aconteceu. */
+  const m = /^\/api\/fotos\/([A-Za-z0-9._-]+)$/.exec(row.url)
+  if (m) {
+    try {
+      await env.PHOTOS.delete(m[1])
+    } catch {
+      /* objeto órfão no R2 é desperdício de espaço, não vazamento novo */
+    }
+  }
+  return true
 }

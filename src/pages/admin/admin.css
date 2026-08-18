@@ -1073,3 +1073,5 @@
 .adm .lnk-nota { margin: 10px 0 0; }
 .adm .lnk-aviso-off { color: #8a3a2f; }
 .adm .lnk-acoes { display: flex; flex-wrap: wrap; gap: 8px; }
+.adm .cli-menu-sub { padding-left: 24px !important; font-size: 0.86rem !important; color: var(--muted) !important; }
+.adm .cli-menu-sub:hover { color: var(--ink) !important; }
