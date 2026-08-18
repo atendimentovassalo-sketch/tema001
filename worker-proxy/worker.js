@@ -232,9 +232,15 @@ export default {
     const tenant = TENANTS[url.host]
     const tipo = res.headers.get('content-type') || ''
     if (tenant && res.status === 200 && tipo.includes('text/html')) {
-      /* Página de uma nota: /obituario/<slug> (exatamente dois segmentos).
-       * A prévia passa a trazer o nome do falecido, o velório e a foto. */
-      const nota = /^\/obituario\/([^/]+)\/?$/.exec(url.pathname)
+      /* Página de uma nota, nas TRÊS rotas que servem memorial: /obituario/<slug>,
+       * /m/<slug> e /memorial/<slug> (sempre exatamente dois segmentos).
+       *
+       * `/m/` não é detalhe: é a URL do Modelo A, a que a funerária manda no
+       * WhatsApp da família e a que de fato circula. Quando só `/obituario/`
+       * era tratada, o card certo existia justamente na rota que ninguém
+       * compartilha — verificado ao vivo em 18/08/2026, logo depois de corrigir
+       * o host do tenant na subrequisição. */
+      const nota = /^\/(?:obituario|m|memorial)\/([^/]+)\/?$/.exec(url.pathname)
       const meta = (nota && (await metaDoMemorial(nota[1], tenant, `https://${url.host}`, url.host))) || {
         ...tenant,
         cartaoGrande: true,
