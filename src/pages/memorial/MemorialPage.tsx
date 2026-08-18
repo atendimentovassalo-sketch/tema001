@@ -38,7 +38,10 @@ const ROT: Record<string, string> = {
  *  "Compartilhar". Com o formulário na tela ela também sobra: a pessoa já
  *  chegou onde a barra levaria.
  *
- *  Observa os dois blocos ao mesmo tempo; a barra é o que fica no meio. */
+ *  Observa o FORMULÁRIO, não a seção inteira: a seção inclui o mural, que
+ *  sozinho tem uns 2.000 px — observá-la deixava a barra escondida em quase
+ *  toda a página, e ela só reaparecia nos últimos 50 px de rolagem. Enquanto a
+ *  pessoa lê o mural a barra serve; enquanto ela escreve, não. */
 function useBarraFixa(
   heroi: React.RefObject<HTMLElement | null>,
   formulario: React.RefObject<HTMLElement | null>,
@@ -127,7 +130,7 @@ function MemorialModerno({
   )
   const [historiaAberta, setHistoriaAberta] = useState(false)
   const acoesHeroiRef = useRef<HTMLDivElement>(null)
-  const formularioRef = useRef<HTMLElement>(null)
+  const formularioRef = useRef<HTMLFormElement>(null)
   const mostrarBarraFixa = useBarraFixa(
     acoesHeroiRef,
     formularioRef,
@@ -501,11 +504,7 @@ function MemorialModerno({
         {/* livro de homenagens: composição (mensagem + vela) e o mural com o
           feed. Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
           Homenagem só-vela (sem mensagem) fica diferenciada. */}
-        <section
-          id="homenagear"
-          className="mv3-sec mv3-livro"
-          ref={formularioRef}
-        >
+        <section id="homenagear" className="mv3-sec mv3-livro">
           <div className="mv3-w">
             <span className="mv3-cap">Homenagens</span>
             <h2 className="mv3-h2">Deixe uma mensagem para a família</h2>
@@ -518,7 +517,12 @@ function MemorialModerno({
               </p>
             )}
 
-            <form className="mv3-compor" onSubmit={onSubmit} noValidate>
+            <form
+              className="mv3-compor"
+              onSubmit={onSubmit}
+              noValidate
+              ref={formularioRef}
+            >
               {/* Recado curto e no topo: quem chega aqui muitas vezes trava no
                   "não sei o que escrever". Frase de exemplo resolve, mas só se
                   vier ANTES do campo — depois dele, ninguém lê. */}
