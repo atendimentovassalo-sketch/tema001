@@ -17,32 +17,10 @@ import {
   removerFotoPelaFamilia,
 } from '../../../_lib/db'
 import { json, erro } from '../../../_lib/http'
+import { tipoRealDaImagem } from '../../../_lib/imagem'
 
 const MAX_BYTES = 8 * 1024 * 1024
 const MAX_FOTOS = 12
-
-/** Detecta o tipo pelos primeiros bytes. Devolve null para o que não for
- *  imagem que a gente aceita — inclusive SVG, que é XML e executa script. */
-function tipoReal(buf: ArrayBuffer): { mime: string; ext: string } | null {
-  const b = new Uint8Array(buf)
-  if (b.length < 12) return null
-  // JPEG: FF D8 FF
-  if (b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff)
-    return { mime: 'image/jpeg', ext: 'jpg' }
-  // PNG: 89 50 4E 47 0D 0A 1A 0A
-  if (
-    b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47 &&
-    b[4] === 0x0d && b[5] === 0x0a && b[6] === 0x1a && b[7] === 0x0a
-  )
-    return { mime: 'image/png', ext: 'png' }
-  // WebP: "RIFF" .... "WEBP"
-  if (
-    b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
-    b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50
-  )
-    return { mime: 'image/webp', ext: 'webp' }
-  return null
-}
 
 export const onRequestPost: PagesFunction<Env> = async ({ env, request, params }) => {
   const acesso = await getAcessoFamilia(env, String(params.token))
@@ -53,7 +31,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request, params }
   if (buf.byteLength > MAX_BYTES)
     return erro('Imagem grande demais (máximo 8 MB).', 413)
 
-  const tipo = tipoReal(buf)
+  const tipo = tipoRealDaImagem(buf)
   if (!tipo) return erro('Envie uma foto em JPEG, PNG ou WebP.', 415)
 
   const nome = `${crypto.randomUUID()}.${tipo.ext}`

@@ -1,0 +1,24 @@
+# Normalização de fim de linha (18/08/2026).
+#
+# POR QUE ESTE ARQUIVO EXISTE: sem ele, o Git no Windows decidia sozinho o
+# fim de linha de cada arquivo, e o resultado foi um commit em 13/08 com
+# "135 arquivos modificados" — dos quais 133 eram só CRLF, nenhuma mudança
+# de conteúdo. Custou uma investigação inteira para descobrir isso, e todo
+# commit desde então sai com dezenas de avisos.
+#
+# Regra: o repositório guarda LF; cada máquina que faça o que quiser na
+# árvore de trabalho.
+
+* text=auto eol=lf
+
+# Binários: nunca converter, senão a imagem corrompe.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.woff binary
+*.woff2 binary

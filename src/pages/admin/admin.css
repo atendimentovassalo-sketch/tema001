@@ -1075,3 +1075,28 @@
 .adm .lnk-acoes { display: flex; flex-wrap: wrap; gap: 8px; }
 .adm .cli-menu-sub { padding-left: 24px !important; font-size: 0.86rem !important; color: var(--muted) !important; }
 .adm .cli-menu-sub:hover { color: var(--ink) !important; }
+
+/* Ação principal dentro do menu, e separador do grupo de ajustes. */
+.adm .adm-lateral-acao {
+  display: block;
+  text-align: center;
+  padding: 11px 12px;
+  margin-bottom: 14px;
+  border-radius: 3px;
+  background: var(--ink);
+  color: var(--paper);
+  text-decoration: none;
+  font-size: 0.92rem;
+}
+.adm .adm-lateral-acao:hover { opacity: 0.9; }
+.adm .adm-lateral-sep {
+  margin: 16px 0 6px;
+  padding: 0 12px;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+  border-top: 1px solid var(--line-soft);
+  padding-top: 14px;
+}
+.adm .lnk-revogar { color: #8a3a2f; border-color: #d9b5ac; }

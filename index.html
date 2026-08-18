@@ -3,6 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Emblema da funerária na aba. Aponta para /logo.png, que hoje é o mesmo
+         arquivo que o painel usa. Quando entrar o segundo cliente isto tem de
+         ser reescrito por tenant no Worker `proxy-obituario`, junto com as meta
+         tags — senão a aba do cliente B mostra a marca do cliente A. -->
+    <link rel="icon" type="image/png" href="/logo.png" />
+    <link rel="apple-touch-icon" href="/logo.png" />
     <title>Funerária Demonstração — Atendimento 24 horas</title>
     <meta name="description" content="Modelo de site para funerárias: atendimento 24 horas, obituário online e orientação para as famílias." />
     <meta property="og:title" content="Funerária Demonstração — Atendimento 24 horas" />

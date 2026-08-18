@@ -22,10 +22,16 @@ interface Secao {
   exato?: boolean
 }
 
-const SECOES: Secao[] = [
+/* Duas listas, e não uma de cinco itens: o que se usa todo dia fica em cima, e
+ * o que se mexe uma vez por mês desce para um grupo separado. Menu em que tudo
+ * tem o mesmo peso obriga a ler os cinco toda vez para achar um. */
+const DIA_A_DIA: Secao[] = [
   { para: '/admin', rotulo: 'Memoriais', exato: true },
   { para: '/admin/clientes', rotulo: 'Clientes' },
   { para: '/admin/financeiro', rotulo: 'Financeiro' },
+]
+
+const AJUSTES: Secao[] = [
   { para: '/admin/usuarios', rotulo: 'Usuários' },
   { para: '/admin/config', rotulo: 'Configurações' },
 ]
@@ -102,27 +108,54 @@ export default function PainelShell({
           </span>
         </a>
 
+        {/* A ação principal fica no menu, e não só na tela de memoriais:
+            publicar nota é o que a funerária abre o painel para fazer, e
+            precisar navegar até a lista antes é um passo a mais no pior
+            momento possível. */}
+        <Link className="adm-lateral-acao" to="/memorial/novo">
+          + Nova nota de falecimento
+        </Link>
+
         <ul className="adm-lateral-lista">
-          {SECOES.map((s) => {
-            const ativo = s.exato
-              ? pathname === s.para
-              : pathname.startsWith(s.para)
-            return (
-              <li key={s.para}>
-                <Link
-                  to={s.para}
-                  className={
-                    ativo
-                      ? 'adm-lateral-link adm-lateral-ativo'
-                      : 'adm-lateral-link'
-                  }
-                  aria-current={ativo ? 'page' : undefined}
-                >
-                  {s.rotulo}
-                </Link>
-              </li>
-            )
-          })}
+          {DIA_A_DIA.map((s) => (
+            <li key={s.para}>
+              <Link
+                to={s.para}
+                className={
+                  (s.exato ? pathname === s.para : pathname.startsWith(s.para))
+                    ? 'adm-lateral-link adm-lateral-ativo'
+                    : 'adm-lateral-link'
+                }
+                aria-current={
+                  (s.exato ? pathname === s.para : pathname.startsWith(s.para))
+                    ? 'page'
+                    : undefined
+                }
+              >
+                {s.rotulo}
+              </Link>
+            </li>
+          ))}
+
+          <li className="adm-lateral-sep" aria-hidden="true">
+            Ajustes
+          </li>
+
+          {AJUSTES.map((s) => (
+            <li key={s.para}>
+              <Link
+                to={s.para}
+                className={
+                  pathname.startsWith(s.para)
+                    ? 'adm-lateral-link adm-lateral-ativo'
+                    : 'adm-lateral-link'
+                }
+                aria-current={pathname.startsWith(s.para) ? 'page' : undefined}
+              >
+                {s.rotulo}
+              </Link>
+            </li>
+          ))}
         </ul>
 
         <button className="adm-lateral-sair" onClick={sair}>

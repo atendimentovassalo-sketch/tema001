@@ -7,6 +7,7 @@
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   Content-Security-Policy: default-src 'self'; base-uri 'self'; frame-ancestors 'none'; object-src 'none'; img-src 'self' https: data:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; script-src 'self'; connect-src 'self'; form-action 'self'
 
-# As imagens do R2 têm nome único (uuid): cache longo e imutável.
-/api/fotos/*
-  Cache-Control: public, max-age=31536000, immutable
+# O cache de /api/fotos/* NÃO fica aqui de propósito (18/08/2026): a resposta
+# varia conforme a foto seja pública ou dependa de sessão, e uma regra fixa neste
+# arquivo sobrescreveria o `private, no-store` das que dependem — entregando a um
+# CDN compartilhado imagem que exige login. Quem decide é a própria função.

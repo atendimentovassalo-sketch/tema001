@@ -1700,3 +1700,18 @@ export async function removerFotoPelaFamilia(
   }
   return true
 }
+
+/** Esta foto está referenciada por algum memorial? Usada para decidir se um
+ *  objeto do R2 pode ser servido publicamente. Cobre os dois lugares em que uma
+ *  imagem é referenciada: a galeria (`foto.url`) e o retrato (`memorial.foto_url`). */
+export async function fotoEhPublica(env: Env, url: string): Promise<boolean> {
+  const row = await env.DB.prepare(
+    `SELECT 1 AS ok FROM foto WHERE url = ?
+      UNION ALL
+     SELECT 1 AS ok FROM memorial WHERE foto_url = ?
+     LIMIT 1`,
+  )
+    .bind(url, url)
+    .first<{ ok: number }>()
+  return !!row
+}

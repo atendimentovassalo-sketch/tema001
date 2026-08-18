@@ -65,6 +65,25 @@ export default function CompartilharMemorial({
     }
   }
 
+  /* Revogar é diferente de "gerar outro": aqui o memorial fica SEM link nenhum.
+   * É o que se faz quando o link vazou e ninguém mais deveria editar a página. */
+  async function revogar() {
+    if (
+      !confirm(
+        'Revogar o link de gestão? Quem tiver o endereço perde o acesso na hora, ' +
+          'e a família precisará de um link novo para editar a página.',
+      )
+    )
+      return
+    try {
+      await api.del(`/api/admin/memoriais/${memorialId}/familia`)
+      setGestaoUrl(null)
+      toast.success('Link revogado. Ninguém mais consegue editar a página.')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Não deu para revogar.')
+    }
+  }
+
   function abrir(url: string) {
     window.open(url, '_blank', 'noopener,noreferrer')
   }
@@ -106,7 +125,9 @@ export default function CompartilharMemorial({
           </button>
           <button
             className="adm-btn adm-btn-mini adm-btn-fantasma"
-            onClick={() => abrir(`https://wa.me/?text=${encodeURIComponent(textoPublico)}`)}
+            onClick={() =>
+              abrir(`https://wa.me/?text=${encodeURIComponent(textoPublico)}`)
+            }
           >
             Enviar no WhatsApp
           </button>
@@ -143,7 +164,9 @@ export default function CompartilharMemorial({
               <button
                 className="adm-btn adm-btn-mini adm-btn-fantasma"
                 onClick={() =>
-                  abrir(`https://wa.me/?text=${encodeURIComponent(textoGestao)}`)
+                  abrir(
+                    `https://wa.me/?text=${encodeURIComponent(textoGestao)}`,
+                  )
                 }
               >
                 Enviar no WhatsApp (com o aviso)
@@ -156,10 +179,18 @@ export default function CompartilharMemorial({
               >
                 Gerar outro
               </button>
+              <button
+                className="adm-btn adm-btn-mini adm-btn-fantasma lnk-revogar"
+                onClick={revogar}
+                title="Deixa o memorial sem nenhum link de gestão"
+              >
+                Revogar
+              </button>
             </div>
             <p className="lnk-nota">
-              Gerar outro invalida este imediatamente — use se ele foi parar no
-              lugar errado.
+              <strong>Gerar outro</strong> troca o link e invalida este na hora.{' '}
+              <strong>Revogar</strong> tira o acesso sem criar outro — use se o
+              link vazou e ninguém deve editar a página.
             </p>
           </>
         ) : (
