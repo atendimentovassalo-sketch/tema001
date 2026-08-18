@@ -3,12 +3,19 @@
  * Escopo autorizado em 17/08/2026: controle de clientes e financeiro, sem nada
  * fiscal e sem estoque. Dimensionamento real da São Francisco: ~30 famílias com
  * plano — a tela é feita para dezenas de linhas, não para milhares, e por isso
- * não tem paginação nem busca no servidor. */
+ * não tem paginação nem busca no servidor.
+ *
+ * A tela abre na LISTA, não no formulário (ajuste de 18/08). Cadastrar cliente
+ * novo é o que ela faz de vez em quando; consultar quem já existe é o que ela
+ * faz toda semana.
+ */
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { formatarReais, paraCentavos } from '@/lib/dinheiro'
+import { linkWhatsApp } from '@/lib/whatsapp'
+import { modelosAplicaveis } from '@/lib/modelosMensagem'
 import { useSessao } from './auth'
 import PainelShell from './PainelShell'
 import './admin.css'
@@ -25,6 +32,12 @@ interface Cliente {
   planoDiaVencimento: number | null
   planoInicio: string | null
   ativo: boolean
+}
+
+interface LancamentoAberto {
+  clienteId: string | null
+  valorCentavos: number
+  vencimento: string | null
 }
 
 const VAZIO = {
@@ -47,7 +60,12 @@ export default function AdminClientes() {
   const [busca, setBusca] = useState('')
   const [form, setForm] = useState({ ...VAZIO })
   const [editandoId, setEditandoId] = useState<string | null>(null)
+  const [mostrarForm, setMostrarForm] = useState(false)
   const [salvando, setSalvando] = useState(false)
+  const [menuId, setMenuId] = useState<string | null>(null)
+  const [abertos, setAbertos] = useState<LancamentoAberto[]>([])
+  const [funeraria, setFuneraria] = useState('Funerária')
+  const [diaPadrao, setDiaPadrao] = useState('10')
 
   useEffect(() => {
     document.title = 'Clientes — Painel'
@@ -67,6 +85,39 @@ export default function AdminClientes() {
     if (usuario) recarregar().catch(() => setProntos(true))
   }, [usuario, recarregar])
 
+  /* O que está em aberto por cliente alimenta os modelos de cobrança: mensagem
+   * de cobrança sem o valor não serve para nada. */
+  useEffect(() => {
+    if (!usuario) return
+    api
+      .get<{ emAberto: LancamentoAberto[] }>('/api/admin/financeiro')
+      .then((r) => setAbertos(r.emAberto))
+      .catch(() => setAbertos([]))
+    api
+      .get<{ config?: { nome?: string; diaInicioCiclo?: number } }>(
+        '/api/admin/config',
+      )
+      .then((r) => {
+        if (r.config?.nome) setFuneraria(r.config.nome)
+        if (r.config?.diaInicioCiclo)
+          setDiaPadrao(String(r.config.diaInicioCiclo))
+      })
+      .catch(() => {})
+  }, [usuario])
+
+  const porCliente = useMemo(() => {
+    const m = new Map<string, { total: number; vencimento: string | null }>()
+    for (const l of abertos) {
+      if (!l.clienteId) continue
+      const a = m.get(l.clienteId) ?? { total: 0, vencimento: null }
+      a.total += l.valorCentavos
+      if (l.vencimento && (!a.vencimento || l.vencimento < a.vencimento))
+        a.vencimento = l.vencimento
+      m.set(l.clienteId, a)
+    }
+    return m
+  }, [abertos])
+
   const filtrada = useMemo(() => {
     const t = busca.trim().toLowerCase()
     if (!t) return lista
@@ -85,12 +136,21 @@ export default function AdminClientes() {
   )
 
   function limpar() {
-    setForm({ ...VAZIO })
+    setForm({ ...VAZIO, diaVencimento: diaPadrao })
     setEditandoId(null)
+    setMostrarForm(false)
+  }
+
+  function novo() {
+    setForm({ ...VAZIO, diaVencimento: diaPadrao })
+    setEditandoId(null)
+    setMostrarForm(true)
   }
 
   function editar(c: Cliente) {
     setEditandoId(c.id)
+    setMostrarForm(true)
+    setMenuId(null)
     setForm({
       nome: c.nome,
       telefone: c.telefone ?? '',
@@ -102,7 +162,7 @@ export default function AdminClientes() {
         c.planoValorCentavos != null
           ? (c.planoValorCentavos / 100).toFixed(2).replace('.', ',')
           : '',
-      diaVencimento: String(c.planoDiaVencimento ?? 10),
+      diaVencimento: String(c.planoDiaVencimento ?? diaPadrao),
       planoInicio: c.planoInicio ?? '',
     })
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -171,6 +231,12 @@ export default function AdminClientes() {
     }
   }
 
+  /* `noopener` porque a página aberta não tem motivo nenhum para alcançar esta. */
+  function abrirWhats(url: string) {
+    window.open(url, '_blank', 'noopener,noreferrer')
+    setMenuId(null)
+  }
+
   if (carregando || !usuario)
     return <div className="adm adm-carregando">Carregando…</div>
 
@@ -181,126 +247,140 @@ export default function AdminClientes() {
           <div>
             <h1>Clientes</h1>
             <p className="adm-sub">
-              {comPlano.length > 0
-                ? `${comPlano.length} com plano ativo · ${formatarReais(totalMensal)} por mês`
+              {lista.length > 0
+                ? `${lista.length} cadastrados · ${comPlano.length} com plano · ${formatarReais(totalMensal)} por mês`
                 : 'Cadastro das famílias atendidas e dos planos funerários.'}
             </p>
           </div>
+          {!mostrarForm && (
+            <button className="adm-btn adm-btn-primario" onClick={novo}>
+              + Novo cliente
+            </button>
+          )}
         </div>
 
-        <section className="adm-bloco">
-          <h2>{editandoId ? 'Editar cliente' : 'Novo cliente'}</h2>
-          <form className="ges-form" onSubmit={salvar}>
-            <label className="ges-campo ges-campo-largo">
-              <span>Nome</span>
-              <input
-                value={form.nome}
-                onChange={(e) => setForm({ ...form, nome: e.target.value })}
-                maxLength={160}
-                required
-              />
-            </label>
-            <label className="ges-campo">
-              <span>Telefone</span>
-              <input
-                value={form.telefone}
-                onChange={(e) => setForm({ ...form, telefone: e.target.value })}
-                maxLength={40}
-                inputMode="tel"
-              />
-            </label>
-            <label className="ges-campo">
-              <span>CPF ou documento</span>
-              <input
-                value={form.documento}
-                onChange={(e) =>
-                  setForm({ ...form, documento: e.target.value })
-                }
-                maxLength={40}
-              />
-            </label>
-            <label className="ges-campo ges-campo-largo">
-              <span>Endereço</span>
-              <input
-                value={form.endereco}
-                onChange={(e) => setForm({ ...form, endereco: e.target.value })}
-                maxLength={240}
-              />
-            </label>
+        {mostrarForm && (
+          <section className="adm-bloco">
+            <h2>{editandoId ? 'Editar cliente' : 'Novo cliente'}</h2>
+            <form className="ges-form" onSubmit={salvar}>
+              <label className="ges-campo ges-campo-largo">
+                <span>Nome</span>
+                <input
+                  value={form.nome}
+                  onChange={(e) => setForm({ ...form, nome: e.target.value })}
+                  maxLength={160}
+                  autoFocus
+                  required
+                />
+              </label>
+              <label className="ges-campo">
+                <span>Telefone / WhatsApp</span>
+                <input
+                  value={form.telefone}
+                  onChange={(e) =>
+                    setForm({ ...form, telefone: e.target.value })
+                  }
+                  maxLength={40}
+                  inputMode="tel"
+                  placeholder="(45) 99128-4521"
+                />
+              </label>
+              <label className="ges-campo">
+                <span>CPF ou documento</span>
+                <input
+                  value={form.documento}
+                  onChange={(e) =>
+                    setForm({ ...form, documento: e.target.value })
+                  }
+                  maxLength={40}
+                />
+              </label>
+              <label className="ges-campo ges-campo-largo">
+                <span>Endereço</span>
+                <input
+                  value={form.endereco}
+                  onChange={(e) =>
+                    setForm({ ...form, endereco: e.target.value })
+                  }
+                  maxLength={240}
+                />
+              </label>
 
-            <label className="ges-check">
-              <input
-                type="checkbox"
-                checked={form.planoAtivo}
-                onChange={(e) =>
-                  setForm({ ...form, planoAtivo: e.target.checked })
-                }
-              />
-              <span>Tem plano funerário</span>
-            </label>
+              <label className="ges-check">
+                <input
+                  type="checkbox"
+                  checked={form.planoAtivo}
+                  onChange={(e) =>
+                    setForm({ ...form, planoAtivo: e.target.checked })
+                  }
+                />
+                <span>Tem plano funerário</span>
+              </label>
 
-            {form.planoAtivo && (
-              <>
-                <label className="ges-campo">
-                  <span>Mensalidade</span>
-                  <input
-                    value={form.valor}
-                    onChange={(e) =>
-                      setForm({ ...form, valor: e.target.value })
-                    }
-                    placeholder="Ex.: 65,00"
-                    inputMode="decimal"
-                  />
-                </label>
-                <label className="ges-campo">
-                  <span>Dia do vencimento</span>
-                  <select
-                    value={form.diaVencimento}
-                    onChange={(e) =>
-                      setForm({ ...form, diaVencimento: e.target.value })
-                    }
-                  >
-                    {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-                      <option key={d} value={d}>
-                        {d}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label className="ges-campo">
-                  <span>Início do plano</span>
-                  <input
-                    type="date"
-                    value={form.planoInicio}
-                    onChange={(e) =>
-                      setForm({ ...form, planoInicio: e.target.value })
-                    }
-                  />
-                </label>
-              </>
-            )}
+              {form.planoAtivo && (
+                <>
+                  <label className="ges-campo">
+                    <span>Mensalidade</span>
+                    <input
+                      value={form.valor}
+                      onChange={(e) =>
+                        setForm({ ...form, valor: e.target.value })
+                      }
+                      placeholder="Ex.: 65,00"
+                      inputMode="decimal"
+                    />
+                  </label>
+                  <label className="ges-campo">
+                    <span>Dia do vencimento</span>
+                    <select
+                      value={form.diaVencimento}
+                      onChange={(e) =>
+                        setForm({ ...form, diaVencimento: e.target.value })
+                      }
+                    >
+                      {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
+                        <option key={d} value={d}>
+                          {d}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="ges-campo">
+                    <span>Início do plano</span>
+                    <input
+                      type="date"
+                      value={form.planoInicio}
+                      onChange={(e) =>
+                        setForm({ ...form, planoInicio: e.target.value })
+                      }
+                    />
+                  </label>
+                </>
+              )}
 
-            <label className="ges-campo ges-campo-largo">
-              <span>Observação</span>
-              <textarea
-                value={form.observacao}
-                onChange={(e) =>
-                  setForm({ ...form, observacao: e.target.value })
-                }
-                maxLength={1000}
-                rows={2}
-              />
-            </label>
+              <label className="ges-campo ges-campo-largo">
+                <span>Observação</span>
+                <textarea
+                  value={form.observacao}
+                  onChange={(e) =>
+                    setForm({ ...form, observacao: e.target.value })
+                  }
+                  maxLength={1000}
+                  rows={2}
+                />
+              </label>
 
-            <div className="ges-form-acoes">
-              <button className="adm-btn adm-btn-primario" disabled={salvando}>
-                {salvando
-                  ? 'Salvando…'
-                  : editandoId
-                    ? 'Salvar alterações'
-                    : 'Cadastrar'}
-              </button>
-              {editandoId && (
+              <div className="ges-form-acoes">
+                <button
+                  className="adm-btn adm-btn-primario"
+                  disabled={salvando}
+                >
+                  {salvando
+                    ? 'Salvando…'
+                    : editandoId
+                      ? 'Salvar alterações'
+                      : 'Cadastrar'}
+                </button>
                 <button
                   type="button"
                   className="adm-btn adm-btn-fantasma"
@@ -308,64 +388,145 @@ export default function AdminClientes() {
                 >
                   Cancelar
                 </button>
-              )}
-            </div>
-          </form>
-        </section>
+              </div>
+            </form>
+          </section>
+        )}
 
         <section className="adm-bloco">
-          <h2>
-            Cadastrados <span className="adm-tag">{lista.length}</span>
-          </h2>
           <input
             className="ges-busca"
             value={busca}
             onChange={(e) => setBusca(e.target.value)}
             placeholder="Buscar por nome, telefone ou documento"
+            aria-label="Buscar cliente"
           />
           {!prontos ? (
             <p className="adm-vazio">Carregando…</p>
           ) : filtrada.length === 0 ? (
             <p className="adm-vazio">
-              {lista.length === 0
-                ? 'Nenhum cliente cadastrado ainda.'
-                : 'Nenhum cliente encontrado com esse termo.'}
+              {lista.length === 0 ? (
+                <>
+                  Nenhum cliente cadastrado ainda.{' '}
+                  <button className="adm-link" onClick={novo}>
+                    Cadastrar o primeiro
+                  </button>
+                </>
+              ) : (
+                'Nenhum cliente encontrado com esse termo.'
+              )}
             </p>
           ) : (
             <ul className="ges-lista">
-              {filtrada.map((c) => (
-                <li key={c.id}>
-                  <div className="ges-lista-txt">
-                    <strong>{c.nome}</strong>
-                    <span className="ges-meta">
-                      {[c.telefone, c.documento].filter(Boolean).join(' · ') ||
-                        'sem contato'}
-                    </span>
-                    {c.planoAtivo && c.planoValorCentavos != null && (
-                      <span className="ges-plano">
-                        plano {formatarReais(c.planoValorCentavos)}/mês
-                        {c.planoDiaVencimento
-                          ? ` · vence dia ${c.planoDiaVencimento}`
-                          : ''}
+              {filtrada.map((c) => {
+                const aberto = porCliente.get(c.id)
+                const dados = {
+                  clienteNome: c.nome,
+                  funeraria,
+                  emAbertoCentavos: aberto?.total ?? 0,
+                  vencimento: aberto?.vencimento ?? null,
+                }
+                const modelos = modelosAplicaveis(dados)
+                const zap = linkWhatsApp(c.telefone)
+                return (
+                  <li key={c.id}>
+                    <div className="ges-lista-txt">
+                      <strong>{c.nome}</strong>
+                      <span className="ges-meta">
+                        {[c.telefone, c.documento]
+                          .filter(Boolean)
+                          .join(' · ') || 'sem contato'}
                       </span>
-                    )}
-                  </div>
-                  <div className="adm-pend-acoes">
-                    <button
-                      className="adm-btn adm-btn-mini adm-btn-fantasma"
-                      onClick={() => editar(c)}
-                    >
-                      Editar
-                    </button>
-                    <button
-                      className="adm-btn adm-btn-mini adm-btn-fantasma"
-                      onClick={() => arquivar(c)}
-                    >
-                      Arquivar
-                    </button>
-                  </div>
-                </li>
-              ))}
+                      {c.planoAtivo && c.planoValorCentavos != null && (
+                        <span className="ges-plano">
+                          plano {formatarReais(c.planoValorCentavos)}/mês
+                          {c.planoDiaVencimento
+                            ? ` · vence dia ${c.planoDiaVencimento}`
+                            : ''}
+                        </span>
+                      )}
+                      {aberto && aberto.total > 0 && (
+                        <span className="ges-devendo">
+                          {formatarReais(aberto.total)} em aberto
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="adm-pend-acoes">
+                      {zap ? (
+                        <>
+                          <button
+                            className="adm-btn adm-btn-mini cli-zap"
+                            onClick={() => abrirWhats(zap)}
+                            title={`Abrir conversa com ${c.nome}`}
+                          >
+                            WhatsApp
+                          </button>
+                          <div className="cli-menu-wrap">
+                            <button
+                              className="adm-btn adm-btn-mini adm-btn-fantasma"
+                              onClick={() =>
+                                setMenuId(menuId === c.id ? null : c.id)
+                              }
+                              aria-expanded={menuId === c.id}
+                            >
+                              Mensagem ▾
+                            </button>
+                            {menuId === c.id && (
+                              <div className="cli-menu" role="menu">
+                                {modelos.map(({ modelo, texto }) => (
+                                  <button
+                                    key={modelo.id}
+                                    role="menuitem"
+                                    onClick={() =>
+                                      abrirWhats(
+                                        linkWhatsApp(c.telefone, texto)!,
+                                      )
+                                    }
+                                  >
+                                    {modelo.rotulo}
+                                  </button>
+                                ))}
+                                {modelos.length === 0 && (
+                                  <span className="cli-menu-vazio">
+                                    Nada em aberto para cobrar.
+                                  </span>
+                                )}
+                                <button
+                                  role="menuitem"
+                                  className="cli-menu-sep"
+                                  onClick={() => abrirWhats(zap)}
+                                >
+                                  Escrever do zero
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        <span
+                          className="ges-meta"
+                          title="Cadastre um telefone válido para liberar o WhatsApp"
+                        >
+                          sem WhatsApp
+                        </span>
+                      )}
+                      <button
+                        className="adm-btn adm-btn-mini adm-btn-fantasma"
+                        onClick={() => editar(c)}
+                      >
+                        Editar
+                      </button>
+                      <button
+                        className="adm-btn adm-btn-mini adm-btn-fantasma"
+                        onClick={() => arquivar(c)}
+                      >
+                        Arquivar
+                      </button>
+                    </div>
+                  </li>
+                )
+              })}
             </ul>
           )}
         </section>

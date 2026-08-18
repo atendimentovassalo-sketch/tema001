@@ -28,7 +28,11 @@ export function nomeCompetencia(competencia: string): string {
   const [ano, mes] = competencia.split('-').map(Number)
   if (!ano || !mes) return competencia
   const d = new Date(Date.UTC(ano, mes - 1, 1))
-  return d.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+  return d.toLocaleDateString('pt-BR', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  })
 }
 
 /** 'AAAA-MM-DD' -> "05/08/2026". Meio-dia UTC de propósito: com T00:00 a data
@@ -51,8 +55,45 @@ export function competenciaAtual(): string {
   return hojeISO().slice(0, 7)
 }
 
+/** Competência de hoje respeitando o dia de início do ciclo da funerária.
+ *
+ *  Com `diaInicio = 10`, o dia 5 de setembro ainda pertence a agosto: quem
+ *  recebe as mensalidades no dia 10 pensa o mês de 10 a 9, e o painel tem de
+ *  abrir no mês que a pessoa tem na cabeça, não no do calendário.
+ *
+ *  `diaInicio = 1` devolve exatamente o mês do calendário — que é o padrão e o
+ *  comportamento de antes desta opção existir. */
+export function competenciaDoCiclo(diaInicio: number): string {
+  const hoje = hojeISO()
+  const dia = Number(hoje.slice(8, 10))
+  const mes = hoje.slice(0, 7)
+  return dia >= diaInicio ? mes : deslocarCompetencia(mes, -1)
+}
+
+/** Rótulo do intervalo coberto por uma competência, quando o ciclo não começa
+ *  no dia 1. Serve para a tela dizer o que "agosto" significa nesta funerária. */
+export function intervaloDoCiclo(
+  competencia: string,
+  diaInicio: number,
+): string | null {
+  if (diaInicio <= 1) return null
+  const fim = deslocarCompetencia(competencia, 1)
+  const d = String(diaInicio).padStart(2, '0')
+  const anterior = new Date(
+    Date.UTC(
+      Number(fim.slice(0, 4)),
+      Number(fim.slice(5, 7)) - 1,
+      diaInicio - 1,
+    ),
+  )
+  return `${d}/${competencia.slice(5, 7)} a ${String(anterior.getUTCDate()).padStart(2, '0')}/${fim.slice(5, 7)}`
+}
+
 /** Desloca uma competência em N meses: ('2026-01', -1) -> '2025-12'. */
-export function deslocarCompetencia(competencia: string, meses: number): string {
+export function deslocarCompetencia(
+  competencia: string,
+  meses: number,
+): string {
   const [ano, mes] = competencia.split('-').map(Number)
   const d = new Date(Date.UTC(ano, mes - 1 + meses, 1))
   return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, '0')}`

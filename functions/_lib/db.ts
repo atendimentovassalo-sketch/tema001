@@ -167,6 +167,9 @@ export function toConfigDTO(t: TenantRow): ConfigDTO {
     velorioEnderecoPadrao: t.velorio_endereco_padrao,
     sepultamentoLocalPadrao: t.sepultamento_local_padrao,
     whatsappTemplate: t.whatsapp_template,
+    /* Coluna acrescentada pela migration 0009: o `?? 1` cobre a janela entre o
+     * deploy do código e a aplicação da migration, e tenants antigos. */
+    diaInicioCiclo: (t as { dia_inicio_ciclo?: number }).dia_inicio_ciclo ?? 1,
   }
 }
 
@@ -179,7 +182,7 @@ export async function atualizarConfig(
     `UPDATE tenant SET nome = ?, cidade = ?, uf = ?, telefone = ?, whatsapp = ?,
       endereco = ?, desde = ?, sobre = ?, velorio_local_padrao = ?,
       velorio_endereco_padrao = ?, sepultamento_local_padrao = ?,
-      whatsapp_template = ? WHERE id = ?`,
+      whatsapp_template = ?, dia_inicio_ciclo = ? WHERE id = ?`,
   )
     .bind(
       c.nome,
@@ -194,6 +197,7 @@ export async function atualizarConfig(
       c.velorioEnderecoPadrao,
       c.sepultamentoLocalPadrao,
       c.whatsappTemplate,
+      c.diaInicioCiclo,
       tenantId,
     )
     .run()

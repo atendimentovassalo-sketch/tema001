@@ -86,7 +86,15 @@ export default function RelatorioContador({
 
   function baixarCSV() {
     const linhas = [
-      ['Data', 'Tipo', 'Categoria', 'Descricao', 'Cliente', 'Valor', 'Situacao'].join(';'),
+      [
+        'Data',
+        'Tipo',
+        'Categoria',
+        'Descricao',
+        'Cliente',
+        'Valor',
+        'Situacao',
+      ].join(';'),
       ...incluidos.map((l) =>
         [
           campoCSV(formatarData(l.pagoEm ?? l.vencimento)),
@@ -99,7 +107,9 @@ export default function RelatorioContador({
         ].join(';'),
       ),
       '',
-      ['', '', '', '', 'Total entradas', valorCSV(totais.entradas), ''].join(';'),
+      ['', '', '', '', 'Total entradas', valorCSV(totais.entradas), ''].join(
+        ';',
+      ),
       ['', '', '', '', 'Total saidas', valorCSV(totais.saidas), ''].join(';'),
       ['', '', '', '', 'Saldo', valorCSV(totais.saldo), ''].join(';'),
     ].join('\r\n')
@@ -256,7 +266,8 @@ export default function RelatorioContador({
         <p className="rel-imp-rodape">
           Extrato gerado pelo painel da funerária. Documento de conferência
           interna — não substitui documento fiscal.
-          {fora.size > 0 && ` ${fora.size} lançamento(s) do mês não incluído(s).`}
+          {fora.size > 0 &&
+            ` ${fora.size} lançamento(s) do mês não incluído(s).`}
         </p>
       </div>
     </section>

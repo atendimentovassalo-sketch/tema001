@@ -130,6 +130,9 @@ export interface ConfigDTO {
   velorioEnderecoPadrao: string | null
   sepultamentoLocalPadrao: string | null
   whatsappTemplate: string | null
+  /* Dia em que começa o mês financeiro da funerária (1..28). Ver migration 0009.
+   * Fica só aqui, e não no DTO público: é configuração interna. */
+  diaInicioCiclo: number
 }
 
 export interface EventoDTO {

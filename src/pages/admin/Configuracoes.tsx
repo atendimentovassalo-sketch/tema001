@@ -199,6 +199,34 @@ export default function AdminConfig() {
             </label>
           </section>
 
+          <section className="adm-bloco">
+            <h2>Financeiro</h2>
+            <p className="adm-sub">
+              Em que dia começa o seu mês financeiro. Quem recebe as
+              mensalidades no dia 10 costuma pensar o mês de 10 a 9 — o painel
+              passa a abrir nesse mês, e não no do calendário.
+            </p>
+            <label className="ges-campo" style={{ maxWidth: 220 }}>
+              <span>Dia de início do ciclo</span>
+              <select
+                value={String(cfg.diaInicioCiclo ?? 1)}
+                onChange={(e) => set('diaInicioCiclo', Number(e.target.value))}
+              >
+                <option value="1">Dia 1 (mês do calendário)</option>
+                {Array.from({ length: 27 }, (_, i) => i + 2).map((d) => (
+                  <option key={d} value={d}>
+                    Dia {d}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="adm-dica">
+              Vale também como dia de vencimento sugerido ao cadastrar um plano
+              novo. Não muda nada do que já está lançado — trocar depois é
+              seguro. Vai até 28 por causa de fevereiro.
+            </p>
+          </section>
+
           <button className="adm-btn adm-btn-primario" disabled={salvando}>
             {salvando ? 'Salvando…' : 'Salvar configurações'}
           </button>

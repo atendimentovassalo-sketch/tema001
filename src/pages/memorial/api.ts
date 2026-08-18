@@ -101,6 +101,8 @@ export interface ConfigTenant {
   velorioEnderecoPadrao: string | null
   sepultamentoLocalPadrao: string | null
   whatsappTemplate: string | null
+  /* Dia em que começa o mês financeiro da funerária (1..28). Ver migration 0009. */
+  diaInicioCiclo: number
 }
 
 export async function fetchConfig(): Promise<ConfigTenant> {

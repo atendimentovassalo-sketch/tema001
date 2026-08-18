@@ -57,6 +57,8 @@ export const configInputSchema = z.object({
   velorioEnderecoPadrao: z.string().trim().max(200).nullable().default(null),
   sepultamentoLocalPadrao: z.string().trim().max(160).nullable().default(null),
   whatsappTemplate: z.string().trim().max(1000).nullable().default(null),
+  // 1..28: ver migration 0009 (fevereiro).
+  diaInicioCiclo: z.number().int().min(1).max(28).default(1),
 })
 
 export const usuarioNovoSchema = z.object({

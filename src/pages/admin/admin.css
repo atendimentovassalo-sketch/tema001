@@ -896,3 +896,59 @@
   .adm .rel-imprimivel tr { break-inside: avoid; }
   .adm .rel-imp-rodape { margin-top: 8mm; font-size: 8.5pt; color: #444; }
 }
+
+/* ---- WhatsApp e modelos de mensagem por cliente (18/08/2026) ---- */
+
+.adm .cli-zap {
+  background: #1f7a4d;
+  border-color: #1f7a4d;
+  color: #fff;
+}
+.adm .cli-zap:hover { background: #196340; border-color: #196340; }
+
+.adm .cli-menu-wrap { position: relative; }
+
+.adm .cli-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  min-width: 232px;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 8px 24px rgba(26, 23, 18, 0.14);
+}
+.adm .cli-menu button {
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  padding: 9px 10px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.adm .cli-menu button:hover { background: var(--cream); }
+.adm .cli-menu .cli-menu-sep {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line-soft);
+  color: var(--muted);
+}
+.adm .cli-menu-vazio {
+  padding: 9px 10px;
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+
+/* Quem deve aparece marcado na lista — é a informação que decide a ação. */
+.adm .ges-devendo {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #8a3a2f;
+}

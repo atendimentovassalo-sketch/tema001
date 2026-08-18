@@ -1,0 +1,23 @@
+-- Dia de início do fluxo financeiro mensal (18/08/2026).
+--
+-- Pedido do Felipe: a funerária escolhe em que dia começa o mês financeiro dela
+-- ("dia X do mês"), porque o mês do dinheiro raramente é o mês do calendário —
+-- quem recebe as mensalidades no dia 10 pensa o mês de 10 a 9.
+--
+-- O QUE ESTE CAMPO MUDA:
+--   1. Qual competência o painel abre em "Mês atual". Com início no dia 10, o dia
+--      5 de setembro ainda pertence à competência de agosto.
+--   2. O dia de vencimento sugerido ao cadastrar um plano novo.
+--
+-- O QUE ELE NÃO MUDA: nada do que já está gravado. `competencia` continua sendo
+-- 'AAAA-MM' no banco e os lançamentos existentes não se movem — este campo é
+-- interpretação de "hoje", não reescrita de histórico. Trocar o dia depois é
+-- seguro.
+--
+-- 1..28 pela mesma razão do vencimento do plano: fevereiro. Um ciclo que começa
+-- "dia 31" não começa em 11 meses do ano.
+--
+-- SEGURANÇA: um ALTER com DEFAULT. Não altera linha existente (o default vale
+-- para leitura), não apaga nada.
+
+ALTER TABLE tenant ADD COLUMN dia_inicio_ciclo INTEGER NOT NULL DEFAULT 1;

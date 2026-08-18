@@ -19,6 +19,8 @@ import {
   formatarData,
   hojeISO,
   competenciaAtual,
+  competenciaDoCiclo,
+  intervaloDoCiclo,
   deslocarCompetencia,
 } from '@/lib/dinheiro'
 import { useSessao } from './auth'
@@ -73,6 +75,7 @@ export default function AdminFinanceiro() {
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [prontos, setProntos] = useState(false)
   const [nomeFuneraria, setNomeFuneraria] = useState('Funerária')
+  const [diaInicio, setDiaInicio] = useState(1)
   const [salvando, setSalvando] = useState(false)
 
   const [form, setForm] = useState({
@@ -114,8 +117,22 @@ export default function AdminFinanceiro() {
   useEffect(() => {
     if (!usuario) return
     api
-      .get<{ config?: { nome?: string } }>('/api/admin/config')
-      .then((r) => r.config?.nome && setNomeFuneraria(r.config.nome))
+      .get<{ config?: { nome?: string; diaInicioCiclo?: number } }>(
+        '/api/admin/config',
+      )
+      .then((r) => {
+        if (r.config?.nome) setNomeFuneraria(r.config.nome)
+        if (r.config?.diaInicioCiclo) {
+          setDiaInicio(r.config.diaInicioCiclo)
+          /* Reposiciona no mês do ciclo dela — mas só enquanto ninguém navegou,
+           * senão o clique em "mês anterior" seria desfeito ao carregar. */
+          setCompetencia((c) =>
+            c === competenciaAtual()
+              ? competenciaDoCiclo(r.config!.diaInicioCiclo!)
+              : c,
+          )
+        }
+      })
       .catch(() => {})
   }, [usuario])
 
@@ -213,7 +230,12 @@ export default function AdminFinanceiro() {
         <div className="adm-acao-topo">
           <div>
             <h1>Financeiro</h1>
-            <p className="adm-sub">{nomeCompetencia(competencia)}</p>
+            <p className="adm-sub">
+              {nomeCompetencia(competencia)}
+              {intervaloDoCiclo(competencia, diaInicio) && (
+                <> · ciclo de {intervaloDoCiclo(competencia, diaInicio)}</>
+              )}
+            </p>
           </div>
           <div className="ges-mes">
             <button
@@ -227,7 +249,7 @@ export default function AdminFinanceiro() {
             </button>
             <button
               className="adm-btn adm-btn-fantasma adm-btn-mini"
-              onClick={() => setCompetencia(competenciaAtual())}
+              onClick={() => setCompetencia(competenciaDoCiclo(diaInicio))}
             >
               Mês atual
             </button>
