@@ -185,16 +185,23 @@ export default function AdminPainel() {
                         {m.visitas.toLocaleString('pt-BR')}
                       </td>
                       <td className="adm-col-acoes">
-                        {m.status === 'publicado' && (
-                          <a
-                            className="adm-link"
-                            href={`/m/${m.slug}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                          >
-                            Ver
-                          </a>
-                        )}
+                        {/* Rascunho também tem como ver: abre a PÁGINA REAL em
+                            modo prévia (`?previa=<id>`), buscando pelo endpoint
+                            admin. Antes só dava para conferir publicando — ou
+                            seja, a conferência acontecia depois de o link já
+                            poder circular. */}
+                        <a
+                          className="adm-link"
+                          href={
+                            m.status === 'publicado'
+                              ? `/m/${m.slug}`
+                              : `/m/${m.slug}?previa=${m.id}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {m.status === 'publicado' ? 'Ver' : 'Ver prévia'}
+                        </a>
                         <Link
                           className="adm-link"
                           to={`/memorial/novo?id=${m.id}`}

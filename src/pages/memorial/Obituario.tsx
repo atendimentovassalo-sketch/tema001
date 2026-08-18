@@ -73,100 +73,101 @@ export default function Obituario() {
 
   return (
     <SiteShell aqui="obituario">
-    <div
-      className="memorial-root"
-      style={{ ['--marca' as string]: f.corMarca }}
-    >
-      <section
-        style={{
-          padding: 'clamp(40px,6vw,72px) 0 24px',
-          textAlign: 'center',
-          background: 'transparent',
-        }}
+      <div
+        className="memorial-root"
+        style={{ ['--marca' as string]: f.corMarca }}
       >
-        <p className="eti" style={{ color: 'var(--bordo,#8A6828)' }}>
-          {f.cidade} e região
-        </p>
-        <h1 style={{ maxWidth: 'none', color: 'var(--ink,#1A1712)' }}>Obituário</h1>
-      </section>
-
-      <div className="corpo obit-corpo">
-        <div className="obit-busca">
-          <input
-            type="search"
-            value={busca}
-            onChange={(e) => setBusca(e.target.value)}
-            placeholder={`Buscar por nome em ${f.cidade}…`}
-            aria-label="Buscar falecimento por nome"
-          />
-          <span className="obit-contagem num">
-            {itens.length}{' '}
-            {itens.length === 1 ? 'nota publicada' : 'notas publicadas'}
-          </span>
-        </div>
-
-        {itens.length === 0 ? (
-          <p className="vazio">
-            {busca
-              ? `Nenhuma nota encontrada para "${busca}".`
-              : 'Nenhuma nota publicada no momento.'}
+        <section
+          style={{
+            padding: 'clamp(40px,6vw,72px) 0 24px',
+            textAlign: 'center',
+            background: 'transparent',
+          }}
+        >
+          <p className="eti" style={{ color: 'var(--bordo,#8A6828)' }}>
+            {f.cidade} e região
           </p>
-        ) : (
-          <ul className="obit-grid">
-            {itens.map((m) => {
-              const retrato = retratoDe(m)
-              const hoje = velorioHoje(m)
-              return (
-                <li key={m.id}>
-                  <Link className="obit-card" to={`/m/${m.slug}`}>
-                    <span className="obit-foto">
-                      {retrato ? (
-                        <img src={retrato} alt="" loading="lazy" />
-                      ) : (
-                        <span className="ini" aria-hidden="true">
-                          {iniciais(m.nomeCompleto)}
-                        </span>
-                      )}
-                      {hoje && <span className="velhoje">Velório hoje</span>}
-                    </span>
-                    <span className="obit-nome">{m.nomeCompleto}</span>
-                    <span className="obit-datas num">
-                      {m.nascimentoISO ? `${anoBR(m.nascimentoISO)} – ` : ''}
-                      {anoBR(m.falecimentoISO)}
-                    </span>
-                    <span className="obit-falec num">
-                      Faleceu em {ddmm(m.falecimentoISO)}
-                    </span>
-                  </Link>
-                  <div className="obit-share">
-                    <a
-                      className="obit-share-btn zap"
-                      href={urlWhatsapp(m, f)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      WhatsApp
-                    </a>
-                    <button
-                      className="obit-share-btn"
-                      type="button"
-                      onClick={() => copiarLink(m)}
-                    >
-                      Copiar link
-                    </button>
-                  </div>
-                </li>
-              )
-            })}
-          </ul>
-        )}
+          <h1 style={{ maxWidth: 'none', color: 'var(--ink,#1A1712)' }}>
+            Obituário
+          </h1>
+        </section>
 
-        <p className="corrigir">
-          <a href="/">Voltar ao início</a>
-        </p>
+        <div className="corpo obit-corpo">
+          <div className="obit-busca">
+            <input
+              type="search"
+              value={busca}
+              onChange={(e) => setBusca(e.target.value)}
+              placeholder={`Buscar por nome em ${f.cidade}…`}
+              aria-label="Buscar falecimento por nome"
+            />
+            <span className="obit-contagem num">
+              {itens.length}{' '}
+              {itens.length === 1 ? 'nota publicada' : 'notas publicadas'}
+            </span>
+          </div>
+
+          {itens.length === 0 ? (
+            <p className="vazio">
+              {busca
+                ? `Nenhuma nota encontrada para "${busca}".`
+                : 'Nenhuma nota publicada no momento.'}
+            </p>
+          ) : (
+            <ul className="obit-grid">
+              {itens.map((m) => {
+                const retrato = retratoDe(m)
+                const hoje = velorioHoje(m)
+                return (
+                  <li key={m.id}>
+                    <Link className="obit-card" to={`/m/${m.slug}`}>
+                      <span className="obit-foto">
+                        {retrato ? (
+                          <img src={retrato} alt="" loading="lazy" />
+                        ) : (
+                          <span className="ini" aria-hidden="true">
+                            {iniciais(m.nomeCompleto)}
+                          </span>
+                        )}
+                        {hoje && <span className="velhoje">Velório hoje</span>}
+                      </span>
+                      <span className="obit-nome">{m.nomeCompleto}</span>
+                      <span className="obit-datas num">
+                        {m.nascimentoISO ? `${anoBR(m.nascimentoISO)} – ` : ''}
+                        {anoBR(m.falecimentoISO)}
+                      </span>
+                      <span className="obit-falec num">
+                        Faleceu em {ddmm(m.falecimentoISO)}
+                      </span>
+                    </Link>
+                    <div className="obit-share">
+                      <a
+                        className="obit-share-btn zap"
+                        href={urlWhatsapp(m, f)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        WhatsApp
+                      </a>
+                      <button
+                        className="obit-share-btn"
+                        type="button"
+                        onClick={() => copiarLink(m)}
+                      >
+                        Copiar link
+                      </button>
+                    </div>
+                  </li>
+                )
+              })}
+            </ul>
+          )}
+
+          <p className="corrigir">
+            <a href="/">Voltar ao início</a>
+          </p>
+        </div>
       </div>
-
-    </div>
     </SiteShell>
   )
 }

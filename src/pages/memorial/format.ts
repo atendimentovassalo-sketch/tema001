@@ -79,6 +79,23 @@ export function ddmm(iso: string): string {
   return `${s.slice(8, 10)}/${s.slice(5, 7)}`
 }
 
+/** 'AAAA-MM-DD' -> 'março de 1946'.
+ *
+ *  Meio-termo pedido pelo Felipe em 18/08/2026, entre o dia exato (que a decisão
+ *  de 12/08 tirou por ser vetor de fraude junto do nome completo) e só o ano
+ *  (que empobrecia a página). Mês e ano dizem o que a família quer ler sem
+ *  entregar a data de nascimento que um golpista usaria. */
+export function mesAnoBR(iso: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ''
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    month: 'long',
+    year: 'numeric',
+  }).format(d)
+}
+
 export function anoBR(iso: string | null): string {
   if (!iso) return ''
   const d = new Date(iso)

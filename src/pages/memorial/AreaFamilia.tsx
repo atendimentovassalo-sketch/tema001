@@ -36,7 +36,9 @@ interface Dados {
 export default function AreaFamilia() {
   const { token = '' } = useParams()
   const [dados, setDados] = useState<Dados | null>(null)
-  const [estado, setEstado] = useState<'carregando' | 'ok' | 'invalido'>('carregando')
+  const [estado, setEstado] = useState<'carregando' | 'ok' | 'invalido'>(
+    'carregando',
+  )
   const [historia, setHistoria] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [salvo, setSalvo] = useState(false)
@@ -46,7 +48,9 @@ export default function AreaFamilia() {
 
   const carregar = useCallback(async () => {
     try {
-      const d = await api.get<Dados>(`/api/familia/${encodeURIComponent(token)}`)
+      const d = await api.get<Dados>(
+        `/api/familia/${encodeURIComponent(token)}`,
+      )
       setDados(d)
       setHistoria(d.memorial.historia ?? '')
       setEstado('ok')
@@ -131,7 +135,8 @@ export default function AreaFamilia() {
         <div className="fam-caixa">
           <h1>Link indisponível</h1>
           <p>
-            Este link não é mais válido — ele vale por 30 dias a partir do envio.
+            Este link não é mais válido — ele vale por 30 dias a partir do
+            envio.
           </p>
           <p className="fam-dica">
             Peça um link novo à funerária que fez o atendimento. Nada do que já
@@ -153,7 +158,12 @@ export default function AreaFamilia() {
           Aqui você pode escrever a história, acrescentar fotos e escolher o que
           aparece na página. Só você e a funerária têm este link.
         </p>
-        <a className="fam-ver" href={`/m/${memorial.slug}`} target="_blank" rel="noreferrer">
+        <a
+          className="fam-ver"
+          href={`/m/${memorial.slug}`}
+          target="_blank"
+          rel="noreferrer"
+        >
           Ver a página como as pessoas veem →
         </a>
       </header>
@@ -174,7 +184,11 @@ export default function AreaFamilia() {
           placeholder="Escreva aqui…"
         />
         <div className="fam-acoes">
-          <button className="fam-btn" onClick={salvarHistoria} disabled={salvando}>
+          <button
+            className="fam-btn"
+            onClick={salvarHistoria}
+            disabled={salvando}
+          >
             {salvando ? 'Salvando…' : 'Salvar'}
           </button>
           {salvo && <span className="fam-ok">Salvo.</span>}
@@ -225,8 +239,8 @@ export default function AreaFamilia() {
         <section className="fam-bloco">
           <h2>Homenagens recebidas</h2>
           <p className="fam-dica">
-            Se alguma mensagem incomodar, você pode escondê-la da página. Ela não
-            é apagada — dá para mostrar de novo quando quiser.
+            Se alguma mensagem incomodar, você pode escondê-la da página. Ela
+            não é apagada — dá para mostrar de novo quando quiser.
           </p>
           <ul className="fam-homenagens">
             {homenagens.map((h) => (
@@ -234,7 +248,9 @@ export default function AreaFamilia() {
                 <div>
                   <strong>{h.nome}</strong>
                   <p>{h.texto ?? (h.vela ? 'Acendeu uma vela' : '—')}</p>
-                  {h.oculta && <span className="fam-marca">escondida da página</span>}
+                  {h.oculta && (
+                    <span className="fam-marca">escondida da página</span>
+                  )}
                 </div>
                 <button onClick={() => alternarHomenagem(h)}>
                   {h.oculta ? 'Mostrar' : 'Esconder'}

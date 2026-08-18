@@ -43,13 +43,31 @@ function isoLocal(v: string): string | null {
   return v ? v : null
 }
 
+/** Hoje em 'AAAA-MM-DD', no fuso de Brasília. O navegador da funerária está no
+ *  Brasil, mas o `toISOString()` é UTC — depois das 21h daria o dia seguinte. */
+function hojeSP(): string {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/Sao_Paulo',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
 const schema = z
   .object({
     nomeCompleto: z.string().trim().min(1, 'Informe o nome completo.').max(120),
     apelido: z.string().trim().max(80).optional().default(''),
     nascimento: z.string().optional().default(''),
     cidadeNascimento: z.string().trim().max(80).optional().default(''),
-    falecimento: z.string().min(1, 'Informe a data de falecimento.'),
+    falecimento: z
+      .string()
+      .min(1, 'Informe a data de falecimento.')
+      /* Data futura é sempre erro de digitação — ninguém publica nota de quem
+       * ainda não faleceu. Comparar como texto funciona porque 'AAAA-MM-DD'
+       * ordena igual à data, e evita fuso: `new Date('2026-08-18')` é UTC e no
+       * Brasil ainda seria "ontem" à noite. */
+      .refine((v) => v <= hojeSP(), 'A data não pode ser no futuro.'),
     cidadeFalecimento: z.string().trim().max(80).optional().default(''),
     epitafio: z
       .string()
@@ -321,7 +339,7 @@ export default function NovoMemorial() {
             <div className="par">
               <label>
                 <span className="rot">Nascimento</span>
-                <input type="date" {...register('nascimento')} />
+                <input type="date" max={hojeSP()} {...register('nascimento')} />
               </label>
               <label>
                 <span className="rot">Cidade de nascimento</span>
@@ -336,7 +354,13 @@ export default function NovoMemorial() {
             <div className="par">
               <label>
                 <span className="rot">Falecimento</span>
-                <input type="date" {...register('falecimento')} />
+                {/* `max` para o seletor do navegador já não oferecer data futura —
+                  barrar antes de digitar é melhor que reclamar depois. */}
+                <input
+                  type="date"
+                  max={hojeSP()}
+                  {...register('falecimento')}
+                />
                 {errors.falecimento && (
                   <span className="erro">{errors.falecimento.message}</span>
                 )}

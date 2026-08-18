@@ -14,6 +14,7 @@ import {
   anoBR,
   dataHoraBR,
   dataLongaBR,
+  mesAnoBR,
   iniciais,
   retratoDe,
   tempoRelativo,
@@ -172,7 +173,9 @@ export default function MemorialLegado({
         },
         ...prev,
       ])
-      toast.success('Prévia — na página publicada a homenagem é registrada de verdade.')
+      toast.success(
+        'Prévia — na página publicada a homenagem é registrada de verdade.',
+      )
       reset({ nome: '', texto: '', vela: true, website: '' })
       return
     }
@@ -197,12 +200,16 @@ export default function MemorialLegado({
       } else if (texto) {
         toast.success('Mensagem publicada')
       } else {
-        toast.success('Vela acesa', { description: 'Obrigado por deixar sua luz.' })
+        toast.success('Vela acesa', {
+          description: 'Obrigado por deixar sua luz.',
+        })
       }
       reset({ nome: '', texto: '', vela: true, website: '' })
     } catch (err) {
       toast.error(
-        err instanceof ApiError ? err.message : 'Não foi possível enviar agora.',
+        err instanceof ApiError
+          ? err.message
+          : 'Não foi possível enviar agora.',
       )
     }
   }
@@ -214,358 +221,368 @@ export default function MemorialLegado({
 
   return (
     <SiteShell>
-    <div
-      className="memorial-root"
-      style={{ ['--marca' as string]: f.corMarca }}
-    >
+      <div
+        className="memorial-root"
+        style={{ ['--marca' as string]: f.corMarca }}
+      >
+        {/* hero */}
+        <section className="hero" style={{ paddingBottom: 66 }}>
+          <p className="eti2">Em memória de</p>
+          <div className="moldura">
+            <div className="janela">
+              {retratoDe(memorial) ? (
+                <img src={retratoDe(memorial)!} alt={memorial.nomeCompleto} />
+              ) : (
+                <span className="mono">{iniciais(memorial.nomeCompleto)}</span>
+              )}
+            </div>
+          </div>
+          <h1>{memorial.nomeCompleto}</h1>
+          {memorial.apelido && <p className="trato">{memorial.apelido}</p>}
+          <p className="orn" aria-hidden="true">
+            <i></i>
+            <b></b>
+            <i></i>
+          </p>
+          <p className="datas num">
+            {anoBR(memorial.nascimentoISO)}
+            {memorial.nascimentoISO ? ' — ' : ''}
+            {anoBR(memorial.falecimentoISO)}
+            {memorial.idade ? ` · ${memorial.idade} anos` : ''}
+          </p>
+          {memorial.epitafio && (
+            <p className="epi">&ldquo;{memorial.epitafio}&rdquo;</p>
+          )}
+          <div className="cta">
+            <a className="solid" href="#homenagear">
+              Deixar uma homenagem
+            </a>
+          </div>
+        </section>
 
-      {/* hero */}
-      <section className="hero" style={{ paddingBottom: 66 }}>
-        <p className="eti2">Em memória de</p>
-        <div className="moldura">
-          <div className="janela">
-            {retratoDe(memorial) ? (
-              <img src={retratoDe(memorial)!} alt={memorial.nomeCompleto} />
-            ) : (
-              <span className="mono">{iniciais(memorial.nomeCompleto)}</span>
-            )}
-          </div>
-        </div>
-        <h1>{memorial.nomeCompleto}</h1>
-        {memorial.apelido && <p className="trato">{memorial.apelido}</p>}
-        <p className="orn" aria-hidden="true">
-          <i></i>
-          <b></b>
-          <i></i>
-        </p>
-        <p className="datas num">
-          {anoBR(memorial.nascimentoISO)}
-          {memorial.nascimentoISO ? ' — ' : ''}
-          {anoBR(memorial.falecimentoISO)}
-          {memorial.idade ? ` · ${memorial.idade} anos` : ''}
-        </p>
-        {memorial.epitafio && (
-          <p className="epi">&ldquo;{memorial.epitafio}&rdquo;</p>
-        )}
-        <div className="cta">
-          <a className="solid" href="#homenagear">
-            Deixar uma homenagem
-          </a>
-        </div>
-      </section>
-
-      <div className="corpo corpo-mem">
-        <div className="corpo-cols">
-        {/* contador */}
-        <div className="contador">
-          <div className="cel-vela">
-            <Chama grande />
-            <b className="num">{totalVelas}</b>
-            <span>{totalVelas === 1 ? 'vela acesa' : 'velas acesas'}</span>
-          </div>
-          <div>
-            <b className="num">{totalMensagens}</b>
-            <span>{totalMensagens === 1 ? 'mensagem' : 'mensagens'}</span>
-          </div>
-          <div>
-            <b className="num">{memorial.visitas.toLocaleString('pt-BR')}</b>
-            <span>{memorial.visitas === 1 ? 'visita' : 'visitas'}</span>
-          </div>
-        </div>
-
-        {/* rail lateral: informação operacional (o motivo da visita) fica
-            sempre à vista — sticky no desktop, no topo do fluxo no mobile */}
-        <aside className="corpo-side">
-          <section className="sec">
-            <h2 className="eti">Onde e quando</h2>
-            <div className="placa">
-              <div className="placa-in">
-                {memorial.eventos.map((e) => (
-                  <div className="fato" key={e.id}>
-                    <h3>{ROT[e.tipo] ?? e.tipo}</h3>
-                    <p className="onde">{e.localNome}</p>
-                    {e.endereco && <p className="end">{e.endereco}</p>}
-                    <p
-                      className={`quando${e.horarioConfirmado && e.inicioISO ? '' : ' pend'}`}
-                    >
-                      {e.horarioConfirmado && e.inicioISO
-                        ? dataHoraBR(e.inicioISO)
-                        : 'Horário a confirmar'}
-                    </p>
-                  </div>
-                ))}
+        <div className="corpo corpo-mem">
+          <div className="corpo-cols">
+            {/* contador */}
+            <div className="contador">
+              <div className="cel-vela">
+                <Chama grande />
+                <b className="num">{totalVelas}</b>
+                <span>{totalVelas === 1 ? 'vela acesa' : 'velas acesas'}</span>
+              </div>
+              <div>
+                <b className="num">{totalMensagens}</b>
+                <span>{totalMensagens === 1 ? 'mensagem' : 'mensagens'}</span>
+              </div>
+              <div>
+                <b className="num">
+                  {memorial.visitas.toLocaleString('pt-BR')}
+                </b>
+                <span>{memorial.visitas === 1 ? 'visita' : 'visitas'}</span>
               </div>
             </div>
-            {velorio && (
-              <a
-                className="acao"
-                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-                  [velorio.localNome, velorio.endereco]
-                    .filter(Boolean)
-                    .join(', '),
-                )}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Como chegar ao velório
-              </a>
-            )}
-            <a className="acao vazia" href="#homenagear">
-              Acender uma vela
-            </a>
-          </section>
-        </aside>
 
-        <div className="corpo-main">
-        {/* nascimento / falecimento */}
-        <section className="sec">
-          <h2 className="eti">Nascimento e falecimento</h2>
-          <div className="marcos">
-            <div className="marco">
-              <p className="rot">Nascimento</p>
-              {memorial.cidadeNascimento && (
-                <p className="loc">{memorial.cidadeNascimento}</p>
-              )}
-              <p className="dt">{dataLongaBR(memorial.nascimentoISO)}</p>
-            </div>
-            <div className="marco">
-              <p className="rot">Falecimento</p>
-              {memorial.cidadeFalecimento && (
-                <p className="loc">{memorial.cidadeFalecimento}</p>
-              )}
-              <p className="dt">{dataLongaBR(memorial.falecimentoISO)}</p>
-            </div>
-          </div>
-        </section>
-
-        {/* história — condicional: só quando a família envia e a funerária insere */}
-        {memorial.historia && (
-          <section className="sec">
-            <h2 className="eti">A história</h2>
-            <div className={`bio${historiaAberta ? '' : ' corta'}`}>
-              {memorial.historia.split('\n\n').map((par, i) => (
-                <p key={i}>{par}</p>
-              ))}
-            </div>
-            {!historiaAberta && (
-              <button
-                className="lermais"
-                onClick={() => setHistoriaAberta(true)}
-              >
-                Continuar lendo ›
-              </button>
-            )}
-          </section>
-        )}
-
-        {/* álbum — limitado a 5 fotos */}
-        {memorial.fotos.length > 0 && (
-          <section className="sec">
-            <h2 className="eti">
-              Álbum ·{' '}
-              <span style={{ opacity: 0.6 }}>
-                {memorial.fotos.length} fotos
-              </span>
-            </h2>
-            <div className="galeria">
-              {memorial.fotos.slice(0, 5).map((foto) => (
-                <figure key={foto.id}>
-                  <img
-                    src={foto.url}
-                    alt={foto.alt ?? memorial.nomeCompleto}
-                    loading="lazy"
-                  />
-                </figure>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* comunidade — feed único de homenagens.
-            Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
-            Homenagem só-vela (sem mensagem) fica diferenciada. */}
-        <section className="sec">
-          <h2 className="eti">Quem ama, lembra · Comunidade</h2>
-          <div className="feed">
-            {visiveis.length === 0 && (
-              <p className="vazio">
-                Ainda não há homenagens. Seja o primeiro a deixar uma palavra ou
-                acender uma vela.
-              </p>
-            )}
-            {visiveis.slice(0, 12).map((h) => {
-              const soVela = h.vela && !h.texto
-              return (
-                <div
-                  className={`item${h.vela ? ' vela' : ''}${soVela ? ' so-vela' : ''}`}
-                  key={h.id}
-                >
-                  <div className="av">
-                    {h.vela ? <Chama /> : iniciais(h.nome) || '·'}
-                  </div>
-                  <div>
-                    <span className="quem">{h.nome}</span>
-                    <span className="qd">{tempoRelativo(h.criadoEmISO)}</span>
-                    {h.texto ? (
-                      <p className="tx">{h.texto}</p>
-                    ) : (
-                      <p className="tx acendeu">acendeu uma vela</p>
-                    )}
+            {/* rail lateral: informação operacional (o motivo da visita) fica
+            sempre à vista — sticky no desktop, no topo do fluxo no mobile */}
+            <aside className="corpo-side">
+              <section className="sec">
+                <h2 className="eti">Onde e quando</h2>
+                <div className="placa">
+                  <div className="placa-in">
+                    {memorial.eventos.map((e) => (
+                      <div className="fato" key={e.id}>
+                        <h3>{ROT[e.tipo] ?? e.tipo}</h3>
+                        <p className="onde">{e.localNome}</p>
+                        {e.endereco && <p className="end">{e.endereco}</p>}
+                        <p
+                          className={`quando${e.horarioConfirmado && e.inicioISO ? '' : ' pend'}`}
+                        >
+                          {e.horarioConfirmado && e.inicioISO
+                            ? dataHoraBR(e.inicioISO)
+                            : 'Horário a confirmar'}
+                        </p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              )
-            })}
-          </div>
-        </section>
+                {velorio && (
+                  <a
+                    className="acao"
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+                      [velorio.localNome, velorio.endereco]
+                        .filter(Boolean)
+                        .join(', '),
+                    )}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Como chegar ao velório
+                  </a>
+                )}
+                <a className="acao vazia" href="#homenagear">
+                  Acender uma vela
+                </a>
+              </section>
+            </aside>
 
-        {/* formulário único: homenagem + checkbox de vela */}
-        <section className="sec mural" id="homenagear">
-          <h2 className="eti">Deixe uma homenagem</h2>
-          <form onSubmit={handleSubmit(onSubmit)} noValidate>
-            <label>
-              <span className="rot">Seu nome</span>
-              <input
-                type="text"
-                placeholder="Como você quer assinar"
-                {...register('nome')}
-              />
-              {errors.nome && (
-                <span className="erro">{errors.nome.message}</span>
+            <div className="corpo-main">
+              {/* nascimento / falecimento */}
+              <section className="sec">
+                <h2 className="eti">Nascimento e falecimento</h2>
+                <div className="marcos">
+                  <div className="marco">
+                    <p className="rot">Nascimento</p>
+                    {memorial.cidadeNascimento && (
+                      <p className="loc">{memorial.cidadeNascimento}</p>
+                    )}
+                    {/* Mês e ano, nunca o dia: ver mesAnoBR e a decisão de 12/08. */}
+                    <p className="dt">{mesAnoBR(memorial.nascimentoISO)}</p>
+                  </div>
+                  <div className="marco">
+                    <p className="rot">Falecimento</p>
+                    {memorial.cidadeFalecimento && (
+                      <p className="loc">{memorial.cidadeFalecimento}</p>
+                    )}
+                    <p className="dt">{dataLongaBR(memorial.falecimentoISO)}</p>
+                  </div>
+                </div>
+              </section>
+
+              {/* história — condicional: só quando a família envia e a funerária insere */}
+              {memorial.historia && (
+                <section className="sec">
+                  <h2 className="eti">A história</h2>
+                  <div className={`bio${historiaAberta ? '' : ' corta'}`}>
+                    {memorial.historia.split('\n\n').map((par, i) => (
+                      <p key={i}>{par}</p>
+                    ))}
+                  </div>
+                  {!historiaAberta && (
+                    <button
+                      className="lermais"
+                      onClick={() => setHistoriaAberta(true)}
+                    >
+                      Continuar lendo ›
+                    </button>
+                  )}
+                </section>
               )}
-            </label>
-            <label>
-              <span className="rot">Sua mensagem</span>
-              <textarea
-                placeholder="Uma lembrança, uma oração, uma palavra de conforto"
-                {...register('texto')}
-              />
-              {errors.texto && (
-                <span className="erro">{errors.texto.message}</span>
+
+              {/* álbum — limitado a 5 fotos */}
+              {memorial.fotos.length > 0 && (
+                <section className="sec">
+                  <h2 className="eti">
+                    Álbum ·{' '}
+                    <span style={{ opacity: 0.6 }}>
+                      {memorial.fotos.length} fotos
+                    </span>
+                  </h2>
+                  <div className="galeria">
+                    {memorial.fotos.slice(0, 5).map((foto) => (
+                      <figure key={foto.id}>
+                        <img
+                          src={foto.url}
+                          alt={foto.alt ?? memorial.nomeCompleto}
+                          loading="lazy"
+                        />
+                      </figure>
+                    ))}
+                  </div>
+                </section>
               )}
-            </label>
-            {/* honeypot invisível */}
-            <input
-              type="text"
-              tabIndex={-1}
-              autoComplete="off"
-              aria-hidden="true"
-              style={{
-                position: 'absolute',
-                left: '-9999px',
-                width: 1,
-                height: 1,
-              }}
-              {...register('website')}
-            />
-            <label className="velacheck">
-              <input type="checkbox" {...register('vela')} />
-              <span>
-                <span className="tt">
-                  🕯️ Acender uma vela em memória de{' '}
-                  {memorial.apelido ?? memorial.nomeCompleto.split(' ')[0]}
-                </span>
-                <span className="ds">
-                  A vela é gratuita e aparece na hora, junto da homenagem.
-                </span>
-              </span>
-            </label>
+
+              {/* comunidade — feed único de homenagens.
+            Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
+            Homenagem só-vela (sem mensagem) fica diferenciada. */}
+              <section className="sec">
+                <h2 className="eti">Quem ama, lembra · Comunidade</h2>
+                <div className="feed">
+                  {visiveis.length === 0 && (
+                    <p className="vazio">
+                      Ainda não há homenagens. Seja o primeiro a deixar uma
+                      palavra ou acender uma vela.
+                    </p>
+                  )}
+                  {visiveis.slice(0, 12).map((h) => {
+                    const soVela = h.vela && !h.texto
+                    return (
+                      <div
+                        className={`item${h.vela ? ' vela' : ''}${soVela ? ' so-vela' : ''}`}
+                        key={h.id}
+                      >
+                        <div className="av">
+                          {h.vela ? <Chama /> : iniciais(h.nome) || '·'}
+                        </div>
+                        <div>
+                          <span className="quem">{h.nome}</span>
+                          <span className="qd">
+                            {tempoRelativo(h.criadoEmISO)}
+                          </span>
+                          {h.texto ? (
+                            <p className="tx">{h.texto}</p>
+                          ) : (
+                            <p className="tx acendeu">acendeu uma vela</p>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </section>
+
+              {/* formulário único: homenagem + checkbox de vela */}
+              <section className="sec mural" id="homenagear">
+                <h2 className="eti">Deixe uma homenagem</h2>
+                <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                  <label>
+                    <span className="rot">Seu nome</span>
+                    <input
+                      type="text"
+                      placeholder="Como você quer assinar"
+                      {...register('nome')}
+                    />
+                    {errors.nome && (
+                      <span className="erro">{errors.nome.message}</span>
+                    )}
+                  </label>
+                  <label>
+                    <span className="rot">Sua mensagem</span>
+                    <textarea
+                      placeholder="Uma lembrança, uma oração, uma palavra de conforto"
+                      {...register('texto')}
+                    />
+                    {errors.texto && (
+                      <span className="erro">{errors.texto.message}</span>
+                    )}
+                  </label>
+                  {/* honeypot invisível */}
+                  <input
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    style={{
+                      position: 'absolute',
+                      left: '-9999px',
+                      width: 1,
+                      height: 1,
+                    }}
+                    {...register('website')}
+                  />
+                  <label className="velacheck">
+                    <input type="checkbox" {...register('vela')} />
+                    <span>
+                      <span className="tt">
+                        🕯️ Acender uma vela em memória de{' '}
+                        {memorial.apelido ??
+                          memorial.nomeCompleto.split(' ')[0]}
+                      </span>
+                      <span className="ds">
+                        A vela é gratuita e aparece na hora, junto da homenagem.
+                      </span>
+                    </span>
+                  </label>
+                  <button
+                    className="acao primaria"
+                    type="submit"
+                    style={{ marginTop: 20 }}
+                    disabled={isSubmitting}
+                  >
+                    Publicar homenagem
+                  </button>
+                  <p className="mod">
+                    {memorial.moderarMensagens
+                      ? 'A mensagem aparece assim que a família confirmar — costuma levar poucos minutos. A vela é registrada na hora.'
+                      : 'Sua homenagem aparece na hora. Contamos com o respeito de todos neste momento.'}
+                  </p>
+                  <p className="mod">
+                    Ao enviar, você concorda com a exibição da sua homenagem
+                    nesta página, conforme a{' '}
+                    <Link to="/privacidade" style={{ color: 'var(--brass-e)' }}>
+                      Política de Privacidade
+                    </Link>
+                    .
+                  </p>
+                </form>
+              </section>
+
+              {/* compartilhar */}
+              <section className="sec">
+                <h2 className="eti">Compartilhar</h2>
+                <div className="duo">
+                  <a
+                    className="acao vazia"
+                    href={`https://wa.me/?text=${textoZap}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Enviar pelo WhatsApp
+                  </a>
+                  <button
+                    className="acao vazia"
+                    type="button"
+                    onClick={copiarLink}
+                  >
+                    Copiar link
+                  </button>
+                </div>
+              </section>
+
+              <p className="corrigir">
+                Alguma informação está incorreta?
+                <br />
+                <a
+                  href={`https://wa.me/${f.whatsapp}?text=${encodeURIComponent('Correção na página de ' + memorial.nomeCompleto)}`}
+                >
+                  Avise pelo WhatsApp
+                </a>{' '}
+                — corrigimos em minutos.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* rodapé com linha de autorização */}
+
+        {preview && (
+          <div className="form" style={{ maxWidth: 640 }}>
+            <div className="aviso">
+              <b>Confira o nome, os textos e os horários.</b> Depois de
+              publicar, o endereço da página não muda — mas o conteúdo continua
+              editável.
+            </div>
             <button
-              className="acao primaria"
-              type="submit"
-              style={{ marginTop: 20 }}
-              disabled={isSubmitting}
+              className="acao"
+              type="button"
+              onClick={() =>
+                toast.success('Pronto para publicar', {
+                  description:
+                    'A publicação de verdade (com geração do card do WhatsApp) entra com o backend.',
+                })
+              }
             >
-              Publicar homenagem
+              Confirmar e publicar
             </button>
-            <p className="mod">
-              {memorial.moderarMensagens
-                ? 'A mensagem aparece assim que a família confirmar — costuma levar poucos minutos. A vela é registrada na hora.'
-                : 'Sua homenagem aparece na hora. Contamos com o respeito de todos neste momento.'}
-            </p>
-            <p className="mod">
-              Ao enviar, você concorda com a exibição da sua homenagem nesta
-              página, conforme a{' '}
-              <Link to="/privacidade" style={{ color: 'var(--brass-e)' }}>
-                Política de Privacidade
-              </Link>
-              .
-            </p>
-          </form>
-        </section>
-
-        {/* compartilhar */}
-        <section className="sec">
-          <h2 className="eti">Compartilhar</h2>
-          <div className="duo">
-            <a
+            <button
               className="acao vazia"
-              href={`https://wa.me/?text=${textoZap}`}
-              target="_blank"
-              rel="noopener noreferrer"
+              type="button"
+              style={{ marginTop: 12 }}
+              onClick={() => navigate('/memorial/novo')}
             >
-              Enviar pelo WhatsApp
-            </a>
-            <button className="acao vazia" type="button" onClick={copiarLink}>
-              Copiar link
+              Corrigir
             </button>
           </div>
-        </section>
+        )}
 
-        <p className="corrigir">
-          Alguma informação está incorreta?
-          <br />
-          <a
-            href={`https://wa.me/${f.whatsapp}?text=${encodeURIComponent('Correção na página de ' + memorial.nomeCompleto)}`}
-          >
-            Avise pelo WhatsApp
-          </a>{' '}
-          — corrigimos em minutos.
-        </p>
-        </div>
-        </div>
-      </div>
-
-      {/* rodapé com linha de autorização */}
-
-      {preview && (
-        <div className="form" style={{ maxWidth: 640 }}>
-          <div className="aviso">
-            <b>Confira o nome, os textos e os horários.</b> Depois de publicar,
-            o endereço da página não muda — mas o conteúdo continua editável.
-          </div>
-          <button
-            className="acao"
-            type="button"
-            onClick={() =>
-              toast.success('Pronto para publicar', {
-                description:
-                  'A publicação de verdade (com geração do card do WhatsApp) entra com o backend.',
-              })
-            }
-          >
-            Confirmar e publicar
-          </button>
-          <button
-            className="acao vazia"
-            type="button"
-            style={{ marginTop: 12 }}
-            onClick={() => navigate('/memorial/novo')}
-          >
-            Corrigir
-          </button>
-        </div>
-      )}
-
-      {/* CTA fixo no mobile — o botão do herói some ao rolar e a homenagem
+        {/* CTA fixo no mobile — o botão do herói some ao rolar e a homenagem
           fica a milhares de pixels; a barra mantém a ação sempre à mão */}
-      {!preview && (
-        <nav className="mobicta" aria-label="Ação rápida">
-          <a className="mb-btn" href="#homenagear">
-            Deixar uma homenagem
-          </a>
-        </nav>
-      )}
-    </div>
+        {!preview && (
+          <nav className="mobicta" aria-label="Ação rápida">
+            <a className="mb-btn" href="#homenagear">
+              Deixar uma homenagem
+            </a>
+          </nav>
+        )}
+      </div>
     </SiteShell>
   )
 }

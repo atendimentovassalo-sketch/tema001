@@ -81,7 +81,8 @@ export default function HomeV2() {
         if (vivo) setDados({ funeraria: r.funeraria, ultimos: r.memoriais })
       })
       .catch(() => {
-        if (vivo) setDados({ funeraria: null as unknown as Funeraria, ultimos: [] })
+        if (vivo)
+          setDados({ funeraria: null as unknown as Funeraria, ultimos: [] })
       })
     return () => {
       vivo = false
@@ -112,7 +113,7 @@ export default function HomeV2() {
       {/* barra */}
       <header className="bar">
         <div className="bar-in">
-          <a  className="brand" href="/">
+          <a className="brand" href="/">
             {f.nome}
             <small>
               {f.cidade} · {f.uf}

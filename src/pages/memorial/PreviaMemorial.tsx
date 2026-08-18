@@ -13,7 +13,7 @@
  * Campo vazio some, não vira "—" nem mostra o nome do campo: a prévia tem de
  * parecer com o que vai ao ar, e o que está em branco simplesmente não sai.
  */
-import { ddmm } from './format'
+import { ddmm, mesAnoBR } from './format'
 
 export interface DadosPrevia {
   nomeCompleto?: string
@@ -43,20 +43,19 @@ function quando(iso?: string): string | null {
   return `${dm} às ${h}h${min && min !== '00' ? min : ''}`
 }
 
-/** Só o ANO no nascimento — decisão de 12/08: nome completo mais data exata de
- *  nascimento é vetor de fraude. Vale na tela e no JSON-LD; vale aqui também. */
-function anos(nascimento?: string, falecimento?: string): string | null {
-  const a = nascimento?.slice(0, 4)
-  const b = falecimento?.slice(0, 4)
+/** Nascimento em MÊS e ano; falecimento com a data cheia. Nunca o dia do
+ *  nascimento — nome completo mais data exata de nascimento é vetor de fraude
+ *  (decisão de 12/08, ajustada em 18/08 de "só o ano" para "mês e ano"). */
+function periodoDe(nascimento?: string, falecimento?: string): string | null {
+  const a = nascimento ? mesAnoBR(nascimento) : ''
+  const b = falecimento ? ddmm(falecimento) : ''
   if (a && b) return `${a} — ${b}`
-  if (b) return b
-  if (a) return a
-  return null
+  return b || a || null
 }
 
 export default function PreviaMemorial({ d }: { d: DadosPrevia }) {
   const nome = d.nomeCompleto?.trim()
-  const periodo = anos(d.nascimento, d.falecimento)
+  const periodo = periodoDe(d.nascimento, d.falecimento)
   const velorio = quando(d.velorioInicio)
   const sep = quando(d.sepInicio)
   const vazia = !nome && !d.fotoUrl && !periodo

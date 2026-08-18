@@ -2081,3 +2081,17 @@
   .memorial-root .edit-wrap { grid-template-columns: minmax(0, 600px); }
   .memorial-root .prv { position: static; }
 }
+
+/* Faixa de pré-visualização (18/08/2026): a página é a real, então precisa ficar
+   inequívoco que ela ainda não está no ar — senão alguém confere, fecha e acha
+   que publicou. */
+.memorial-root .mv3-previa-faixa {
+  position: sticky;
+  top: 0;
+  z-index: 90;
+  padding: 10px 18px;
+  background: #7a5a12;
+  color: #fff;
+  font-size: 0.92rem;
+  text-align: center;
+}

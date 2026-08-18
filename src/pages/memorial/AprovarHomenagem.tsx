@@ -65,7 +65,7 @@ export default function AprovarHomenagem() {
         {estado === 'invalido' && (
           <div className="aviso" style={{ marginTop: 8 }}>
             <b>Link inválido ou já utilizado.</b> Esta mensagem pode já ter sido
-            aprovada ou recusada. <a  href="/">Ir ao site</a>.
+            aprovada ou recusada. <a href="/">Ir ao site</a>.
           </div>
         )}
 
@@ -75,8 +75,8 @@ export default function AprovarHomenagem() {
               Nova mensagem para aprovar
             </p>
             <p className="dica" style={{ marginTop: 8 }}>
-              Uma pessoa deixou uma homenagem em memória de <b>{nome}</b>. Ela só
-              aparece na página depois que você aprovar.
+              Uma pessoa deixou uma homenagem em memória de <b>{nome}</b>. Ela
+              só aparece na página depois que você aprovar.
             </p>
 
             <div className="feed" style={{ marginTop: 20 }}>
@@ -84,7 +84,9 @@ export default function AprovarHomenagem() {
                 <div className="av">{iniciais(pendente.nome) || '·'}</div>
                 <div>
                   <span className="quem">{pendente.nome}</span>
-                  <span className="qd">{tempoRelativo(pendente.criadoEmISO)}</span>
+                  <span className="qd">
+                    {tempoRelativo(pendente.criadoEmISO)}
+                  </span>
                   {pendente.texto ? (
                     <p className="tx">{pendente.texto}</p>
                   ) : (
@@ -128,7 +130,8 @@ export default function AprovarHomenagem() {
 
         {estado === 'recusada' && (
           <div className="aviso" style={{ marginTop: 24 }}>
-            <b>Mensagem recusada.</b> Ela não será publicada e ninguém é avisado.
+            <b>Mensagem recusada.</b> Ela não será publicada e ninguém é
+            avisado.
           </div>
         )}
       </div>
