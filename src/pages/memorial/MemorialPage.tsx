@@ -1,12 +1,10 @@
 /* Página pública do memorial. Front-end apenas: estado local + mock, sem backend. */
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { toast } from 'sonner'
 import { fetchMemorial, fetchMemorialAdmin, enviarHomenagem } from './api'
 import { Vela, TIPOS_VELA, TIPO_VELA_PADRAO } from './velas'
+import { useFormHomenagem } from './useFormHomenagem'
 import { montarTextoWhatsapp } from './share'
 import { ApiError } from '@/lib/api'
 import type { Homenagem, Memorial } from './types'
@@ -29,26 +27,9 @@ const ROT: Record<string, string> = {
   sepultamento: 'Sepultamento',
 }
 
-const homenagemSchema = z
-  .object({
-    nome: z.string().trim().min(1, 'Diga como você quer assinar.').max(80),
-    texto: z
-      .string()
-      .trim()
-      .max(600, 'Máximo de 600 caracteres.')
-      .optional()
-      .default(''),
-    vela: z.boolean().default(true),
-    velaTipo: z.string().default(TIPO_VELA_PADRAO),
-    // honeypot anti-spam: humanos não preenchem
-    website: z.string().max(0).optional().default(''),
-  })
-  .refine((d) => d.vela || d.texto.trim().length > 0, {
-    message: 'Escreva uma mensagem ou marque a vela.',
-    path: ['texto'],
-  })
-
-type HomenagemForm = z.input<typeof homenagemSchema>
+/* Validação e estado do formulário: `useFormHomenagem`, escrito à mão.
+ * As regras são as mesmas de antes — ver aquele arquivo para o porquê de não
+ * usar biblioteca nesta página. */
 
 /** Chama de vela em CSS puro, bruxuleando (respeita prefers-reduced-motion). */
 function Chama({ grande = false }: { grande?: boolean }) {
@@ -144,27 +125,13 @@ function MemorialModerno({
     }
   }, [memorial])
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-    watch,
-  } = useForm<HomenagemForm>({
-    resolver: zodResolver(homenagemSchema),
-    defaultValues: {
-      nome: '',
-      texto: '',
-      vela: true,
-      velaTipo: TIPO_VELA_PADRAO,
-      website: '',
-    },
-  })
+  const { valores, erros, enviando, setEnviando, campo, limpar, validar } =
+    useFormHomenagem(TIPO_VELA_PADRAO)
 
   /* A escolha do desenho só aparece com a vela ligada, e o cartão selecionado
      precisa saber qual é — daí os dois observados. */
-  const velaLigada = watch('vela')
-  const velaEscolhida = watch('velaTipo')
+  const velaLigada = valores.vela
+  const velaEscolhida = valores.velaTipo
 
   // Feed visível: toda homenagem com vela, e mensagens já aprovadas.
   const visiveis = useMemo(
@@ -211,10 +178,13 @@ function MemorialModerno({
   const textoZap = encodeURIComponent(montarTextoWhatsapp(memorial, f))
   const primeiroNome = memorial.apelido ?? memorial.nomeCompleto.split(' ')[0]
 
-  const onSubmit = async (data: HomenagemForm) => {
+  const onSubmit = async (ev: React.FormEvent) => {
+    ev.preventDefault()
+    const data = validar()
+    if (!data) return
     if (data.website) return // honeypot: bot detectado, descarta em silêncio
     const nome = data.nome.trim()
-    const texto = (data.texto ?? '').trim()
+    const texto = data.texto.trim()
 
     // Na prévia (memorial ainda não salvo) insere só localmente para visualizar.
     if (preview) {
@@ -233,22 +203,18 @@ function MemorialModerno({
       toast.success(
         'Prévia — na página publicada a homenagem é registrada de verdade.',
       )
-      reset({
-        nome: '',
-        texto: '',
-        vela: true,
-        velaTipo: TIPO_VELA_PADRAO,
-        website: '',
-      })
+      limpar()
       return
     }
 
+    setEnviando(true)
     try {
       const r = await enviarHomenagem({
         memorialSlug: memorial.slug,
         nome,
         texto: texto || undefined,
         vela: data.vela,
+        velaTipo: data.vela ? data.velaTipo : null,
       })
       // vela sempre entra no feed; mensagem moderada fica oculta até aprovar
       setHomenagens((prev) => [r.homenagem, ...prev])
@@ -267,13 +233,15 @@ function MemorialModerno({
           description: 'Obrigado por deixar sua luz.',
         })
       }
-      reset({ nome: '', texto: '', vela: true, website: '' })
+      limpar()
     } catch (err) {
       toast.error(
         err instanceof ApiError
           ? err.message
           : 'Não foi possível enviar agora.',
       )
+    } finally {
+      setEnviando(false)
     }
   }
 
@@ -496,11 +464,7 @@ function MemorialModerno({
               </p>
             )}
 
-            <form
-              className="mv3-compor"
-              onSubmit={handleSubmit(onSubmit)}
-              noValidate
-            >
+            <form className="mv3-compor" onSubmit={onSubmit} noValidate>
               {/* Recado curto e no topo: quem chega aqui muitas vezes trava no
                   "não sei o que escrever". Frase de exemplo resolve, mas só se
                   vier ANTES do campo — depois dele, ninguém lê. */}
@@ -515,22 +479,22 @@ function MemorialModerno({
                 <span className="sr">Sua mensagem</span>
                 <textarea
                   placeholder="Escreva aqui uma lembrança, uma oração ou uma palavra de conforto…"
-                  {...register('texto')}
+                  value={valores.texto}
+                  onChange={(e) => campo('texto', e.target.value)}
+                  maxLength={600}
                 />
-                {errors.texto && (
-                  <span className="mv3-erro">{errors.texto.message}</span>
-                )}
+                {erros.texto && <span className="mv3-erro">{erros.texto}</span>}
               </label>
               <label>
                 <span className="sr">Seu nome</span>
                 <input
                   type="text"
                   placeholder="Como você quer assinar"
-                  {...register('nome')}
+                  value={valores.nome}
+                  onChange={(e) => campo('nome', e.target.value)}
+                  maxLength={80}
                 />
-                {errors.nome && (
-                  <span className="mv3-erro">{errors.nome.message}</span>
-                )}
+                {erros.nome && <span className="mv3-erro">{erros.nome}</span>}
               </label>
               {/* honeypot invisível */}
               <input
@@ -544,7 +508,8 @@ function MemorialModerno({
                   width: 1,
                   height: 1,
                 }}
-                {...register('website')}
+                value={valores.website}
+                onChange={(e) => campo('website', e.target.value)}
               />
 
               <div id="velas" className="mv3-vela-rot">
@@ -554,7 +519,11 @@ function MemorialModerno({
                 </span>
               </div>
               <label className="mv3-vela-toggle">
-                <input type="checkbox" {...register('vela')} />
+                <input
+                  type="checkbox"
+                  checked={valores.vela}
+                  onChange={(e) => campo('vela', e.target.checked)}
+                />
                 <span>
                   <span className="tt">
                     🕯️ Acender uma vela em memória de {primeiroNome}
@@ -580,7 +549,8 @@ function MemorialModerno({
                       <input
                         type="radio"
                         value={t.id}
-                        {...register('velaTipo')}
+                        checked={valores.velaTipo === t.id}
+                        onChange={() => campo('velaTipo', t.id)}
                       />
                       <Vela tipo={t.id} tamanho={30} />
                       <span>{t.nome}</span>
@@ -602,7 +572,7 @@ function MemorialModerno({
                 <button
                   className="mv3-btn mv3-btn--ouro"
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={enviando}
                 >
                   Publicar homenagem
                 </button>

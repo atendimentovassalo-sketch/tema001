@@ -38,16 +38,17 @@ export default defineConfig(({ mode }) => ({
          * publicar mudança — hoje qualquer alteração invalidava o bundle
          * inteiro, e a pessoa rebaixava tudo de novo.
          *
-         * `zod` + `react-hook-form` viram outro grupo: são 275 KB de fonte que
-         * só o formulário de homenagem e o editor precisam. */
+         * `zod` e `react-hook-form` NÃO viram grupo próprio de propósito: desde
+         * 18/08 quem as usa é só o editor da funerária, que já carrega sob
+         * demanda. Num grupo separado elas viravam `modulepreload` no HTML —
+         * o navegador baixava adiantado justamente o que a gente tirou do
+         * caminho do visitante. Dentro do chunk do editor, só descem com ele. */
         manualChunks(id) {
           if (!id.includes('node_modules')) return
           if (/[\/]node_modules[\/](react|react-dom|scheduler)[\/]/.test(id))
             return 'react'
           if (/[\/]node_modules[\/](react-router|react-router-dom|@remix-run)[\/]/.test(id))
             return 'router'
-          if (/[\/]node_modules[\/](zod|react-hook-form|@hookform)[\/]/.test(id))
-            return 'forms'
         },
       },
     },

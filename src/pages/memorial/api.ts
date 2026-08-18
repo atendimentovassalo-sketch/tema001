@@ -37,6 +37,9 @@ export interface EnvioHomenagem {
   nome: string
   texto?: string
   vela: boolean
+  /** Desenho escolhido. Sem isto a escolha ficava só na tela e nunca chegava
+   *  ao servidor — bug achado em 18/08, no mesmo dia em que a escolha entrou. */
+  velaTipo?: string | null
   website?: string
 }
 
