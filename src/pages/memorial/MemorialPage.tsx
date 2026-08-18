@@ -22,7 +22,6 @@ import {
 } from './format'
 import { SiteShell } from '@/components/SiteChrome'
 import './memorial.css'
-import MemorialLegado from './MemorialLegado'
 
 const ROT: Record<string, string> = {
   velorio: 'Velório',
@@ -739,22 +738,21 @@ function MemorialModerno({
 }
 
 /* ------------------------------------------------------------------ *
- * Seletor de modelo: os memoriais ja publicados no visual antigo (lista
- * abaixo) continuam no MemorialLegado; todos os novos usam o modelo novo.
- * Nao ha campo de data de criacao na API, por isso a selecao e por slug.
- * Para migrar um antigo ao novo, basta remove-lo desta lista.
+ * TODOS os memoriais usam o modelo atual desde 18/08/2026.
+ *
+ * Até aqui havia uma lista de slugs (`amalia-teresa-justen` e
+ * `marli-cordeiro-de-almeida`) que continuavam no `MemorialLegado`, por
+ * decisão de 09/08: "os já publicados deixe como estão". O Felipe reabriu em
+ * 18/08 e pediu os dois no modelo novo — e o motivo prático pesa: as melhorias
+ * do dia (velas escolhíveis, mês no intervalo, correção do mural, formulário
+ * reorganizado) chegavam só ao modelo atual, então as duas únicas notas reais
+ * da cliente eram justamente as que NÃO as recebiam.
+ *
+ * `MemorialLegado.tsx` fica no repositório como referência do visual anterior,
+ * mas deixa de ser importado — e portanto sai do bundle.
  * ------------------------------------------------------------------ */
-const MEMORIAIS_LEGADO = new Set<string>([
-  'amalia-teresa-justen',
-  'marli-cordeiro-de-almeida',
-])
-
 export default function MemorialPage(
   props: { memorialOverride?: Memorial; preview?: boolean } = {},
 ) {
-  const { slug } = useParams()
-  if (!props.memorialOverride && slug && MEMORIAIS_LEGADO.has(slug)) {
-    return <MemorialLegado {...props} />
-  }
   return <MemorialModerno {...props} />
 }
