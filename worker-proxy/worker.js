@@ -202,16 +202,21 @@ export default {
      *
      * Vai com um segredo compartilhado porque cabecalho e' texto que qualquer um
      * escreve: sem ele, bastaria bater direto em tema001.pages.dev mandando um
-     * X-Real-IP aleatorio a cada requisicao para nunca cair em nenhum limite.
+     * IP aleatorio a cada requisicao para nunca cair em nenhum limite.
+     *
+     * O cabecalho NAO se chama X-Real-IP: esse nome e gerenciado pela propria
+     * Cloudflare, que o reescreve na borda. Medido em 18/08/2026 — mandando
+     * X-Real-IP com o segredo correto, o app enxergava o IP de quem chamava, e
+     * nao o valor enviado. Nome proprio resolve.
      * Se o segredo nao estiver configurado dos dois lados, o app ignora o
      * cabecalho e volta ao comportamento de hoje — degrada, nao quebra. */
     const ipReal = request.headers.get('cf-connecting-ip')
     if (ipReal && PROXY_SEGREDO) {
-      req.headers.set('X-Real-IP', ipReal)
+      req.headers.set('X-Visitante-IP', ipReal)
       req.headers.set('X-Proxy-Auth', PROXY_SEGREDO)
     } else {
       /* Nunca deixar passar um cabecalho vindo de fora sem o segredo desta borda. */
-      req.headers.delete('X-Real-IP')
+      req.headers.delete('X-Visitante-IP')
       req.headers.delete('X-Proxy-Auth')
     }
 

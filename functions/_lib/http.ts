@@ -53,13 +53,17 @@ export async function sha256Hex(input: string): Promise<string> {
  * Cloudflare — igual para todos os visitantes. Sem tratar isso, todo rate-limit
  * do app deixa de ser "por visitante" e vira "por tenant" (medido em 17/08/2026:
  * a mesma máquina gerava hash diferente entrando direto no pages.dev e entrando
- * pelo domínio da cliente). O Worker passa o IP real em `X-Real-IP`, acompanhado
+ * pelo domínio da cliente). O Worker passa o IP real em `X-Visitante-IP`, acompanhado
  * de um segredo — porque cabeçalho é texto que qualquer um escreve, e sem a
  * conferência bastaria bater direto no `pages.dev` mandando um IP falso a cada
  * requisição para nunca cair em limite nenhum.
  *
  * Sem `PROXY_SEGREDO` configurado, o cabeçalho é ignorado e vale o comportamento
- * antigo: degrada para "por tenant", não quebra. */
+ * antigo: degrada para "por tenant", não quebra.
+ *
+ * O cabeçalho NÃO se chama `X-Real-IP`: esse nome é gerenciado pela própria
+ * Cloudflare, que o reescreve na borda — medido em 18/08/2026, o valor enviado
+ * era descartado e valia o IP de quem chamava. Nome próprio resolve. */
 export async function ipHash(
   request: Request,
   env?: { PROXY_SEGREDO?: string },
@@ -68,7 +72,7 @@ export async function ipHash(
   // qual cabeçalho o IP é lido. Errar aqui degrada a granularidade do limite.
   const doProxy =
     env?.PROXY_SEGREDO && request.headers.get('x-proxy-auth') === env.PROXY_SEGREDO
-      ? request.headers.get('x-real-ip')
+      ? request.headers.get('x-visitante-ip')
       : null
 
   const ip =
