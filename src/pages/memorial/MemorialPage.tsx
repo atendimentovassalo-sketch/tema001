@@ -31,7 +31,9 @@ const ROT: Record<string, string> = {
  * As regras são as mesmas de antes — ver aquele arquivo para o porquê de não
  * usar biblioteca nesta página. */
 
-/** Chama de vela em CSS puro, bruxuleando (respeita prefers-reduced-motion). */
+/** Chama de vela em CSS puro, bruxuleando (respeita prefers-reduced-motion).
+ *  Fica no contador do herói: ali o que se conta é o número, e a vela animada
+ *  de verdade tem lugar próprio, no convite para acender (ver mv3-vela-destaque). */
 function Chama({ grande = false }: { grande?: boolean }) {
   return (
     <span className={`chama${grande ? ' chama-g' : ''}`} aria-hidden="true">
@@ -518,6 +520,13 @@ function MemorialModerno({
                   — gratuito, e aparece na hora
                 </span>
               </div>
+              <div className="mv3-vela-destaque">
+                <Vela grande tamanho={88} />
+                <p>
+                  A vela fica acesa na página de {primeiroNome}, com o seu nome,
+                  para quem visitar depois.
+                </p>
+              </div>
               <label className="mv3-vela-toggle">
                 <input
                   type="checkbox"
@@ -526,7 +535,7 @@ function MemorialModerno({
                 />
                 <span>
                   <span className="tt">
-                    🕯️ Acender uma vela em memória de {primeiroNome}
+                    Acender uma vela em memória de {primeiroNome}
                   </span>
                   <span className="ds">
                     Escolha abaixo o desenho, se quiser.
@@ -552,7 +561,7 @@ function MemorialModerno({
                         checked={valores.velaTipo === t.id}
                         onChange={() => campo('velaTipo', t.id)}
                       />
-                      <Vela tipo={t.id} tamanho={30} />
+                      <Vela tipo={t.id} tamanho={60} forma="placa" />
                       <span>{t.nome}</span>
                     </label>
                   ))}
@@ -595,7 +604,7 @@ function MemorialModerno({
                   >
                     <div className="mv3-av">
                       {h.vela ? (
-                        <Vela tipo={h.velaTipo} tamanho={26} />
+                        <Vela tipo={h.velaTipo} tamanho={44} />
                       ) : (
                         iniciais(h.nome) || '·'
                       )}

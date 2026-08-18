@@ -1862,11 +1862,18 @@
   font-size: 0.86rem;
   font-weight: 700;
 }
+/* medalhão do mural: a vela ocupa o disco inteiro. box-shadow em vez de border
+   porque a borda encolheria a caixa interna e deixaria uma meia-lua do fundo
+   aparecendo por trás da arte. */
 .memorial-root.mv3 .mv3-msg.vela .mv3-av {
-  background: var(--vellum);
+  background: var(--ink);
   color: var(--brass-e);
-  border: 1px solid var(--brass-e);
+  box-shadow: 0 0 0 1px var(--brass-e);
+  overflow: hidden;
+  padding: 0;
 }
+.memorial-root.mv3 .mv3-av picture { display: contents; }
+.memorial-root.mv3 .mv3-av .vela-img { width: 100%; height: 100%; object-fit: cover; }
 .memorial-root.mv3 .mv3-msg-quem {
   display: block;
   font-family: var(--a);
@@ -2096,20 +2103,34 @@
   text-align: center;
 }
 
-/* ---- velas em SVG (18/08/2026) ---- */
-.memorial-root .vsvg { display: block; }
-.memorial-root .vsvg-chama {
-  transform-origin: 16px 12px;
-  animation: vsvg-bruxa 2.4s ease-in-out infinite;
+/* ---- velas animadas (18/08/2026) ----
+   A arte vem com fundo preto chapado, sem transparência. É isso que decide as
+   duas formas: no medalhão o preto VIRA o disco, e no seletor o quadrado
+   arredondado mostra a vela inteira — a cruz e as contas do terço só se
+   distinguem uma da outra com os cantos à mostra.
+   Quem pediu menos movimento no sistema recebe o quadro parado, pelo <picture>
+   em velas.tsx: WebP animado não obedece prefers-reduced-motion sozinho. */
+.memorial-root .vela-img { display: block; background: #0a0603; }
+.memorial-root .vela-img--circulo { border-radius: 50%; }
+.memorial-root .vela-img--placa { border-radius: 10px; }
+
+/* destaque do convite: a vela grande ao lado do que ela significa */
+.memorial-root.mv3 .mv3-vela-destaque {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 12px 0 4px;
 }
-@keyframes vsvg-bruxa {
-  0%, 100% { transform: scaleY(1) translateX(0); opacity: 1; }
-  35%      { transform: scaleY(1.1) translateX(-0.4px); opacity: 0.92; }
-  70%      { transform: scaleY(0.94) translateX(0.4px); opacity: 0.97; }
-}
-/* Um GIF continuaria tremulando aqui; o SVG obedece. */
-@media (prefers-reduced-motion: reduce) {
-  .memorial-root .vsvg-chama { animation: none; }
+/* O item do flex é o <picture>, não a <img> — `flex: none` na imagem não
+   segurava nada, e no celular a vela encolhia de 88 para 43 px. Quem cede
+   espaço é o texto, que quebra em mais uma linha. */
+.memorial-root.mv3 .mv3-vela-destaque picture { flex: none; display: block; }
+.memorial-root.mv3 .mv3-vela-destaque p {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: var(--muted, #565049);
+  max-width: 34ch;
 }
 
 /* escolha do desenho */
@@ -2124,12 +2145,12 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  padding: 10px 12px 8px;
+  padding: 8px 8px 6px;
   border: 1px solid var(--hair, #E4E0D6);
-  border-radius: 8px;
+  border-radius: 12px;
   background: #fff;
   cursor: pointer;
-  min-width: 74px;
+  min-width: 76px;
 }
 .memorial-root .mv3-vela-opcao input { position: absolute; opacity: 0; pointer-events: none; }
 .memorial-root .mv3-vela-opcao span { font-size: 0.78rem; color: var(--muted, #565049); }
