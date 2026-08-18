@@ -51,7 +51,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   if (!memorial) return erro('Memorial não encontrado.', 404)
 
   // rate-limit: no máximo 5 homenagens por IP por minuto
-  const ip = await ipHash(request)
+  const ip = await ipHash(request, env)
   if (ip) {
     const recentes = await contarHomenagensRecentesPorIp(env, ip, 60)
     if (recentes >= 5)

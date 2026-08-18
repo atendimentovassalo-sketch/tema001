@@ -10,6 +10,9 @@ export interface Env {
   // e-mail transacional (recuperação de senha) — Resend
   RESEND_API_KEY?: string
   EMAIL_FROM?: string
+  /* Compartilhado com o Worker `proxy-obituario`: autoriza o `X-Real-IP` que ele
+   * repassa. Ausente = rate-limit volta a ser por tenant (ver ipHash). */
+  PROXY_SEGREDO?: string
 }
 
 /* ----- Linhas do banco (snake_case) ----- */

@@ -1,0 +1,30 @@
+# Worker `proxy-obituario` — a peça 3 da arquitetura (compartilhada por todos os
+# clientes). Encaminha os caminhos do app do domínio da funerária para o Pages
+# `tema001` e reescreve as meta tags do shell HTML por tenant.
+#
+# POR QUE ESTE ARQUIVO EXISTE (18/08/2026): até hoje o código deste Worker vivia
+# SÓ no dashboard da Cloudflare. Isso já custou caro — o `DECISOES.md` registra
+# que uma correção de `og:` feita direto no painel desapareceu num redeploy
+# posterior, porque não havia fonte versionada para reaplicar. A partir daqui o
+# código-fonte é este arquivo, e todo deploy sai daqui.
+#
+# DEPLOY:  npx wrangler deploy --config worker-proxy/wrangler.toml
+# SEGREDO: npx wrangler secret put PROXY_SEGREDO --config worker-proxy/wrangler.toml
+#          (o mesmo valor precisa existir como variável no Pages `tema001`,
+#           senão o repasse de IP fica desligado — degrada, não quebra.)
+#
+# ROTAS EFETIVAS, levantadas por sondagem em 18/08/2026 (o painel é a fonte, isto
+# é o registro para restaurar se algum dia sumirem). Passam pelo Worker:
+#     /obituario*   /m/*   /memorial/*   /admin*   /api/*   /assets/*   /og-image.png
+# e as mesmas em www. NÃO passam (site estático do Pages `funerariacatanduvas`):
+#     /   /plantao   /planos   /privacidade   /termos   /cidade-*
+#
+# ATENÇÃO: as rotas NÃO estão declaradas aqui de propósito. Elas já existem na
+# conta, apontando o domínio da cliente para este Worker; declará-las aqui e dar
+# deploy com uma lista incompleta removeria as que faltassem — ou seja, tiraria o
+# site da cliente do ar. Rotas continuam sendo gerenciadas no painel até alguém
+# ter tempo de conferir a lista inteira e trazê-la para cá com segurança.
+
+name = "proxy-obituario"
+main = "worker.js"
+compatibility_date = "2026-08-01"

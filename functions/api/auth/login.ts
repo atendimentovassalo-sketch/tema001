@@ -58,7 +58,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   // Chave do rate-limit. Nem IP nem e-mail entram em claro no banco: o ipHash já
   // é o helper usado no rate-limit de homenagens, e o e-mail recebe o mesmo
   // tratamento para esta tabela não virar um registro dos e-mails chutados.
-  const ip = await ipHash(request)
+  const ip = await ipHash(request, env)
   const emailChave = ip
     ? await sha256Hex(`login:${parsed.data.email.toLowerCase()}`)
     : null

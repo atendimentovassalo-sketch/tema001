@@ -46,9 +46,33 @@ export async function sha256Hex(input: string): Promise<string> {
     .join('')
 }
 
-/** Hash do IP do cliente (com sal fixo) para rate-limit/abuso sem PII crua. */
-export async function ipHash(request: Request): Promise<string | null> {
+/** Hash do IP do cliente (com sal fixo) para rate-limit/abuso sem PII crua.
+ *
+ * O `env` NÃO é decorativo. Pelo domínio da funerária o tráfego passa pelo Worker
+ * `proxy-obituario`, e o `cf-connecting-ip` que chega aqui é o da borda da
+ * Cloudflare — igual para todos os visitantes. Sem tratar isso, todo rate-limit
+ * do app deixa de ser "por visitante" e vira "por tenant" (medido em 17/08/2026:
+ * a mesma máquina gerava hash diferente entrando direto no pages.dev e entrando
+ * pelo domínio da cliente). O Worker passa o IP real em `X-Real-IP`, acompanhado
+ * de um segredo — porque cabeçalho é texto que qualquer um escreve, e sem a
+ * conferência bastaria bater direto no `pages.dev` mandando um IP falso a cada
+ * requisição para nunca cair em limite nenhum.
+ *
+ * Sem `PROXY_SEGREDO` configurado, o cabeçalho é ignorado e vale o comportamento
+ * antigo: degrada para "por tenant", não quebra. */
+export async function ipHash(
+  request: Request,
+  env?: { PROXY_SEGREDO?: string },
+): Promise<string | null> {
+  // Comparação simples basta: este segredo não autentica ninguém, só decide de
+  // qual cabeçalho o IP é lido. Errar aqui degrada a granularidade do limite.
+  const doProxy =
+    env?.PROXY_SEGREDO && request.headers.get('x-proxy-auth') === env.PROXY_SEGREDO
+      ? request.headers.get('x-real-ip')
+      : null
+
   const ip =
+    doProxy ??
     request.headers.get('cf-connecting-ip') ??
     request.headers.get('x-forwarded-for') ??
     null
