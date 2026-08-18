@@ -94,22 +94,31 @@ export const MODELOS: Modelo[] = [
   },
   {
     id: 'familia',
-    rotulo: 'Acesso da família ao memorial',
+    rotulo: 'Link de GESTÃO (aprovações) — não compartilhar',
     texto: (d) =>
       d.familiaUrl
-        ? `Oi, ${primeiroNome(d.clienteNome)}. Este é o link para vocês cuidarem da página:
+        ? `Oi, ${primeiroNome(d.clienteNome)}.
+
+` +
+          `Este link é para VOCÊ cuidar da página — escrever a história, ` +
+          `acrescentar fotos e aprovar ou esconder as mensagens que chegarem:
 ` +
           `${d.familiaUrl}
 
 ` +
-          `Por ele dá para escrever a história, acrescentar fotos e esconder alguma ` +
-          `mensagem que não queiram na página. Não precisa de senha.
+          `⚠️ Por favor, NÃO repasse este link em grupos nem para outras pessoas. ` +
+          `Ele não pede senha: quem tiver o endereço consegue alterar a página. ` +
+          `Guarde só com você, ou com uma pessoa da família de sua confiança.
 
 ` +
-          `O link vale por 30 dias e é só de vocês — se precisar de outro depois, ` +
-          `me chama que eu gero.
+          `Para divulgar o falecimento, use o outro link, o da página em si — ` +
+          `esse pode circular à vontade.
 
-— ${d.funeraria}`
+` +
+          `O acesso vale 30 dias. Se precisar de um novo depois, me chame.
+
+` +
+          `— ${d.funeraria}`
         : null,
   },
 ]

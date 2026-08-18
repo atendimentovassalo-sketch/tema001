@@ -984,3 +984,92 @@
   .adm .ges-mes { flex-wrap: wrap; }
   .adm .ges-mes-sel { flex: 1 1 auto; min-width: 150px; }
 }
+
+/* ---- barra de filtros (18/08/2026) ----
+   Mesma ideia da referência (pílulas, ativo em destaque), na paleta do painel:
+   fundo escuro ali serviria a um app escuro, aqui destoaria de tudo. */
+.adm .fil {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 22px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.adm .fil-grupo { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.adm .fil-rot {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin-right: 4px;
+}
+.adm .fil-btn {
+  font: inherit;
+  font-size: 0.86rem;
+  padding: 7px 13px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.adm .fil-btn:hover { color: var(--ink); }
+/* Ativo por fundo + borda + peso: só cor não basta para quem não distingue bem. */
+.adm .fil-on {
+  background: var(--paper);
+  border-color: var(--line);
+  color: var(--ink);
+  font-weight: 600;
+}
+.adm .fil-btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+/* ---- os dois links de um memorial (18/08/2026) ----
+   O contraste entre os cartões é funcional, não decorativo: trocar o link de
+   gestão pelo público num grupo de WhatsApp entrega a estranhos o poder de
+   alterar a página de um morto. */
+.adm .adm-linha-links > td { background: var(--cream); padding: 16px !important; }
+.adm .lnk {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 14px;
+}
+.adm .lnk-cartao {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+.adm .lnk-cartao-restrito { border-color: #c8a24a; box-shadow: inset 3px 0 0 #c8a24a; }
+
+.adm .lnk-cab { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.adm .lnk-tag {
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.adm .lnk-tag-ok { background: #e7f0e8; color: #2f5d3a; }
+.adm .lnk-tag-alerta { background: #fbf0d8; color: #7a5a12; }
+
+.adm .lnk-url {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  word-break: break-all;
+  margin: 0 0 10px;
+}
+.adm .lnk-explica,
+.adm .lnk-nota,
+.adm .lnk-aviso-off {
+  font-size: 0.86rem;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.adm .lnk-nota { margin: 10px 0 0; }
+.adm .lnk-aviso-off { color: #8a3a2f; }
+.adm .lnk-acoes { display: flex; flex-wrap: wrap; gap: 8px; }

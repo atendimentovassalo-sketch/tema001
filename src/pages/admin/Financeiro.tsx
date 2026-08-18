@@ -77,6 +77,13 @@ export default function AdminFinanceiro() {
   const [nomeFuneraria, setNomeFuneraria] = useState('Funerária')
   const [diaInicio, setDiaInicio] = useState(1)
   const [salvando, setSalvando] = useState(false)
+  /* Filtros da lista do mês. Não vão para a API: são dezenas de linhas por mês
+   * (0–10 atendimentos + ~30 mensalidades), então filtrar no cliente é instantâneo
+   * e evita uma ida ao servidor a cada clique. */
+  const [fTipo, setFTipo] = useState<'todos' | 'entrada' | 'saida'>('todos')
+  const [fStatus, setFStatus] = useState<
+    'todos' | 'pagas' | 'aberto' | 'atrasadas'
+  >('todos')
 
   const [form, setForm] = useState({
     tipo: 'entrada' as 'entrada' | 'saida',
@@ -233,6 +240,16 @@ export default function AdminFinanceiro() {
     }
     return lista
   })()
+
+  const hoje = hojeISO()
+  const lancamentosFiltrados = lancamentos.filter((l) => {
+    if (fTipo !== 'todos' && l.tipo !== fTipo) return false
+    if (fStatus === 'pagas') return !!l.pagoEm
+    if (fStatus === 'aberto') return !l.pagoEm
+    if (fStatus === 'atrasadas')
+      return !l.pagoEm && !!l.vencimento && l.vencimento < hoje
+    return true
+  })
 
   const saldo = resumo ? resumo.recebidoCentavos - resumo.saidasCentavos : 0
   const categorias =
@@ -491,9 +508,11 @@ export default function AdminFinanceiro() {
             <p className="adm-vazio">Carregando…</p>
           ) : lancamentos.length === 0 ? (
             <p className="adm-vazio">Nada lançado neste mês ainda.</p>
+          ) : lancamentosFiltrados.length === 0 ? (
+            <p className="adm-vazio">Nenhum lançamento com esse filtro.</p>
           ) : (
             <ul className="ges-lista">
-              {lancamentos.map((l) => (
+              {lancamentosFiltrados.map((l) => (
                 <li key={l.id}>
                   <div className="ges-lista-txt">
                     <strong>

@@ -4,6 +4,7 @@
 import type { Env } from '../../../_lib/types'
 import type { AdminData } from '../_middleware'
 import {
+  ehGestor,
   getUsuarioDoTenant,
   getTenantPorId,
   atualizarUsuario,
@@ -27,6 +28,13 @@ export const onRequestPut: PagesFunction<Env, string, AdminData> = async ({
   const id = String(params.id)
   const alvo = await getUsuarioDoTenant(env, data.sessao.tenantId, id)
   if (!alvo) return erro('Usuário não encontrado.', 404)
+
+  /* Conta de gestão do SaaS só é tocada por quem também é gestor. Devolve 404,
+   * e não 403, para ser coerente com a listagem: para a funerária essa conta não
+   * existe, e um 403 aqui contaria que existe. */
+  if (ehGestor(alvo.papel) && !ehGestor(data.sessao.papel)) {
+    return erro('Usuário não encontrado.', 404)
+  }
 
   let body: unknown
   try {
@@ -85,6 +93,13 @@ export const onRequestDelete: PagesFunction<Env, string, AdminData> = async ({
   }
   const alvo = await getUsuarioDoTenant(env, data.sessao.tenantId, id)
   if (!alvo) return erro('Usuário não encontrado.', 404)
+
+  /* Conta de gestão do SaaS só é tocada por quem também é gestor. Devolve 404,
+   * e não 403, para ser coerente com a listagem: para a funerária essa conta não
+   * existe, e um 403 aqui contaria que existe. */
+  if (ehGestor(alvo.papel) && !ehGestor(data.sessao.papel)) {
+    return erro('Usuário não encontrado.', 404)
+  }
   await deletarUsuario(env, id)
   return json({ ok: true })
 }

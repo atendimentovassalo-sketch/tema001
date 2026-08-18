@@ -19,7 +19,7 @@ export const onRequestGet: PagesFunction<Env, string, AdminData> = async ({
   env,
   data,
 }) => {
-  const usuarios = await listUsuarios(env, data.sessao.tenantId)
+  const usuarios = await listUsuarios(env, data.sessao.tenantId, data.sessao.papel)
   return json({ usuarios, euId: data.sessao.usuarioId })
 }
 

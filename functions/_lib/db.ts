@@ -641,14 +641,27 @@ function toUsuarioAdminDTO(r: UsuarioAdminRow): UsuarioAdminDTO {
   }
 }
 
+/** Papel do lado SaaS. Quem não é `gestor` não enxerga nem alcança estas contas.
+ *  Ver migrations/0011_papel_gestor_saas.sql. */
+export const PAPEL_GESTOR = 'gestor'
+
+export function ehGestor(papel: string): boolean {
+  return papel === PAPEL_GESTOR
+}
+
+/** Usuários do tenant. `papelDeQuemPede` decide se as contas de gestão do SaaS
+ *  aparecem: para a funerária elas simplesmente não existem — não vêm em cinza
+ *  nem desabilitadas, porque o que não se vê não se tenta mexer. */
 export async function listUsuarios(
   env: Env,
   tenantId: string,
+  papelDeQuemPede: string,
 ): Promise<UsuarioAdminDTO[]> {
+  const filtro = ehGestor(papelDeQuemPede) ? '' : `AND papel <> '${PAPEL_GESTOR}'`
   const rows = await env.DB.prepare(
     `SELECT id, nome, email, papel, ativo, (senha_hash IS NOT NULL) AS tem_senha,
             convite_token, convite_expira, ultimo_acesso, criado_em
-     FROM usuario WHERE tenant_id = ? ORDER BY criado_em ASC`,
+     FROM usuario WHERE tenant_id = ? ${filtro} ORDER BY criado_em ASC`,
   )
     .bind(tenantId)
     .all<UsuarioAdminRow>()

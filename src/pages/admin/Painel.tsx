@@ -1,11 +1,12 @@
 /* Painel de acesso rápido: novo memorial em destaque, fila de moderação e
  * lista de memoriais (todos os status) com ações. */
-import { useCallback, useEffect, useState } from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { useSessao } from './auth'
 import PainelShell from './PainelShell'
+import CompartilharMemorial from './CompartilharMemorial'
 import { ddmm } from '../memorial/format'
 import './admin.css'
 
@@ -35,6 +36,7 @@ export default function AdminPainel() {
   const [memoriais, setMemoriais] = useState<MemorialItem[]>([])
   const [pendentes, setPendentes] = useState<Pendente[]>([])
   const [prontos, setProntos] = useState(false)
+  const [compartilhando, setCompartilhando] = useState<string | null>(null)
 
   useEffect(() => {
     document.title = 'Painel — Funerária'
@@ -71,25 +73,6 @@ export default function AdminPainel() {
     await api.post(`/api/admin/memoriais/${m.id}/publicar`, { publicar })
     toast.success(publicar ? 'Memorial publicado' : 'Memorial despublicado')
     recarregar()
-  }
-
-  /* Gera o link de 30 dias e já copia: o passo seguinte é sempre colar no
-   * WhatsApp da família, e obrigar a selecionar o texto na tela é atrito puro. */
-  async function linkDaFamilia(m: MemorialItem) {
-    try {
-      const r = await api.post<{ ok: true; url: string; dias: number }>(
-        `/api/admin/memoriais/${m.id}/familia`,
-      )
-      try {
-        await navigator.clipboard.writeText(r.url)
-        toast.success(`Link copiado — vale ${r.dias} dias.`)
-      } catch {
-        /* clipboard bloqueado (http, permissão): mostra para copiar na mão */
-        toast.success(`Link gerado: ${r.url}`)
-      }
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : 'Não deu para gerar o link.')
-    }
   }
 
   async function apagar(m: MemorialItem) {
@@ -177,65 +160,87 @@ export default function AdminPainel() {
               </thead>
               <tbody>
                 {memoriais.map((m) => (
-                  <tr key={m.id}>
-                    <td className="adm-nome">
-                      {m.nomeCompleto}
-                      {m.pendentes > 0 && (
+                  <Fragment key={m.id}>
+                    <tr>
+                      <td className="adm-nome">
+                        {m.nomeCompleto}
+                        {m.pendentes > 0 && (
+                          <span
+                            className="adm-pend-dot"
+                            title="Homenagens a aprovar"
+                          >
+                            {m.pendentes}
+                          </span>
+                        )}
+                      </td>
+                      <td className="num">{ddmm(m.falecimentoISO)}</td>
+                      <td>
                         <span
-                          className="adm-pend-dot"
-                          title="Homenagens a aprovar"
+                          className={`adm-status ${m.status === 'publicado' ? 'on' : 'off'}`}
                         >
-                          {m.pendentes}
+                          {m.status === 'publicado' ? 'No ar' : 'Rascunho'}
                         </span>
-                      )}
-                    </td>
-                    <td className="num">{ddmm(m.falecimentoISO)}</td>
-                    <td>
-                      <span
-                        className={`adm-status ${m.status === 'publicado' ? 'on' : 'off'}`}
-                      >
-                        {m.status === 'publicado' ? 'No ar' : 'Rascunho'}
-                      </span>
-                    </td>
-                    <td className="num">{m.visitas.toLocaleString('pt-BR')}</td>
-                    <td className="adm-col-acoes">
-                      {m.status === 'publicado' && (
-                        <a
+                      </td>
+                      <td className="num">
+                        {m.visitas.toLocaleString('pt-BR')}
+                      </td>
+                      <td className="adm-col-acoes">
+                        {m.status === 'publicado' && (
+                          <a
+                            className="adm-link"
+                            href={`/m/${m.slug}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            Ver
+                          </a>
+                        )}
+                        <Link
                           className="adm-link"
-                          href={`/m/${m.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          to={`/memorial/novo?id=${m.id}`}
                         >
-                          Ver
-                        </a>
-                      )}
-                      <Link
-                        className="adm-link"
-                        to={`/memorial/novo?id=${m.id}`}
-                      >
-                        Editar
-                      </Link>
-                      <button
-                        className="adm-link"
-                        onClick={() => alternarPublicacao(m)}
-                      >
-                        {m.status === 'publicado' ? 'Despublicar' : 'Publicar'}
-                      </button>
-                      <button
-                        className="adm-link"
-                        onClick={() => linkDaFamilia(m)}
-                        title="Gera um link de 30 dias para a família escrever a história, subir fotos e esconder mensagens"
-                      >
-                        Link da família
-                      </button>
-                      <button
-                        className="adm-link adm-link-perigo"
-                        onClick={() => apagar(m)}
-                      >
-                        Apagar
-                      </button>
-                    </td>
-                  </tr>
+                          Editar
+                        </Link>
+                        <button
+                          className="adm-link"
+                          onClick={() => alternarPublicacao(m)}
+                        >
+                          {m.status === 'publicado'
+                            ? 'Despublicar'
+                            : 'Publicar'}
+                        </button>
+                        <button
+                          className="adm-link"
+                          onClick={() =>
+                            setCompartilhando(
+                              compartilhando === m.id ? null : m.id,
+                            )
+                          }
+                          aria-expanded={compartilhando === m.id}
+                        >
+                          Links
+                        </button>
+                        <button
+                          className="adm-link adm-link-perigo"
+                          onClick={() => apagar(m)}
+                        >
+                          Apagar
+                        </button>
+                      </td>
+                    </tr>
+                    {compartilhando === m.id && (
+                      <tr className="adm-linha-links">
+                        <td colSpan={5}>
+                          <CompartilharMemorial
+                            memorialId={m.id}
+                            slug={m.slug}
+                            nome={m.nomeCompleto}
+                            publicado={m.status === 'publicado'}
+                          />
+                        </td>
+                      </tr>
+                    )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
