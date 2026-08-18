@@ -30,6 +30,26 @@ export default defineConfig(({ mode }) => ({
         }
         warn(warning)
       },
+      output: {
+        /* Separa o que quase nunca muda do que muda a cada deploy.
+         *
+         * React e o roteador são estáveis: num arquivo próprio, o navegador de
+         * quem já visitou o site reaproveita do cache mesmo depois de a gente
+         * publicar mudança — hoje qualquer alteração invalidava o bundle
+         * inteiro, e a pessoa rebaixava tudo de novo.
+         *
+         * `zod` + `react-hook-form` viram outro grupo: são 275 KB de fonte que
+         * só o formulário de homenagem e o editor precisam. */
+        manualChunks(id) {
+          if (!id.includes('node_modules')) return
+          if (/[\/]node_modules[\/](react|react-dom|scheduler)[\/]/.test(id))
+            return 'react'
+          if (/[\/]node_modules[\/](react-router|react-router-dom|@remix-run)[\/]/.test(id))
+            return 'router'
+          if (/[\/]node_modules[\/](zod|react-hook-form|@hookform)[\/]/.test(id))
+            return 'forms'
+        },
+      },
     },
   },
   plugins: [react()],

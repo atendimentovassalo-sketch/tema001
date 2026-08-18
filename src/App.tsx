@@ -1,24 +1,37 @@
 /* Main App Component - Handles routing (using react-router-dom), query client and other providers - use this file to add all routes */
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import { Toaster } from '@/components/ui/toaster'
 import { Toaster as Sonner } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+
+/* CARREGAMENTO IMEDIATO — o que o VISITANTE abre.
+ *
+ * Quem chega aqui recebeu o link no WhatsApp, está no celular, muitas vezes com
+ * sinal ruim e no meio de um velório. Essas telas não podem depender de um
+ * segundo download para começar a aparecer. */
 import NotFound from './pages/NotFound'
 import MemorialPage from './pages/memorial/MemorialPage'
-import NovoMemorial from './pages/memorial/NovoMemorial'
 import Obituario from './pages/memorial/Obituario'
-import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
-import AreaFamilia from './pages/memorial/AreaFamilia'
 import HomeV2 from './pages/memorial/HomeV2'
-import AdminLogin from './pages/admin/Login'
-import AdminPainel from './pages/admin/Painel'
-import AdminConfig from './pages/admin/Configuracoes'
-import AdminUsuarios from './pages/admin/Usuarios'
-import AdminClientes from './pages/admin/Clientes'
-import AdminFinanceiro from './pages/admin/Financeiro'
-import AdminRecuperar from './pages/admin/Recuperar'
 import Privacidade from './pages/legal/Privacidade'
 import Termos from './pages/legal/Termos'
+
+/* SOB DEMANDA — o que só a funerária (ou a família com link) abre.
+ *
+ * O painel inteiro estava no mesmo arquivo que o memorial: quem visitava a nota
+ * de um falecido baixava o cadastro de clientes, o financeiro, o editor e as
+ * configurações junto. São telas de quem já está logado, no computador da
+ * funerária, e podem custar um instante a mais. */
+const NovoMemorial = lazy(() => import('./pages/memorial/NovoMemorial'))
+const AprovarHomenagem = lazy(() => import('./pages/memorial/AprovarHomenagem'))
+const AreaFamilia = lazy(() => import('./pages/memorial/AreaFamilia'))
+const AdminLogin = lazy(() => import('./pages/admin/Login'))
+const AdminPainel = lazy(() => import('./pages/admin/Painel'))
+const AdminConfig = lazy(() => import('./pages/admin/Configuracoes'))
+const AdminUsuarios = lazy(() => import('./pages/admin/Usuarios'))
+const AdminClientes = lazy(() => import('./pages/admin/Clientes'))
+const AdminFinanceiro = lazy(() => import('./pages/admin/Financeiro'))
+const AdminRecuperar = lazy(() => import('./pages/admin/Recuperar'))
 
 // ONLY IMPORT AND RENDER WORKING PAGES, NEVER ADD PLACEHOLDER COMPONENTS OR PAGES IN THIS FILE
 // AVOID REMOVING ANY CONTEXT PROVIDERS FROM THIS FILE (e.g. TooltipProvider, Toaster, Sonner)
@@ -28,8 +41,12 @@ const App = () => (
     future={{ v7_startTransition: false, v7_relativeSplatPath: false }}
   >
     <TooltipProvider>
-      <Toaster />
+      {/* Só o Sonner. O <Toaster/> do Radix estava montado aqui sem nenhum
+          consumidor: os únicos arquivos que chamavam `useToast` eram resíduo do
+          template iGreen, cujas rotas saíram em 09/08. Custava ~26 KB de fonte
+          para não fazer nada. */}
       <Sonner />
+      <Suspense fallback={<div />}>
       <Routes>
         {/* Memorial (tema próprio) */}
         <Route path="/funeraria" element={<HomeV2 />} />
@@ -60,6 +77,7 @@ const App = () => (
         <Route path="/termos" element={<Termos />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </Suspense>
     </TooltipProvider>
   </BrowserRouter>
 )
