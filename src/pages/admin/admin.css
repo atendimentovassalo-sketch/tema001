@@ -966,3 +966,21 @@
   border-radius: 4px;
 }
 .adm .rel-periodo-nota { grid-column: 1 / -1; margin: 0; }
+
+/* Seletor de mês do financeiro: mostra o nome, e não só as setas. */
+.adm .ges-mes-sel {
+  font: inherit;
+  font-size: 0.92rem;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  padding: 8px 10px;
+  /* Não deixa o nome do mês encolher a ponto de cortar "setembro de 2026". */
+  min-width: 190px;
+}
+.adm .ges-mes-sel:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+@media (max-width: 640px) {
+  .adm .ges-mes { flex-wrap: wrap; }
+  .adm .ges-mes-sel { flex: 1 1 auto; min-width: 150px; }
+}

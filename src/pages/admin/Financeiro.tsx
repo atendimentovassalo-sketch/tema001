@@ -217,6 +217,23 @@ export default function AdminFinanceiro() {
   if (carregando || !usuario)
     return <div className="adm adm-carregando">Carregando…</div>
 
+  /* Janela do seletor: 24 meses para trás e 2 para frente, a partir do mês
+   * corrente do ciclo. Para frente basta pouco (lançar algo já datado), e para
+   * trás cobre dois anos de histórico sem virar uma lista infinita.
+   * A competência aberta entra na lista mesmo se cair fora da janela — senão o
+   * `select` ficaria sem opção correspondente e mostraria a errada. */
+  const mesCorrente = competenciaDoCiclo(diaInicio)
+  const mesesDisponiveis = (() => {
+    const lista: string[] = []
+    for (let i = 2; i >= -24; i--)
+      lista.push(deslocarCompetencia(mesCorrente, i))
+    if (!lista.includes(competencia)) {
+      lista.push(competencia)
+      lista.sort().reverse()
+    }
+    return lista
+  })()
+
   const saldo = resumo ? resumo.recebidoCentavos - resumo.saidasCentavos : 0
   const categorias =
     form.tipo === 'entrada' ? CATEGORIAS_ENTRADA : CATEGORIAS_SAIDA
@@ -247,12 +264,27 @@ export default function AdminFinanceiro() {
             >
               ←
             </button>
-            <button
-              className="adm-btn adm-btn-fantasma adm-btn-mini"
-              onClick={() => setCompetencia(competenciaDoCiclo(diaInicio))}
+
+            {/* Seletor com o nome do mês, em vez de um botão fixo "Mês atual".
+                Pular de agosto para março com a seta custa cinco cliques; e sem
+                o nome escrito no controle, a pessoa precisa conferir o subtítulo
+                para saber onde está. O mês corrente vem marcado no próprio
+                rótulo — assim o controle diz onde você está E deixa escolher. */}
+            <select
+              className="ges-mes-sel"
+              value={competencia}
+              onChange={(e) => setCompetencia(e.target.value)}
+              aria-label="Escolher o mês"
             >
-              Mês atual
-            </button>
+              {mesesDisponiveis.map((m) => (
+                <option key={m} value={m}>
+                  {m === mesCorrente
+                    ? `${nomeCompetencia(m)} (mês atual)`
+                    : nomeCompetencia(m)}
+                </option>
+              ))}
+            </select>
+
             <button
               className="adm-btn adm-btn-fantasma adm-btn-mini"
               onClick={() =>
@@ -262,6 +294,17 @@ export default function AdminFinanceiro() {
             >
               →
             </button>
+
+            {/* Só aparece quando faz diferença: fora do mês corrente. Botão que
+                não faz nada onde está é ruído. */}
+            {competencia !== mesCorrente && (
+              <button
+                className="adm-btn adm-btn-fantasma adm-btn-mini"
+                onClick={() => setCompetencia(mesCorrente)}
+              >
+                Voltar ao mês atual
+              </button>
+            )}
           </div>
         </div>
 
