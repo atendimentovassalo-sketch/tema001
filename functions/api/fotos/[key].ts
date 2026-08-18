@@ -38,10 +38,17 @@ export const onRequestGet: PagesFunction<Env, 'key'> = async ({
   const headers = new Headers()
   obj.writeHttpMetadata(headers)
   headers.set('etag', obj.httpEtag)
-  /* Uma hora, e não um ano. Foto removida pela família tem
-   * de sair de circulação em tempo humano. `private` quando o acesso dependeu da
-   * sessão — cachear isso num CDN compartilhado entregaria a foto a quem não
-   * está logado. */
+  /* ⚠️ MEDIDO EM PRODUÇÃO (18/08/2026): o Cloudflare Pages SOBRESCREVE este
+   * cabeçalho em resposta de Function e serve `public, max-age=0,
+   * must-revalidate`. Não adianta insistir aqui.
+   *
+   * O efeito é melhor do que o pedido — revalidar sempre significa que foto
+   * removida pela família para de ser servida na hora, que era o objetivo. O
+   * valor abaixo fica como intenção declarada, para o dia em que valer.
+   *
+   * NÃO tente forçar cache longo pelo `public/_headers`: a regra de lá é
+   * estática e pegaria também as fotos que dependem de sessão, entregando a um
+   * CDN compartilhado imagem que exige login. Foi por isso que ela saiu de lá. */
   headers.set('cache-control', publica ? 'public, max-age=3600' : 'private, no-store')
   return new Response(obj.body, { headers })
 }
