@@ -38,7 +38,9 @@ export default function AdminLogin() {
       }
       navigate('/admin', { replace: true })
     } catch (err) {
-      setErro(err instanceof ApiError ? err.message : 'Não foi possível entrar.')
+      setErro(
+        err instanceof ApiError ? err.message : 'Não foi possível entrar.',
+      )
       setEnviando(false)
     }
   }
@@ -46,8 +48,11 @@ export default function AdminLogin() {
   return (
     <div className="adm adm-login-wrap">
       <div className="adm-login">
-        <img className="adm-logo" src="/logo.png"
-          alt="Funerária São Francisco — Catanduvas/PR" />
+        <img
+          className="adm-logo"
+          src="/logo.png"
+          alt="Funerária São Francisco — Catanduvas/PR"
+        />
         <div className="adm-brand">
           Painel da funerária
           <small>Área restrita</small>
@@ -76,7 +81,9 @@ export default function AdminLogin() {
             <span className="adm-rot">Senha</span>
             <input
               type="password"
-              autoComplete={primeiroAcesso ? 'new-password' : 'current-password'}
+              autoComplete={
+                primeiroAcesso ? 'new-password' : 'current-password'
+              }
               value={senha}
               onChange={(e) => setSenha(e.target.value)}
               minLength={primeiroAcesso ? 8 : undefined}
@@ -90,7 +97,11 @@ export default function AdminLogin() {
           {erro && <p className="adm-erro">{erro}</p>}
 
           <button className="adm-btn adm-btn-primario" disabled={enviando}>
-            {enviando ? 'Aguarde…' : primeiroAcesso ? 'Definir senha e entrar' : 'Entrar'}
+            {enviando
+              ? 'Aguarde…'
+              : primeiroAcesso
+                ? 'Definir senha e entrar'
+                : 'Entrar'}
           </button>
         </form>
 
@@ -100,7 +111,7 @@ export default function AdminLogin() {
           </Link>
         )}
 
-        <a className="adm-voltar"  href="/">
+        <a className="adm-voltar" href="/">
           ← Voltar ao site
         </a>
       </div>

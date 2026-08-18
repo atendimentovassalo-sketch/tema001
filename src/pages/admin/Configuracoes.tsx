@@ -1,15 +1,13 @@
 /* Configurações da funerária: dados, locais padrão e modelo de mensagem do
  * WhatsApp. */
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ApiError } from '@/lib/api'
 import { fetchConfig, salvarConfig, type ConfigTenant } from '../memorial/api'
-import {
-  TEMPLATE_WHATSAPP_PADRAO,
-  VARIAVEIS_WHATSAPP,
-} from '../memorial/share'
+import { TEMPLATE_WHATSAPP_PADRAO, VARIAVEIS_WHATSAPP } from '../memorial/share'
 import { useSessao } from './auth'
+import PainelShell from './PainelShell'
 import './admin.css'
 
 export default function AdminConfig() {
@@ -27,7 +25,10 @@ export default function AdminConfig() {
   }, [carregando, usuario, navigate])
 
   useEffect(() => {
-    if (usuario) fetchConfig().then(setCfg).catch(() => setCfg(null))
+    if (usuario)
+      fetchConfig()
+        .then(setCfg)
+        .catch(() => setCfg(null))
   }, [usuario])
 
   function set<K extends keyof ConfigTenant>(k: K, v: ConfigTenant[K]) {
@@ -43,7 +44,9 @@ export default function AdminConfig() {
       toast.success('Configurações salvas')
       navigate('/admin')
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Não foi possível salvar.')
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível salvar.',
+      )
       setSalvando(false)
     }
   }
@@ -54,30 +57,19 @@ export default function AdminConfig() {
   if (!usuario || !cfg) return null
 
   return (
-    <div className="adm">
-      <header className="adm-top">
-        <div className="adm-top-in">
-          <a className="adm-marca" href="/">
-            <img src="/logo.png" alt="Funerária São Francisco" />
-          </a>
-          <div className="adm-brand">
-            Configurações
-            <small>{usuario.nome}</small>
-          </div>
-          <Link className="adm-sair" to="/admin">
-            ← Painel
-          </Link>
-        </div>
-      </header>
-
-      <main className="adm-main">
+    <PainelShell usuario={usuario} titulo="Configurações">
+      <>
         <form className="adm-form-config" onSubmit={salvar}>
           <section className="adm-bloco">
             <h2>A funerária</h2>
             <div className="adm-par">
               <label>
                 <span className="adm-rot">Nome</span>
-                <input value={cfg.nome} onChange={(e) => set('nome', e.target.value)} required />
+                <input
+                  value={cfg.nome}
+                  onChange={(e) => set('nome', e.target.value)}
+                  required
+                />
               </label>
               <label>
                 <span className="adm-rot">Desde (ano)</span>
@@ -91,7 +83,11 @@ export default function AdminConfig() {
             <div className="adm-par">
               <label>
                 <span className="adm-rot">Cidade</span>
-                <input value={cfg.cidade} onChange={(e) => set('cidade', e.target.value)} required />
+                <input
+                  value={cfg.cidade}
+                  onChange={(e) => set('cidade', e.target.value)}
+                  required
+                />
               </label>
               <label>
                 <span className="adm-rot">UF</span>
@@ -151,7 +147,9 @@ export default function AdminConfig() {
               <span className="adm-rot">Velório — local padrão</span>
               <input
                 value={cfg.velorioLocalPadrao ?? ''}
-                onChange={(e) => set('velorioLocalPadrao', e.target.value || null)}
+                onChange={(e) =>
+                  set('velorioLocalPadrao', e.target.value || null)
+                }
                 placeholder="Ex.: Capela Memorial São Francisco"
               />
             </label>
@@ -159,14 +157,18 @@ export default function AdminConfig() {
               <span className="adm-rot">Velório — endereço padrão</span>
               <input
                 value={cfg.velorioEnderecoPadrao ?? ''}
-                onChange={(e) => set('velorioEnderecoPadrao', e.target.value || null)}
+                onChange={(e) =>
+                  set('velorioEnderecoPadrao', e.target.value || null)
+                }
               />
             </label>
             <label>
               <span className="adm-rot">Sepultamento — local padrão</span>
               <input
                 value={cfg.sepultamentoLocalPadrao ?? ''}
-                onChange={(e) => set('sepultamentoLocalPadrao', e.target.value || null)}
+                onChange={(e) =>
+                  set('sepultamentoLocalPadrao', e.target.value || null)
+                }
                 placeholder="Ex.: Cemitério Municipal de Catanduvas"
               />
             </label>
@@ -185,7 +187,9 @@ export default function AdminConfig() {
             <label>
               <textarea
                 value={cfg.whatsappTemplate ?? ''}
-                onChange={(e) => set('whatsappTemplate', e.target.value || null)}
+                onChange={(e) =>
+                  set('whatsappTemplate', e.target.value || null)
+                }
                 rows={5}
                 placeholder={TEMPLATE_WHATSAPP_PADRAO}
               />
@@ -199,7 +203,7 @@ export default function AdminConfig() {
             {salvando ? 'Salvando…' : 'Salvar configurações'}
           </button>
         </form>
-      </main>
-    </div>
+      </>
+    </PainelShell>
   )
 }

@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { useSessao } from './auth'
+import PainelShell from './PainelShell'
 import { ddmm } from '../memorial/format'
 import './admin.css'
 
@@ -59,7 +60,9 @@ export default function AdminPainel() {
 
   async function moderar(id: string, acao: 'aprovar' | 'recusar') {
     await api.post(`/api/admin/homenagens/${id}/moderar`, { acao })
-    toast.success(acao === 'aprovar' ? 'Homenagem publicada' : 'Homenagem recusada')
+    toast.success(
+      acao === 'aprovar' ? 'Homenagem publicada' : 'Homenagem recusada',
+    )
     recarregar()
   }
 
@@ -71,16 +74,15 @@ export default function AdminPainel() {
   }
 
   async function apagar(m: MemorialItem) {
-    if (!confirm(`Apagar a nota de ${m.nomeCompleto}? Esta ação não pode ser desfeita.`))
+    if (
+      !confirm(
+        `Apagar a nota de ${m.nomeCompleto}? Esta ação não pode ser desfeita.`,
+      )
+    )
       return
     await api.del(`/api/admin/memoriais/${m.id}`)
     toast.success('Memorial apagado')
     recarregar()
-  }
-
-  async function sair() {
-    await api.post('/api/auth/logout')
-    navigate('/admin/login', { replace: true })
   }
 
   if (carregando || (usuario && !prontos)) {
@@ -89,43 +91,13 @@ export default function AdminPainel() {
   if (!usuario) return null
 
   return (
-    <div className="adm">
-      <header className="adm-top">
-        <div className="adm-top-in">
-          <a className="adm-marca" href="/">
-            <img src="/logo.png" alt="Funerária São Francisco" />
-          </a>
-          <div className="adm-brand">
-            Painel da funerária
-            <small>{usuario.nome}</small>
-          </div>
-          <div className="adm-top-acoes">
-            <Link className="adm-sair" to="/admin/clientes">
-              Clientes
-            </Link>
-            <Link className="adm-sair" to="/admin/financeiro">
-              Financeiro
-            </Link>
-            <Link className="adm-sair" to="/admin/usuarios">
-              Usuários
-            </Link>
-            <Link className="adm-sair" to="/admin/config">
-              Configurações
-            </Link>
-            <button className="adm-sair" onClick={sair}>
-              Sair
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="adm-main">
+    <PainelShell usuario={usuario} titulo="Memoriais">
+      <>
         <div className="adm-acao-topo">
           <div>
             <h1>Memoriais</h1>
             <p className="adm-sub">
-              {memoriais.length}{' '}
-              {memoriais.length === 1 ? 'nota' : 'notas'} ·{' '}
+              {memoriais.length} {memoriais.length === 1 ? 'nota' : 'notas'} ·{' '}
               {memoriais.filter((m) => m.status === 'publicado').length} no ar
             </p>
           </div>
@@ -137,7 +109,8 @@ export default function AdminPainel() {
         {pendentes.length > 0 && (
           <section className="adm-bloco adm-moderacao">
             <h2>
-              Homenagens a aprovar <span className="adm-tag">{pendentes.length}</span>
+              Homenagens a aprovar{' '}
+              <span className="adm-tag">{pendentes.length}</span>
             </h2>
             <ul className="adm-pendentes">
               {pendentes.map((p) => (
@@ -189,7 +162,10 @@ export default function AdminPainel() {
                     <td className="adm-nome">
                       {m.nomeCompleto}
                       {m.pendentes > 0 && (
-                        <span className="adm-pend-dot" title="Homenagens a aprovar">
+                        <span
+                          className="adm-pend-dot"
+                          title="Homenagens a aprovar"
+                        >
                           {m.pendentes}
                         </span>
                       )}
@@ -214,7 +190,10 @@ export default function AdminPainel() {
                           Ver
                         </a>
                       )}
-                      <Link className="adm-link" to={`/memorial/novo?id=${m.id}`}>
+                      <Link
+                        className="adm-link"
+                        to={`/memorial/novo?id=${m.id}`}
+                      >
                         Editar
                       </Link>
                       <button
@@ -236,7 +215,7 @@ export default function AdminPainel() {
             </table>
           )}
         </section>
-      </main>
-    </div>
+      </>
+    </PainelShell>
   )
 }

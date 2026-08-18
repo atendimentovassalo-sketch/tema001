@@ -5,11 +5,12 @@
  * plano — a tela é feita para dezenas de linhas, não para milhares, e por isso
  * não tem paginação nem busca no servidor. */
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import { formatarReais, paraCentavos } from '@/lib/dinheiro'
 import { useSessao } from './auth'
+import PainelShell from './PainelShell'
 import './admin.css'
 
 interface Cliente {
@@ -98,7 +99,9 @@ export default function AdminClientes() {
       observacao: c.observacao ?? '',
       planoAtivo: c.planoAtivo,
       valor:
-        c.planoValorCentavos != null ? (c.planoValorCentavos / 100).toFixed(2).replace('.', ',') : '',
+        c.planoValorCentavos != null
+          ? (c.planoValorCentavos / 100).toFixed(2).replace('.', ',')
+          : '',
       diaVencimento: String(c.planoDiaVencimento ?? 10),
       planoInicio: c.planoInicio ?? '',
     })
@@ -128,8 +131,11 @@ export default function AdminClientes() {
       observacao: form.observacao.trim() || null,
       planoAtivo: form.planoAtivo,
       planoValorCentavos: centavos,
-      planoDiaVencimento: form.planoAtivo ? Number(form.diaVencimento) || 10 : null,
-      planoInicio: form.planoAtivo && form.planoInicio ? form.planoInicio : null,
+      planoDiaVencimento: form.planoAtivo
+        ? Number(form.diaVencimento) || 10
+        : null,
+      planoInicio:
+        form.planoAtivo && form.planoInicio ? form.planoInicio : null,
     }
     try {
       if (editandoId) {
@@ -149,7 +155,12 @@ export default function AdminClientes() {
   }
 
   async function arquivar(c: Cliente) {
-    if (!confirm(`Arquivar ${c.nome}? O histórico financeiro dele continua guardado.`)) return
+    if (
+      !confirm(
+        `Arquivar ${c.nome}? O histórico financeiro dele continua guardado.`,
+      )
+    )
+      return
     try {
       await api.del(`/api/admin/clientes/${c.id}`)
       toast.success('Cliente arquivado.')
@@ -160,24 +171,12 @@ export default function AdminClientes() {
     }
   }
 
-  if (carregando || !usuario) return <div className="adm adm-carregando">Carregando…</div>
+  if (carregando || !usuario)
+    return <div className="adm adm-carregando">Carregando…</div>
 
   return (
-    <div className="adm">
-      <header className="adm-top">
-        <div className="adm-top-in">
-          <a className="adm-marca" href="/">
-            <span className="adm-brand">Painel da funerária</span>
-          </a>
-          <div className="adm-top-acoes">
-            <Link className="adm-sair" to="/admin">Notas</Link>
-            <Link className="adm-sair" to="/admin/financeiro">Financeiro</Link>
-            <Link className="adm-sair" to="/admin/config">Configurações</Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="adm-main">
+    <PainelShell usuario={usuario} titulo="Clientes">
+      <>
         <div className="adm-acao-topo">
           <div>
             <h1>Clientes</h1>
@@ -214,7 +213,9 @@ export default function AdminClientes() {
               <span>CPF ou documento</span>
               <input
                 value={form.documento}
-                onChange={(e) => setForm({ ...form, documento: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, documento: e.target.value })
+                }
                 maxLength={40}
               />
             </label>
@@ -231,7 +232,9 @@ export default function AdminClientes() {
               <input
                 type="checkbox"
                 checked={form.planoAtivo}
-                onChange={(e) => setForm({ ...form, planoAtivo: e.target.checked })}
+                onChange={(e) =>
+                  setForm({ ...form, planoAtivo: e.target.checked })
+                }
               />
               <span>Tem plano funerário</span>
             </label>
@@ -242,7 +245,9 @@ export default function AdminClientes() {
                   <span>Mensalidade</span>
                   <input
                     value={form.valor}
-                    onChange={(e) => setForm({ ...form, valor: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, valor: e.target.value })
+                    }
                     placeholder="Ex.: 65,00"
                     inputMode="decimal"
                   />
@@ -251,10 +256,14 @@ export default function AdminClientes() {
                   <span>Dia do vencimento</span>
                   <select
                     value={form.diaVencimento}
-                    onChange={(e) => setForm({ ...form, diaVencimento: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, diaVencimento: e.target.value })
+                    }
                   >
                     {Array.from({ length: 28 }, (_, i) => i + 1).map((d) => (
-                      <option key={d} value={d}>{d}</option>
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
                     ))}
                   </select>
                 </label>
@@ -263,7 +272,9 @@ export default function AdminClientes() {
                   <input
                     type="date"
                     value={form.planoInicio}
-                    onChange={(e) => setForm({ ...form, planoInicio: e.target.value })}
+                    onChange={(e) =>
+                      setForm({ ...form, planoInicio: e.target.value })
+                    }
                   />
                 </label>
               </>
@@ -273,7 +284,9 @@ export default function AdminClientes() {
               <span>Observação</span>
               <textarea
                 value={form.observacao}
-                onChange={(e) => setForm({ ...form, observacao: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, observacao: e.target.value })
+                }
                 maxLength={1000}
                 rows={2}
               />
@@ -281,10 +294,18 @@ export default function AdminClientes() {
 
             <div className="ges-form-acoes">
               <button className="adm-btn adm-btn-primario" disabled={salvando}>
-                {salvando ? 'Salvando…' : editandoId ? 'Salvar alterações' : 'Cadastrar'}
+                {salvando
+                  ? 'Salvando…'
+                  : editandoId
+                    ? 'Salvar alterações'
+                    : 'Cadastrar'}
               </button>
               {editandoId && (
-                <button type="button" className="adm-btn adm-btn-fantasma" onClick={limpar}>
+                <button
+                  type="button"
+                  className="adm-btn adm-btn-fantasma"
+                  onClick={limpar}
+                >
                   Cancelar
                 </button>
               )}
@@ -293,7 +314,9 @@ export default function AdminClientes() {
         </section>
 
         <section className="adm-bloco">
-          <h2>Cadastrados <span className="adm-tag">{lista.length}</span></h2>
+          <h2>
+            Cadastrados <span className="adm-tag">{lista.length}</span>
+          </h2>
           <input
             className="ges-busca"
             value={busca}
@@ -315,12 +338,15 @@ export default function AdminClientes() {
                   <div className="ges-lista-txt">
                     <strong>{c.nome}</strong>
                     <span className="ges-meta">
-                      {[c.telefone, c.documento].filter(Boolean).join(' · ') || 'sem contato'}
+                      {[c.telefone, c.documento].filter(Boolean).join(' · ') ||
+                        'sem contato'}
                     </span>
                     {c.planoAtivo && c.planoValorCentavos != null && (
                       <span className="ges-plano">
                         plano {formatarReais(c.planoValorCentavos)}/mês
-                        {c.planoDiaVencimento ? ` · vence dia ${c.planoDiaVencimento}` : ''}
+                        {c.planoDiaVencimento
+                          ? ` · vence dia ${c.planoDiaVencimento}`
+                          : ''}
                       </span>
                     )}
                   </div>
@@ -343,7 +369,7 @@ export default function AdminClientes() {
             </ul>
           )}
         </section>
-      </main>
-    </div>
+      </>
+    </PainelShell>
   )
 }

@@ -3,10 +3,11 @@
  * Regra de ouro: ninguém digita a senha de outra pessoa. O cadastro gera um
  * convite de uso único; a senha é definida pelo próprio convidado. */
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api, ApiError } from '@/lib/api'
 import { useSessao } from './auth'
+import PainelShell from './PainelShell'
 import './admin.css'
 
 interface Usuario {
@@ -25,7 +26,11 @@ function quando(iso: string | null): string {
   if (!iso) return '—'
   const d = new Date(iso.includes('T') ? iso : iso.replace(' ', 'T') + 'Z')
   if (Number.isNaN(d.getTime())) return '—'
-  return d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' })
+  return d.toLocaleDateString('pt-BR', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  })
 }
 
 export default function AdminUsuarios() {
@@ -48,7 +53,9 @@ export default function AdminUsuarios() {
   }, [carregando, usuario, navigate])
 
   const recarregar = useCallback(async () => {
-    const r = await api.get<{ usuarios: Usuario[]; euId: string }>('/api/admin/usuarios')
+    const r = await api.get<{ usuarios: Usuario[]; euId: string }>(
+      '/api/admin/usuarios',
+    )
     setLista(r.usuarios)
     setEuId(r.euId)
     setProntos(true)
@@ -62,17 +69,22 @@ export default function AdminUsuarios() {
     e.preventDefault()
     setSalvando(true)
     try {
-      const r = await api.post<{ ok: true; link: string }>('/api/admin/usuarios', {
-        nome,
-        email,
-      })
+      const r = await api.post<{ ok: true; link: string }>(
+        '/api/admin/usuarios',
+        {
+          nome,
+          email,
+        },
+      )
       setLink({ para: nome, url: r.link })
       setNome('')
       setEmail('')
       toast.success('Convite criado e enviado por e-mail')
       await recarregar()
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Não foi possível cadastrar.')
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível cadastrar.',
+      )
     } finally {
       setSalvando(false)
     }
@@ -88,7 +100,9 @@ export default function AdminUsuarios() {
       toast.success('Novo convite enviado')
       await recarregar()
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Não foi possível reenviar.')
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível reenviar.',
+      )
     }
   }
 
@@ -98,18 +112,27 @@ export default function AdminUsuarios() {
       toast.success(u.ativo ? 'Acesso desativado' : 'Acesso reativado')
       await recarregar()
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Não foi possível alterar.')
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível alterar.',
+      )
     }
   }
 
   async function remover(u: Usuario) {
-    if (!confirm(`Remover o acesso de ${u.nome}? Esta ação não pode ser desfeita.`)) return
+    if (
+      !confirm(
+        `Remover o acesso de ${u.nome}? Esta ação não pode ser desfeita.`,
+      )
+    )
+      return
     try {
       await api.del(`/api/admin/usuarios/${u.id}`)
       toast.success('Acesso removido')
       await recarregar()
     } catch (err) {
-      toast.error(err instanceof ApiError ? err.message : 'Não foi possível remover.')
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível remover.',
+      )
     }
   }
 
@@ -124,28 +147,13 @@ export default function AdminUsuarios() {
   if (!usuario) return null
 
   return (
-    <div className="adm">
-      <header className="adm-top">
-        <div className="adm-top-in">
-          <a className="adm-marca" href="/">
-            <img src="/logo.png" alt="Funerária São Francisco" />
-          </a>
-          <div className="adm-brand">
-            Usuários
-            <small>{usuario.nome}</small>
-          </div>
-          <Link className="adm-sair" to="/admin">
-            ← Painel
-          </Link>
-        </div>
-      </header>
-
-      <main className="adm-main">
+    <PainelShell usuario={usuario} titulo="Usuários">
+      <>
         <section className="adm-bloco">
           <h2>Cadastrar acesso</h2>
           <p className="adm-sub">
-            A pessoa recebe um e-mail com um link de uso único e escolhe a própria
-            senha. Ninguém, nem você, digita a senha de outra pessoa.
+            A pessoa recebe um e-mail com um link de uso único e escolhe a
+            própria senha. Ninguém, nem você, digita a senha de outra pessoa.
           </p>
           <form className="adm-form-usuario" onSubmit={convidar}>
             <label>
@@ -175,8 +183,8 @@ export default function AdminUsuarios() {
           {link && (
             <div className="adm-link-convite">
               <p>
-                Link de primeiro acesso de <b>{link.para}</b> — vale 7 dias, uso único.
-                Se o e-mail não chegar, mande este link por WhatsApp:
+                Link de primeiro acesso de <b>{link.para}</b> — vale 7 dias, uso
+                único. Se o e-mail não chegar, mande este link por WhatsApp:
               </p>
               <code>{link.url}</code>
               <button
@@ -221,7 +229,9 @@ export default function AdminUsuarios() {
                       ) : u.temSenha ? (
                         <span className="adm-status on">Ativo</span>
                       ) : u.conviteAtivo ? (
-                        <span className="adm-status pend">Convite pendente</span>
+                        <span className="adm-status pend">
+                          Convite pendente
+                        </span>
                       ) : (
                         <span className="adm-status off">Convite expirado</span>
                       )}
@@ -260,7 +270,7 @@ export default function AdminUsuarios() {
             </table>
           )}
         </section>
-      </main>
-    </div>
+      </>
+    </PainelShell>
   )
 }

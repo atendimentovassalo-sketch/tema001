@@ -9,7 +9,7 @@
  * deve?" não respeita fronteira de mês — a mensalidade de julho que ninguém
  * pagou tem de aparecer enquanto se olha agosto. */
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { api } from '@/lib/api'
 import {
@@ -22,6 +22,8 @@ import {
   deslocarCompetencia,
 } from '@/lib/dinheiro'
 import { useSessao } from './auth'
+import PainelShell from './PainelShell'
+import RelatorioContador from './RelatorioContador'
 import './admin.css'
 
 interface Lancamento {
@@ -52,7 +54,13 @@ interface Cliente {
 }
 
 const CATEGORIAS_ENTRADA = ['atendimento', 'mensalidade', 'outra']
-const CATEGORIAS_SAIDA = ['fornecedor', 'veículo', 'salário', 'imposto', 'outra']
+const CATEGORIAS_SAIDA = [
+  'fornecedor',
+  'veículo',
+  'salário',
+  'imposto',
+  'outra',
+]
 
 export default function AdminFinanceiro() {
   const navigate = useNavigate()
@@ -64,6 +72,7 @@ export default function AdminFinanceiro() {
   const [emAberto, setEmAberto] = useState<Lancamento[]>([])
   const [clientes, setClientes] = useState<Cliente[]>([])
   const [prontos, setProntos] = useState(false)
+  const [nomeFuneraria, setNomeFuneraria] = useState('Funerária')
   const [salvando, setSalvando] = useState(false)
 
   const [form, setForm] = useState({
@@ -99,6 +108,16 @@ export default function AdminFinanceiro() {
   useEffect(() => {
     if (usuario) recarregar().catch(() => setProntos(true))
   }, [usuario, recarregar])
+
+  /* Nome do tenant para o cabeçalho do relatório impresso: o contador recebe
+   * um PDF solto, e papel sem remetente não serve de nada. */
+  useEffect(() => {
+    if (!usuario) return
+    api
+      .get<{ config?: { nome?: string } }>('/api/admin/config')
+      .then((r) => r.config?.nome && setNomeFuneraria(r.config.nome))
+      .catch(() => {})
+  }, [usuario])
 
   useEffect(() => {
     if (!usuario) return
@@ -144,7 +163,9 @@ export default function AdminFinanceiro() {
       })
       await recarregar()
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : 'Não deu para atualizar.')
+      toast.error(
+        err instanceof Error ? err.message : 'Não deu para atualizar.',
+      )
     }
   }
 
@@ -176,28 +197,19 @@ export default function AdminFinanceiro() {
     }
   }
 
-  if (carregando || !usuario) return <div className="adm adm-carregando">Carregando…</div>
+  if (carregando || !usuario)
+    return <div className="adm adm-carregando">Carregando…</div>
 
   const saldo = resumo ? resumo.recebidoCentavos - resumo.saidasCentavos : 0
-  const categorias = form.tipo === 'entrada' ? CATEGORIAS_ENTRADA : CATEGORIAS_SAIDA
-  const atrasados = emAberto.filter((l) => l.vencimento && l.vencimento < hojeISO())
+  const categorias =
+    form.tipo === 'entrada' ? CATEGORIAS_ENTRADA : CATEGORIAS_SAIDA
+  const atrasados = emAberto.filter(
+    (l) => l.vencimento && l.vencimento < hojeISO(),
+  )
 
   return (
-    <div className="adm">
-      <header className="adm-top">
-        <div className="adm-top-in">
-          <a className="adm-marca" href="/">
-            <span className="adm-brand">Painel da funerária</span>
-          </a>
-          <div className="adm-top-acoes">
-            <Link className="adm-sair" to="/admin">Notas</Link>
-            <Link className="adm-sair" to="/admin/clientes">Clientes</Link>
-            <Link className="adm-sair" to="/admin/config">Configurações</Link>
-          </div>
-        </div>
-      </header>
-
-      <main className="adm-main">
+    <PainelShell usuario={usuario} titulo="Financeiro">
+      <>
         <div className="adm-acao-topo">
           <div>
             <h1>Financeiro</h1>
@@ -206,7 +218,9 @@ export default function AdminFinanceiro() {
           <div className="ges-mes">
             <button
               className="adm-btn adm-btn-fantasma adm-btn-mini"
-              onClick={() => setCompetencia(deslocarCompetencia(competencia, -1))}
+              onClick={() =>
+                setCompetencia(deslocarCompetencia(competencia, -1))
+              }
               aria-label="Mês anterior"
             >
               ←
@@ -219,7 +233,9 @@ export default function AdminFinanceiro() {
             </button>
             <button
               className="adm-btn adm-btn-fantasma adm-btn-mini"
-              onClick={() => setCompetencia(deslocarCompetencia(competencia, 1))}
+              onClick={() =>
+                setCompetencia(deslocarCompetencia(competencia, 1))
+              }
               aria-label="Próximo mês"
             >
               →
@@ -254,7 +270,8 @@ export default function AdminFinanceiro() {
             </div>
           </div>
           <p className="adm-dica">
-            Saldo considera o que já entrou de fato, não o que ainda está a receber.
+            Saldo considera o que já entrou de fato, não o que ainda está a
+            receber.
           </p>
         </section>
 
@@ -270,7 +287,8 @@ export default function AdminFinanceiro() {
                   setForm({
                     ...form,
                     tipo,
-                    categoria: tipo === 'entrada' ? 'atendimento' : 'fornecedor',
+                    categoria:
+                      tipo === 'entrada' ? 'atendimento' : 'fornecedor',
                   })
                 }}
               >
@@ -282,10 +300,14 @@ export default function AdminFinanceiro() {
               <span>Categoria</span>
               <select
                 value={form.categoria}
-                onChange={(e) => setForm({ ...form, categoria: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, categoria: e.target.value })
+                }
               >
                 {categorias.map((c) => (
-                  <option key={c} value={c}>{c}</option>
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
                 ))}
               </select>
             </label>
@@ -303,11 +325,15 @@ export default function AdminFinanceiro() {
                 <span>Cliente (opcional)</span>
                 <select
                   value={form.clienteId}
-                  onChange={(e) => setForm({ ...form, clienteId: e.target.value })}
+                  onChange={(e) =>
+                    setForm({ ...form, clienteId: e.target.value })
+                  }
                 >
                   <option value="">—</option>
                   {clientes.map((c) => (
-                    <option key={c.id} value={c.id}>{c.nome}</option>
+                    <option key={c.id} value={c.id}>
+                      {c.nome}
+                    </option>
                   ))}
                 </select>
               </label>
@@ -316,7 +342,9 @@ export default function AdminFinanceiro() {
               <span>Descrição</span>
               <input
                 value={form.descricao}
-                onChange={(e) => setForm({ ...form, descricao: e.target.value })}
+                onChange={(e) =>
+                  setForm({ ...form, descricao: e.target.value })
+                }
                 maxLength={240}
                 placeholder="Ex.: funeral completo — família Silva"
               />
@@ -359,15 +387,23 @@ export default function AdminFinanceiro() {
               {emAberto.map((l) => (
                 <li key={l.id}>
                   <div className="ges-lista-txt">
-                    <strong>{l.clienteNome ?? l.descricao ?? l.categoria}</strong>
+                    <strong>
+                      {l.clienteNome ?? l.descricao ?? l.categoria}
+                    </strong>
                     <span className="ges-meta">
                       {l.categoria} · {nomeCompetencia(l.competencia)}
-                      {l.vencimento ? ` · vence ${formatarData(l.vencimento)}` : ''}
-                      {l.vencimento && l.vencimento < hojeISO() ? ' · atrasado' : ''}
+                      {l.vencimento
+                        ? ` · vence ${formatarData(l.vencimento)}`
+                        : ''}
+                      {l.vencimento && l.vencimento < hojeISO()
+                        ? ' · atrasado'
+                        : ''}
                     </span>
                   </div>
                   <div className="adm-pend-acoes">
-                    <strong className="ges-valor">{formatarReais(l.valorCentavos)}</strong>
+                    <strong className="ges-valor">
+                      {formatarReais(l.valorCentavos)}
+                    </strong>
                     <button
                       className="adm-btn adm-btn-mini adm-btn-primario"
                       onClick={() => alternarPago(l)}
@@ -383,7 +419,8 @@ export default function AdminFinanceiro() {
 
         <section className="adm-bloco">
           <h2>
-            Lançamentos do mês <span className="adm-tag">{lancamentos.length}</span>
+            Lançamentos do mês{' '}
+            <span className="adm-tag">{lancamentos.length}</span>
           </h2>
           {!prontos ? (
             <p className="adm-vazio">Carregando…</p>
@@ -398,18 +435,24 @@ export default function AdminFinanceiro() {
                       {l.descricao ?? l.clienteNome ?? l.categoria}
                     </strong>
                     <span className="ges-meta">
-                      {l.tipo === 'entrada' ? 'entrada' : 'saída'} · {l.categoria}
+                      {l.tipo === 'entrada' ? 'entrada' : 'saída'} ·{' '}
+                      {l.categoria}
                       {l.clienteNome ? ` · ${l.clienteNome}` : ''}
-                      {l.pagoEm ? ` · pago em ${formatarData(l.pagoEm)}` : ' · em aberto'}
+                      {l.pagoEm
+                        ? ` · pago em ${formatarData(l.pagoEm)}`
+                        : ' · em aberto'}
                     </span>
                   </div>
                   <div className="adm-pend-acoes">
                     <strong
                       className={
-                        l.tipo === 'entrada' ? 'ges-valor ges-valor-in' : 'ges-valor ges-valor-out'
+                        l.tipo === 'entrada'
+                          ? 'ges-valor ges-valor-in'
+                          : 'ges-valor ges-valor-out'
                       }
                     >
-                      {l.tipo === 'entrada' ? '+' : '−'} {formatarReais(l.valorCentavos)}
+                      {l.tipo === 'entrada' ? '+' : '−'}{' '}
+                      {formatarReais(l.valorCentavos)}
                     </strong>
                     <button
                       className="adm-btn adm-btn-mini adm-btn-fantasma"
@@ -429,7 +472,12 @@ export default function AdminFinanceiro() {
             </ul>
           )}
         </section>
-      </main>
-    </div>
+        <RelatorioContador
+          competencia={competencia}
+          lancamentos={lancamentos}
+          nomeFuneraria={nomeFuneraria}
+        />
+      </>
+    </PainelShell>
   )
 }

@@ -661,3 +661,238 @@
   .adm .ges-lista > li { align-items: flex-start; }
   .adm .ges-form { grid-template-columns: 1fr; }
 }
+
+/* ================= LAYOUT COM BARRA LATERAL (18/08/2026) =================
+   Substitui o cabeçalho horizontal que cada página repetia. No desktop a barra
+   fica fixa à esquerda; abaixo de 900px vira gaveta, aberta pelo hambúrguer.
+
+   O conteúdo NÃO é empurrado por margin no mobile: a gaveta desliza por cima.
+   Empurrar reflui a página inteira a cada abertura, o que num celular fraco
+   pisca e perde a posição de rolagem. */
+
+.adm-layout { min-height: 100vh; }
+
+/* ---- barra lateral ---- */
+.adm .adm-lateral {
+  position: fixed;
+  inset: 0 auto 0 0;
+  width: 232px;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 22px 14px 18px;
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+}
+
+.adm .adm-lateral-marca {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 8px 18px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid var(--line-soft);
+  text-decoration: none;
+  color: inherit;
+}
+.adm .adm-lateral-marca img { width: 34px; height: 34px; object-fit: contain; }
+.adm .adm-lateral-marca span {
+  display: flex;
+  flex-direction: column;
+  font-family: var(--display, inherit);
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+.adm .adm-lateral-marca small {
+  font-size: 0.74rem;
+  color: var(--muted);
+  font-family: inherit;
+}
+
+.adm .adm-lateral-lista { list-style: none; margin: 0; padding: 0; flex: 1; }
+.adm .adm-lateral-link {
+  display: block;
+  padding: 10px 12px;
+  margin-bottom: 2px;
+  border-radius: 3px;
+  color: var(--ink);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+.adm .adm-lateral-link:hover { background: var(--cream); }
+
+/* Ativo marcado por peso + barra, não só por cor: a diferença precisa
+   sobreviver a quem não distingue bem matiz. */
+.adm .adm-lateral-ativo {
+  background: var(--cream);
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 var(--sage);
+}
+.adm .adm-lateral-link:focus-visible,
+.adm .adm-lateral-sair:focus-visible,
+.adm .adm-hamburguer:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.adm .adm-lateral-sair {
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  background: transparent;
+  color: var(--muted);
+  cursor: pointer;
+}
+.adm .adm-lateral-sair:hover { color: var(--ink); border-color: var(--ink); }
+
+/* ---- conteúdo ---- */
+.adm-layout .adm-main { margin-left: 232px; }
+
+/* ---- barra do celular ---- */
+.adm .adm-barra-mobile { display: none; }
+.adm .adm-veu { display: none; }
+
+.adm .adm-hamburguer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 44px;   /* alvo de toque de 44px: o mínimo que um polegar acerta */
+  height: 44px;
+  padding: 0 10px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.adm .adm-hamburguer span {
+  display: block;
+  height: 2px;
+  background: var(--ink);
+  border-radius: 2px;
+}
+
+@media (max-width: 900px) {
+  .adm .adm-barra-mobile {
+    position: sticky;
+    top: 0;
+    z-index: 30;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    height: 56px;
+    padding-right: 14px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--line);
+  }
+  .adm .adm-barra-titulo {
+    font-family: var(--display, inherit);
+    font-size: 1.02rem;
+  }
+
+  .adm .adm-lateral {
+    width: 262px;
+    transform: translateX(-100%);
+    transition: transform 0.18s ease;
+    box-shadow: 0 0 0 100vmax transparent;
+  }
+  .adm-layout-aberto .adm-lateral { transform: translateX(0); }
+
+  .adm-layout-aberto .adm-veu {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 35;
+    background: rgba(26, 23, 18, 0.38);
+  }
+
+  .adm-layout .adm-main { margin-left: 0; }
+}
+
+/* Quem pediu menos movimento não recebe o deslize da gaveta. */
+@media (prefers-reduced-motion: reduce) {
+  .adm .adm-lateral { transition: none; }
+}
+
+/* ================= RELATÓRIO PARA O CONTADOR (18/08/2026) ================= */
+
+.adm .rel-acoes { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+.adm .rel-atalhos { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+
+.adm .rel-lista { list-style: none; margin: 10px 0 0; padding: 0; }
+.adm .rel-lista > li { border-bottom: 1px solid var(--line-soft); }
+.adm .rel-lista > li:last-child { border-bottom: 0; }
+.adm .rel-lista label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 0;
+  cursor: pointer;
+}
+.adm .rel-lista input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  accent-color: var(--ink);
+}
+.adm .rel-lista-txt { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+
+/* Desmarcado fica visivelmente fora, sem sumir: a pessoa precisa ver o que
+   tirou para decidir se tirou certo. */
+.adm .rel-lista input:not(:checked) ~ .rel-lista-txt,
+.adm .rel-lista input:not(:checked) ~ .ges-valor {
+  opacity: 0.42;
+  text-decoration: line-through;
+}
+
+.adm .rel-totais {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 22px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
+  font-size: 0.92rem;
+  color: var(--muted);
+}
+.adm .rel-totais strong {
+  display: block;
+  font-size: 1.08rem;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.adm .rel-total-saldo strong { color: var(--sage); }
+
+/* ---- bloco que só existe no papel ---- */
+.adm .rel-imprimivel { display: none; }
+
+@media print {
+  /* Fora tudo que é navegação e formulário; fica só o extrato. */
+  .adm .adm-lateral,
+  .adm .adm-barra-mobile,
+  .adm .adm-veu { display: none !important; }
+  .adm-layout .adm-main { margin: 0 !important; padding: 0 !important; }
+  .adm .adm-main > *:not(.adm-bloco) { display: none !important; }
+  .adm .adm-bloco { border: 0 !important; padding: 0 !important; margin: 0 !important; }
+  .adm .adm-bloco > *:not(.rel-imprimivel) { display: none !important; }
+
+  .adm .rel-imprimivel { display: block !important; }
+  .adm .rel-imprimivel h1 { font-size: 17pt; margin: 0 0 2mm; }
+  .adm .rel-imp-sub { font-size: 11pt; margin: 0 0 6mm; }
+  .adm .rel-imprimivel table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+  .adm .rel-imprimivel th,
+  .adm .rel-imprimivel td {
+    text-align: left;
+    padding: 2mm 1.5mm;
+    border-bottom: 0.2mm solid #999;
+  }
+  .adm .rel-imprimivel .rel-num { text-align: right; white-space: nowrap; }
+  .adm .rel-imprimivel tfoot td { border-bottom: 0; padding-top: 3mm; }
+  /* Cabeçalho repetido em cada página: extrato de mês cheio vira duas folhas. */
+  .adm .rel-imprimivel thead { display: table-header-group; }
+  .adm .rel-imprimivel tr { break-inside: avoid; }
+  .adm .rel-imp-rodape { margin-top: 8mm; font-size: 8.5pt; color: #444; }
+}
