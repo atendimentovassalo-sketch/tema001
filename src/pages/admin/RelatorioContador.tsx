@@ -13,7 +13,8 @@
  * Nada aqui é "fechamento contábil": é extrato conferido por gente. O produto
  * não emite nota nem apura imposto, por decisão registrada em 17/08/2026.
  */
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { api } from '@/lib/api'
 import { formatarReais, formatarData, nomeCompetencia } from '@/lib/dinheiro'
 
 export interface LancamentoRel {
@@ -26,6 +27,14 @@ export interface LancamentoRel {
   competencia: string
   vencimento: string | null
   pagoEm: string | null
+}
+
+/** Último dia do mês de uma competência, em 'AAAA-MM-DD'. Dia 0 do mês
+ *  seguinte é o último do atual — resolve fevereiro e ano bissexto sem tabela. */
+function fimDoMes(competencia: string): string {
+  const [ano, mes] = competencia.split('-').map(Number)
+  const d = new Date(Date.UTC(ano, mes, 0))
+  return d.toISOString().slice(0, 10)
 }
 
 /** Valor em centavos -> "1234,56" (sem "R$", com vírgula decimal).
@@ -54,9 +63,48 @@ export default function RelatorioContador({
   const [fora, setFora] = useState<Set<string>>(new Set())
   const [aberto, setAberto] = useState(false)
 
+  /* Período livre. Nasce desligado: o mês fechado é o caso comum, e obrigar a
+   * escolher duas datas para o que já está na tela seria atrito à toa. */
+  const [porPeriodo, setPorPeriodo] = useState(false)
+  const [de, setDe] = useState(`${competencia}-01`)
+  const [ate, setAte] = useState(fimDoMes(competencia))
+  const [doPeriodo, setDoPeriodo] = useState<LancamentoRel[]>([])
+  const [buscando, setBuscando] = useState(false)
+  const [erroPeriodo, setErroPeriodo] = useState<string | null>(null)
+
+  /* Trocar o mês na tela reposiciona o intervalo sugerido — senão o período
+   * fica preso no mês em que a pessoa abriu a página. */
+  useEffect(() => {
+    setDe(`${competencia}-01`)
+    setAte(fimDoMes(competencia))
+  }, [competencia])
+
+  useEffect(() => {
+    if (!porPeriodo) return
+    if (de > ate) {
+      setErroPeriodo('A data inicial não pode ser depois da final.')
+      return
+    }
+    setErroPeriodo(null)
+    setBuscando(true)
+    let vivo = true
+    api
+      .get<{ lancamentos: LancamentoRel[] }>(
+        `/api/admin/financeiro/periodo?de=${de}&ate=${ate}`,
+      )
+      .then((r) => vivo && setDoPeriodo(r.lancamentos))
+      .catch(() => vivo && setErroPeriodo('Não deu para carregar o período.'))
+      .finally(() => vivo && setBuscando(false))
+    return () => {
+      vivo = false
+    }
+  }, [porPeriodo, de, ate])
+
+  const base = porPeriodo ? doPeriodo : lancamentos
+
   const incluidos = useMemo(
-    () => lancamentos.filter((l) => !fora.has(l.id)),
-    [lancamentos, fora],
+    () => base.filter((l) => !fora.has(l.id)),
+    [base, fora],
   )
 
   const totais = useMemo(() => {
@@ -78,11 +126,11 @@ export default function RelatorioContador({
   }
 
   const marcarTodos = () => setFora(new Set())
-  const desmarcarTodos = () => setFora(new Set(lancamentos.map((l) => l.id)))
+  const desmarcarTodos = () => setFora(new Set(base.map((l) => l.id)))
   /* "Só o que foi pago" é o recorte que o contador costuma pedir: regime de
    * caixa. Continua sendo escolha, não regra do sistema. */
   const soPagos = () =>
-    setFora(new Set(lancamentos.filter((l) => !l.pagoEm).map((l) => l.id)))
+    setFora(new Set(base.filter((l) => !l.pagoEm).map((l) => l.id)))
 
   function baixarCSV() {
     const linhas = [
@@ -120,12 +168,14 @@ export default function RelatorioContador({
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    a.download = `financeiro-${competencia}.csv`
+    a.download = porPeriodo
+      ? `financeiro-${de}_a_${ate}.csv`
+      : `financeiro-${competencia}.csv`
     a.click()
     URL.revokeObjectURL(url)
   }
 
-  if (lancamentos.length === 0) return null
+  if (lancamentos.length === 0 && !porPeriodo) return null
 
   return (
     <section className="adm-bloco">
@@ -137,6 +187,43 @@ export default function RelatorioContador({
         Escolha o que entra e baixe em planilha, ou imprima para salvar em PDF e
         mandar por WhatsApp.
       </p>
+
+      <label className="ges-check rel-periodo-liga">
+        <input
+          type="checkbox"
+          checked={porPeriodo}
+          onChange={(e) => setPorPeriodo(e.target.checked)}
+        />
+        <span>Usar um período em vez do mês fechado</span>
+      </label>
+
+      {porPeriodo && (
+        <div className="rel-periodo">
+          <label className="ges-campo">
+            <span>De</span>
+            <input
+              type="date"
+              value={de}
+              onChange={(e) => setDe(e.target.value)}
+            />
+          </label>
+          <label className="ges-campo">
+            <span>Até</span>
+            <input
+              type="date"
+              value={ate}
+              onChange={(e) => setAte(e.target.value)}
+            />
+          </label>
+          <p className="adm-dica rel-periodo-nota">
+            {erroPeriodo
+              ? erroPeriodo
+              : buscando
+                ? 'Carregando…'
+                : `${base.length} lançamento(s) no período. Conta pela data de pagamento; o que está em aberto entra pela data de vencimento.`}
+          </p>
+        </div>
+      )}
 
       <div className="rel-acoes">
         <button
@@ -171,7 +258,7 @@ export default function RelatorioContador({
             </button>
           </div>
           <ul className="rel-lista">
-            {lancamentos.map((l) => (
+            {base.map((l) => (
               <li key={l.id}>
                 <label>
                   <input
@@ -218,7 +305,10 @@ export default function RelatorioContador({
       <div className="rel-imprimivel">
         <h1>{nomeFuneraria}</h1>
         <p className="rel-imp-sub">
-          Relatório financeiro — {nomeCompetencia(competencia)}
+          Relatório financeiro —{' '}
+          {porPeriodo
+            ? `${formatarData(de)} a ${formatarData(ate)}`
+            : nomeCompetencia(competencia)}
         </p>
         <table>
           <thead>

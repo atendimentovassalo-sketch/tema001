@@ -952,3 +952,17 @@
   font-weight: 600;
   color: #8a3a2f;
 }
+
+/* ---- relatório por período livre (18/08/2026) ---- */
+.adm .rel-periodo-liga { margin-top: 14px; }
+.adm .rel-periodo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+  padding: 14px;
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+}
+.adm .rel-periodo-nota { grid-column: 1 / -1; margin: 0; }

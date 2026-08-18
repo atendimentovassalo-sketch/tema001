@@ -549,7 +549,7 @@ function MemorialModerno({
       <section id="compartilhar" className="mv3-sec">
         <div className="mv3-w">
           <span className="mv3-cap">Compartilhar</span>
-          <h2 className="mv3-h2">Espalhe a notícia</h2>
+          <h2 className="mv3-h2">Compartilhe a notícia</h2>
           <div className="mv3-duo">
             <a
               className="mv3-btn mv3-btn--sage"

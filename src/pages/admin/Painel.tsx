@@ -73,6 +73,25 @@ export default function AdminPainel() {
     recarregar()
   }
 
+  /* Gera o link de 30 dias e já copia: o passo seguinte é sempre colar no
+   * WhatsApp da família, e obrigar a selecionar o texto na tela é atrito puro. */
+  async function linkDaFamilia(m: MemorialItem) {
+    try {
+      const r = await api.post<{ ok: true; url: string; dias: number }>(
+        `/api/admin/memoriais/${m.id}/familia`,
+      )
+      try {
+        await navigator.clipboard.writeText(r.url)
+        toast.success(`Link copiado — vale ${r.dias} dias.`)
+      } catch {
+        /* clipboard bloqueado (http, permissão): mostra para copiar na mão */
+        toast.success(`Link gerado: ${r.url}`)
+      }
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Não deu para gerar o link.')
+    }
+  }
+
   async function apagar(m: MemorialItem) {
     if (
       !confirm(
@@ -201,6 +220,13 @@ export default function AdminPainel() {
                         onClick={() => alternarPublicacao(m)}
                       >
                         {m.status === 'publicado' ? 'Despublicar' : 'Publicar'}
+                      </button>
+                      <button
+                        className="adm-link"
+                        onClick={() => linkDaFamilia(m)}
+                        title="Gera um link de 30 dias para a família escrever a história, subir fotos e esconder mensagens"
+                      >
+                        Link da família
                       </button>
                       <button
                         className="adm-link adm-link-perigo"

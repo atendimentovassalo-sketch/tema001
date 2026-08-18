@@ -22,6 +22,8 @@ export interface DadosMensagem {
   vencimento: string | null
   /** Link do memorial, quando a mensagem for sobre uma nota publicada. */
   memorialUrl?: string | null
+  /** Link da área da família (token de 30 dias), quando já emitido. */
+  familiaUrl?: string | null
 }
 
 export interface Modelo {
@@ -88,6 +90,26 @@ export const MODELOS: Modelo[] = [
           `Pode compartilhar com a família e com quem mais quiser.\n\n` +
           `Se quiser mudar alguma coisa — uma data, uma foto, o texto — me avisa ` +
           `que eu ajusto.\n\n— ${d.funeraria}`
+        : null,
+  },
+  {
+    id: 'familia',
+    rotulo: 'Acesso da família ao memorial',
+    texto: (d) =>
+      d.familiaUrl
+        ? `Oi, ${primeiroNome(d.clienteNome)}. Este é o link para vocês cuidarem da página:
+` +
+          `${d.familiaUrl}
+
+` +
+          `Por ele dá para escrever a história, acrescentar fotos e esconder alguma ` +
+          `mensagem que não queiram na página. Não precisa de senha.
+
+` +
+          `O link vale por 30 dias e é só de vocês — se precisar de outro depois, ` +
+          `me chama que eu gero.
+
+— ${d.funeraria}`
         : null,
   },
 ]

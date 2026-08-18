@@ -1,0 +1,159 @@
+/* Área da família. Escopada em .fam para não encostar no memorial nem no painel.
+   Mobile primeiro de verdade: quem abre isto está no celular, no velório. */
+
+.fam {
+  --cream: #faf8f3;
+  --paper: #fff;
+  --ink: #1a1712;
+  --muted: #565049;
+  --line: #e4e0d6;
+  --sage: #8a6828;
+
+  min-height: 100vh;
+  padding: 22px 18px 60px;
+  margin: 0 auto;
+  max-width: 720px;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: Figtree, system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+.fam-centro {
+  display: grid;
+  place-items: center;
+  text-align: center;
+}
+.fam-caixa {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 32px 26px;
+  max-width: 420px;
+}
+
+.fam-topo { padding: 10px 0 22px; }
+.fam-cap {
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sage);
+  margin: 0 0 6px;
+}
+.fam h1 { font-size: clamp(24px, 6vw, 32px); margin: 0 0 10px; line-height: 1.2; }
+.fam h2 { font-size: 1.12rem; margin: 0 0 6px; }
+.fam-sub { color: var(--muted); margin: 0 0 14px; }
+.fam-dica { color: var(--muted); font-size: 0.9rem; margin: 0 0 12px; }
+.fam-ver { color: var(--sage); font-size: 0.92rem; }
+
+.fam-bloco {
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 20px 18px;
+  margin-bottom: 18px;
+}
+
+.fam textarea,
+.fam input[type='file'] {
+  width: 100%;
+  font: inherit;
+  color: var(--ink);
+  background: var(--cream);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 12px;
+}
+.fam textarea { resize: vertical; min-height: 160px; }
+.fam textarea:focus-visible,
+.fam button:focus-visible,
+.fam input:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.fam-acoes { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+.fam-btn,
+.fam button {
+  font: inherit;
+  font-size: 0.95rem;
+  /* 44px de altura: alvo de toque que o polegar acerta sem mirar. */
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 4px;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  cursor: pointer;
+}
+.fam button:disabled { opacity: 0.55; cursor: default; }
+.fam-ok { color: #2f5d3a; font-size: 0.92rem; }
+.fam-aviso {
+  background: #fdf1ee;
+  border: 1px solid #e0b6ab;
+  color: #8a3a2f;
+  border-radius: 4px;
+  padding: 12px 14px;
+  margin-bottom: 16px;
+}
+
+.fam-galeria {
+  list-style: none;
+  margin: 0 0 16px;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+.fam-galeria li { position: relative; }
+.fam-galeria img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 4px;
+  display: block;
+}
+.fam-galeria button {
+  position: absolute;
+  right: 6px;
+  bottom: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  font-size: 0.78rem;
+  background: rgba(26, 23, 18, 0.82);
+  border-color: transparent;
+}
+
+.fam-homenagens { list-style: none; margin: 0; padding: 0; }
+.fam-homenagens li {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+}
+.fam-homenagens li:last-child { border-bottom: 0; }
+.fam-homenagens p { margin: 4px 0 0; }
+.fam-homenagens button {
+  flex: none;
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--line);
+}
+/* Escondida fica esmaecida, não sumida: a família precisa ver o que escondeu
+   para poder voltar atrás. */
+.fam-oculta > div { opacity: 0.5; }
+.fam-marca {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 0.78rem;
+  color: var(--sage);
+}
+
+.fam-rodape {
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-align: center;
+  margin-top: 26px;
+}

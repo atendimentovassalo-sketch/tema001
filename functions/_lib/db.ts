@@ -1296,6 +1296,31 @@ const SELECT_LANCAMENTO = `
     FROM lancamento l
     LEFT JOIN cliente c ON c.id = l.cliente_id AND c.tenant_id = l.tenant_id`
 
+/** Lançamentos entre duas datas, para o relatório de período livre.
+ *
+ * A data considerada é a do PAGAMENTO quando existe, e a do vencimento quando
+ * ainda está em aberto — é assim que o contador lê um extrato: "o que entrou e
+ * saiu entre X e Y", com o que está pendente aparecendo na data em que deveria
+ * ter caído. Usar `criado_em` colocaria no período a data em que a funerária
+ * digitou, que não interessa a ninguém. */
+export async function listLancamentosPorPeriodo(
+  env: Env,
+  tenantId: string,
+  de: string,
+  ate: string,
+): Promise<LancamentoDTO[]> {
+  const rows = await env.DB.prepare(
+    `${SELECT_LANCAMENTO}
+      WHERE l.tenant_id = ?
+        AND COALESCE(l.pago_em, l.vencimento, l.competencia || '-01') BETWEEN ? AND ?
+      ORDER BY COALESCE(l.pago_em, l.vencimento, l.competencia || '-01'),
+               l.criado_em`,
+  )
+    .bind(tenantId, de, ate)
+    .all<LancamentoRow>()
+  return rows.results.map(toLancamentoDTO)
+}
+
 export async function listLancamentos(
   env: Env,
   tenantId: string,
@@ -1465,4 +1490,179 @@ export async function getResumoFinanceiro(
     aReceberCentavos: t?.a_receber ?? 0,
     clientesComPlano: p?.n ?? 0,
   }
+}
+
+/* ---------- acesso da família ao memorial (link com token) ---------- */
+/* Ver migrations/0010_acesso_familia.sql para as decisões. Escopo deliberado:
+ * história, fotos e ocultar homenagem — daquele memorial e de mais nada. */
+
+export interface AcessoFamilia {
+  memorialId: string
+  tenantId: string
+  slug: string
+  nomeCompleto: string
+  historia: string | null
+  expira: string
+}
+
+/** Resolve o token. Devolve null se não existe ou se venceu — a distinção não
+ *  interessa a quem está do outro lado, e revelá-la só ajudaria quem chuta. */
+export async function getAcessoFamilia(
+  env: Env,
+  token: string,
+): Promise<AcessoFamilia | null> {
+  const row = await env.DB.prepare(
+    `SELECT id, tenant_id, slug, nome_completo, historia, familia_expira
+       FROM memorial
+      WHERE familia_token = ? AND familia_expira > datetime('now')
+      LIMIT 1`,
+  )
+    .bind(token)
+    .first<{
+      id: string
+      tenant_id: string
+      slug: string
+      nome_completo: string
+      historia: string | null
+      familia_expira: string
+    }>()
+  if (!row) return null
+  return {
+    memorialId: row.id,
+    tenantId: row.tenant_id,
+    slug: row.slug,
+    nomeCompleto: row.nome_completo,
+    historia: row.historia,
+    expira: row.familia_expira,
+  }
+}
+
+/** Emite (ou reemite) o link. Sobrescrever invalida o anterior de imediato. */
+export async function emitirTokenFamilia(
+  env: Env,
+  tenantId: string,
+  memorialId: string,
+  token: string,
+  dias = 30,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `UPDATE memorial
+        SET familia_token = ?, familia_expira = datetime('now', ?)
+      WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(token, `+${dias} days`, tenantId, memorialId)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+export async function revogarTokenFamilia(
+  env: Env,
+  tenantId: string,
+  memorialId: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE memorial SET familia_token = NULL, familia_expira = NULL
+      WHERE tenant_id = ? AND id = ?`,
+  )
+    .bind(tenantId, memorialId)
+    .run()
+}
+
+export async function atualizarHistoriaPelaFamilia(
+  env: Env,
+  memorialId: string,
+  historia: string | null,
+): Promise<void> {
+  await env.DB.prepare(`UPDATE memorial SET historia = ? WHERE id = ?`)
+    .bind(historia, memorialId)
+    .run()
+}
+
+/** Homenagens já publicadas daquele memorial, para a família poder ocultar. */
+export async function listHomenagensDoMemorial(
+  env: Env,
+  memorialId: string,
+): Promise<{ id: string; nome: string; texto: string | null; vela: boolean; oculta: boolean }[]> {
+  const rows = await env.DB.prepare(
+    `SELECT id, nome, texto, vela, status FROM homenagem
+      WHERE memorial_id = ? AND status IN ('aprovada', 'oculta')
+      ORDER BY criado_em DESC`,
+  )
+    .bind(memorialId)
+    .all<{ id: string; nome: string; texto: string | null; vela: number; status: string }>()
+  return rows.results.map((r) => ({
+    id: r.id,
+    nome: r.nome,
+    texto: r.texto,
+    vela: !!r.vela,
+    oculta: r.status === 'oculta',
+  }))
+}
+
+/** Ocultar/reexibir — nunca DELETE, conforme a regra do projeto. O `memorial_id`
+ *  no WHERE é o que impede um token de mexer na homenagem de outro falecido. */
+export async function ocultarHomenagemPelaFamilia(
+  env: Env,
+  memorialId: string,
+  homenagemId: string,
+  ocultar: boolean,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `UPDATE homenagem SET status = ?
+      WHERE id = ? AND memorial_id = ? AND status IN ('aprovada', 'oculta')`,
+  )
+    .bind(ocultar ? 'oculta' : 'aprovada', homenagemId, memorialId)
+    .run()
+  return (r.meta.changes ?? 0) > 0
+}
+
+/** Fotos do memorial, para a tela da família. */
+export async function listFotosDoMemorial(
+  env: Env,
+  memorialId: string,
+): Promise<{ id: string; url: string }[]> {
+  const rows = await env.DB.prepare(
+    `SELECT id, url FROM foto WHERE memorial_id = ? ORDER BY ordem ASC`,
+  )
+    .bind(memorialId)
+    .all<{ id: string; url: string }>()
+  return rows.results
+}
+
+/** Acrescenta foto ao fim da galeria. Devolve false se estourou o teto. */
+export async function adicionarFotoPelaFamilia(
+  env: Env,
+  memorialId: string,
+  url: string,
+  maximo: number,
+): Promise<boolean> {
+  const n = await env.DB.prepare(
+    `SELECT count(*) AS n FROM foto WHERE memorial_id = ?`,
+  )
+    .bind(memorialId)
+    .first<{ n: number }>()
+  const atual = n?.n ?? 0
+  if (atual >= maximo) return false
+
+  await env.DB.prepare(
+    `INSERT INTO foto (id, memorial_id, url, alt, ordem) VALUES (?, ?, ?, NULL, ?)`,
+  )
+    .bind(crypto.randomUUID(), memorialId, url, atual)
+    .run()
+  return true
+}
+
+/** A família só remove foto daquele memorial — o `memorial_id` no WHERE é o
+ *  que garante isso mesmo se alguém adivinhar o id de uma foto alheia. */
+export async function removerFotoPelaFamilia(
+  env: Env,
+  memorialId: string,
+  fotoId: string,
+): Promise<boolean> {
+  const r = await env.DB.prepare(
+    `DELETE FROM foto WHERE id = ? AND memorial_id = ?`,
+  )
+    .bind(fotoId, memorialId)
+    .run()
+  return (r.meta.changes ?? 0) > 0
 }

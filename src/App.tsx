@@ -8,6 +8,7 @@ import MemorialPage from './pages/memorial/MemorialPage'
 import NovoMemorial from './pages/memorial/NovoMemorial'
 import Obituario from './pages/memorial/Obituario'
 import AprovarHomenagem from './pages/memorial/AprovarHomenagem'
+import AreaFamilia from './pages/memorial/AreaFamilia'
 import HomeV2 from './pages/memorial/HomeV2'
 import AdminLogin from './pages/admin/Login'
 import AdminPainel from './pages/admin/Painel'
@@ -36,6 +37,7 @@ const App = () => (
         <Route path="/m/:slug" element={<MemorialPage />} />
         <Route path="/memorial/novo" element={<NovoMemorial />} />
         <Route path="/aprovar/:token" element={<AprovarHomenagem />} />
+        <Route path="/familia/:token" element={<AreaFamilia />} />
         {/* Painel administrativo da funerária */}
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/recuperar" element={<AdminRecuperar />} />
