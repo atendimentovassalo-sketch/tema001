@@ -168,6 +168,9 @@ export default function MemorialLegado({
           nome,
           texto: texto || null,
           vela: data.vela,
+          /* O legado não tem escolha de desenho: cai no padrão. Estas duas
+             notas ficaram no visual antigo por decisão de 09/08. */
+          velaTipo: null,
           criadoEmISO: new Date().toISOString(),
           status: 'aprovada',
         },

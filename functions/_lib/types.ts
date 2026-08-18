@@ -155,6 +155,8 @@ export interface HomenagemDTO {
   nome: string
   texto: string | null
   vela: boolean
+  /** Desenho da vela escolhido. NULL = padrão (ver migration 0012). */
+  velaTipo: string | null
   criadoEmISO: string
   status: 'pendente' | 'aprovada' | 'recusada'
 }

@@ -44,6 +44,9 @@ export interface Homenagem {
   vela: boolean
   criadoEmISO: string
   status: 'pendente' | 'aprovada' | 'recusada'
+  /** Desenho escolhido por quem acendeu. null = padrão (homenagens antigas
+   *  e as que vieram antes da escolha existir). */
+  velaTipo: string | null
 }
 
 export interface Memorial {

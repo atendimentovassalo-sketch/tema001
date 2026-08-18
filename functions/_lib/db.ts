@@ -54,6 +54,7 @@ function toHomenagemDTO(h: HomenagemRow): HomenagemDTO {
     nome: h.nome,
     texto: h.texto,
     vela: !!h.vela,
+    velaTipo: (h as { vela_tipo?: string | null }).vela_tipo ?? null,
     criadoEmISO: h.criado_em,
     status: h.status as HomenagemDTO['status'],
   }
@@ -376,6 +377,8 @@ export interface NovaHomenagem {
   nome: string
   texto: string | null
   vela: boolean
+  /** Desenho escolhido por quem acendeu. NULL = padrão (ver migration 0012). */
+  velaTipo: string | null
   status: 'pendente' | 'aprovada'
   aprovarToken: string | null
   ipHash: string | null
@@ -387,8 +390,8 @@ export async function inserirHomenagem(
   h: NovaHomenagem,
 ): Promise<void> {
   await env.DB.prepare(
-    `INSERT INTO homenagem (id, memorial_id, tenant_id, nome, texto, vela, status, aprovar_token, ip_hash)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO homenagem (id, memorial_id, tenant_id, nome, texto, vela, vela_tipo, status, aprovar_token, ip_hash)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
   )
     .bind(
       id,
@@ -397,6 +400,7 @@ export async function inserirHomenagem(
       h.nome,
       h.texto,
       h.vela ? 1 : 0,
+      h.velaTipo,
       h.status,
       h.aprovarToken,
       h.ipHash,

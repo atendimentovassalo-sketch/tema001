@@ -96,6 +96,22 @@ export function mesAnoBR(iso: string | null): string {
   }).format(d)
 }
 
+/** 'AAAA-MM-DD' -> 'mar. 1946'. Versão curta do mês+ano, para o intervalo do
+ *  herói, onde "março de 1946 — agosto de 2026" ficaria longo demais e quebraria
+ *  em duas linhas no celular. */
+export function mesAnoCurtoBR(iso: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (isNaN(d.getTime())) return ''
+  const p = new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo',
+    month: 'short',
+    year: 'numeric',
+  }).formatToParts(d)
+  const g = (t: string) => p.find((x) => x.type === t)?.value ?? ''
+  return `${g('month').replace('.', '')}. ${g('year')}`
+}
+
 export function anoBR(iso: string | null): string {
   if (!iso) return ''
   const d = new Date(iso)

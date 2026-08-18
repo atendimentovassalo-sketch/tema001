@@ -2095,3 +2095,73 @@
   font-size: 0.92rem;
   text-align: center;
 }
+
+/* ---- velas em SVG (18/08/2026) ---- */
+.memorial-root .vsvg { display: block; }
+.memorial-root .vsvg-chama {
+  transform-origin: 16px 12px;
+  animation: vsvg-bruxa 2.4s ease-in-out infinite;
+}
+@keyframes vsvg-bruxa {
+  0%, 100% { transform: scaleY(1) translateX(0); opacity: 1; }
+  35%      { transform: scaleY(1.1) translateX(-0.4px); opacity: 0.92; }
+  70%      { transform: scaleY(0.94) translateX(0.4px); opacity: 0.97; }
+}
+/* Um GIF continuaria tremulando aqui; o SVG obedece. */
+@media (prefers-reduced-motion: reduce) {
+  .memorial-root .vsvg-chama { animation: none; }
+}
+
+/* escolha do desenho */
+.memorial-root .mv3-velas-escolha {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+.memorial-root .mv3-vela-opcao {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 12px 8px;
+  border: 1px solid var(--hair, #E4E0D6);
+  border-radius: 8px;
+  background: #fff;
+  cursor: pointer;
+  min-width: 74px;
+}
+.memorial-root .mv3-vela-opcao input { position: absolute; opacity: 0; pointer-events: none; }
+.memorial-root .mv3-vela-opcao span { font-size: 0.78rem; color: var(--muted, #565049); }
+/* Selecionado por borda e fundo, não só por cor de texto. */
+.memorial-root .mv3-vela-opcao--on {
+  border-color: var(--marca, #8A6828);
+  box-shadow: inset 0 0 0 1px var(--marca, #8A6828);
+  background: #FFFBF2;
+}
+.memorial-root .mv3-vela-opcao:focus-within {
+  outline: 2px solid var(--ink, #1A1712);
+  outline-offset: 2px;
+}
+
+/* Estado vazio do mural: o mural é multi-coluna, e sem isto o parágrafo era
+   partido ao meio entre as duas colunas. */
+.memorial-root.mv3 .mv3-vazio { column-span: all; break-inside: avoid; }
+
+/* Disposição do formulário de homenagem (18/08/2026): o aviso legal era um
+   parágrafo do tamanho do formulário logo antes do botão, e empurrava o "enviar"
+   para fora da tela no celular. Agora ele é nota discreta ao lado do botão. */
+.memorial-root.mv3 .mv3-nota-priv {
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.75;
+  margin: 14px 0 0;
+}
+.memorial-root.mv3 .mv3-enviar--org {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 16px;
+  margin-top: 14px;
+}
+.memorial-root.mv3 .mv3-vela-rot { margin-top: 22px; }

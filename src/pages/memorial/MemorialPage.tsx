@@ -6,11 +6,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { toast } from 'sonner'
 import { fetchMemorial, fetchMemorialAdmin, enviarHomenagem } from './api'
+import { Vela, TIPOS_VELA, TIPO_VELA_PADRAO } from './velas'
 import { montarTextoWhatsapp } from './share'
 import { ApiError } from '@/lib/api'
 import type { Homenagem, Memorial } from './types'
 import {
   anoBR,
+  mesAnoCurtoBR,
   dataHoraBR,
   dataLongaBR,
   mesAnoBR,
@@ -38,6 +40,7 @@ const homenagemSchema = z
       .optional()
       .default(''),
     vela: z.boolean().default(true),
+    velaTipo: z.string().default(TIPO_VELA_PADRAO),
     // honeypot anti-spam: humanos não preenchem
     website: z.string().max(0).optional().default(''),
   })
@@ -147,10 +150,22 @@ function MemorialModerno({
     handleSubmit,
     reset,
     formState: { errors, isSubmitting },
+    watch,
   } = useForm<HomenagemForm>({
     resolver: zodResolver(homenagemSchema),
-    defaultValues: { nome: '', texto: '', vela: true, website: '' },
+    defaultValues: {
+      nome: '',
+      texto: '',
+      vela: true,
+      velaTipo: TIPO_VELA_PADRAO,
+      website: '',
+    },
   })
+
+  /* A escolha do desenho só aparece com a vela ligada, e o cartão selecionado
+     precisa saber qual é — daí os dois observados. */
+  const velaLigada = watch('vela')
+  const velaEscolhida = watch('velaTipo')
 
   // Feed visível: toda homenagem com vela, e mensagens já aprovadas.
   const visiveis = useMemo(
@@ -210,6 +225,7 @@ function MemorialModerno({
           nome,
           texto: texto || null,
           vela: data.vela,
+          velaTipo: data.vela ? data.velaTipo : null,
           criadoEmISO: new Date().toISOString(),
           status: 'aprovada',
         },
@@ -218,7 +234,13 @@ function MemorialModerno({
       toast.success(
         'Prévia — na página publicada a homenagem é registrada de verdade.',
       )
-      reset({ nome: '', texto: '', vela: true, website: '' })
+      reset({
+        nome: '',
+        texto: '',
+        vela: true,
+        velaTipo: TIPO_VELA_PADRAO,
+        website: '',
+      })
       return
     }
 
@@ -285,12 +307,15 @@ function MemorialModerno({
             {memorial.apelido && (
               <p className="mv3-apelido">&ldquo;{memorial.apelido}&rdquo;</p>
             )}
+            {/* Mês e ano nos dois lados do intervalo (18/08/2026). Só o ano
+                dizia pouco; o dia do NASCIMENTO continua fora, por ser vetor de
+                fraude ao lado do nome completo (decisão de 12/08). */}
             <p className="mv3-datas num">
-              <b>{anoBR(memorial.nascimentoISO)}</b>
+              <b>{mesAnoCurtoBR(memorial.nascimentoISO)}</b>
               {memorial.nascimentoISO && (
                 <span className="mv3-bar" aria-hidden="true" />
               )}
-              <b>{anoBR(memorial.falecimentoISO)}</b>
+              <b>{mesAnoCurtoBR(memorial.falecimentoISO)}</b>
               {memorial.idade != null && <span> · {memorial.idade} anos</span>}
             </p>
             {memorial.epitafio && (
@@ -477,9 +502,15 @@ function MemorialModerno({
               onSubmit={handleSubmit(onSubmit)}
               noValidate
             >
+              {/* Recado curto e no topo: quem chega aqui muitas vezes trava no
+                  "não sei o que escrever". Frase de exemplo resolve, mas só se
+                  vier ANTES do campo — depois dele, ninguém lê. */}
               <p className="mv3-dica">
-                Não sabe o que escrever? Basta uma frase de carinho —
-                &ldquo;Meus sentimentos, {primeiroNome} vai fazer falta.&rdquo;
+                Não sabe o que escrever? Uma frase basta —{' '}
+                <em>
+                  &ldquo;Meus sentimentos, {primeiroNome} vai fazer
+                  falta.&rdquo;
+                </em>
               </p>
               <label>
                 <span className="sr">Sua mensagem</span>
@@ -518,9 +549,9 @@ function MemorialModerno({
               />
 
               <div id="velas" className="mv3-vela-rot">
-                Acenda uma vela junto com sua mensagem{' '}
+                Acender uma vela{' '}
                 <span style={{ opacity: 0.6, fontWeight: 400 }}>
-                  (gratuita)
+                  — gratuito, e aparece na hora
                 </span>
               </div>
               <label className="mv3-vela-toggle">
@@ -530,10 +561,34 @@ function MemorialModerno({
                     🕯️ Acender uma vela em memória de {primeiroNome}
                   </span>
                   <span className="ds">
-                    A vela é gratuita e aparece na hora, junto da homenagem.
+                    Escolha abaixo o desenho, se quiser.
                   </span>
                 </span>
               </label>
+
+              {velaLigada && (
+                <fieldset className="mv3-velas-escolha">
+                  <legend className="sr">Desenho da vela</legend>
+                  {TIPOS_VELA.map((t) => (
+                    <label
+                      key={t.id}
+                      className={
+                        velaEscolhida === t.id
+                          ? 'mv3-vela-opcao mv3-vela-opcao--on'
+                          : 'mv3-vela-opcao'
+                      }
+                    >
+                      <input
+                        type="radio"
+                        value={t.id}
+                        {...register('velaTipo')}
+                      />
+                      <Vela tipo={t.id} tamanho={30} />
+                      <span>{t.nome}</span>
+                    </label>
+                  ))}
+                </fieldset>
+              )}
 
               <p className="mv3-nota-priv">
                 {memorial.moderarMensagens
@@ -544,7 +599,7 @@ function MemorialModerno({
                 <Link to="/privacidade">Política de Privacidade</Link>.
               </p>
 
-              <div className="mv3-enviar">
+              <div className="mv3-enviar mv3-enviar--org">
                 <button
                   className="mv3-btn mv3-btn--ouro"
                   type="submit"
@@ -570,7 +625,11 @@ function MemorialModerno({
                     key={h.id}
                   >
                     <div className="mv3-av">
-                      {h.vela ? <Chama /> : iniciais(h.nome) || '·'}
+                      {h.vela ? (
+                        <Vela tipo={h.velaTipo} tamanho={26} />
+                      ) : (
+                        iniciais(h.nome) || '·'
+                      )}
                     </div>
                     <div>
                       <span className="mv3-msg-quem">{h.nome}</span>

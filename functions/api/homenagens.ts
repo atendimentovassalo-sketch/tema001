@@ -16,6 +16,9 @@ const schema = z
     nome: z.string().trim().min(1, 'Diga como você quer assinar.').max(80),
     texto: z.string().trim().max(600, 'Máximo de 600 caracteres.').optional().default(''),
     vela: z.boolean().optional().default(true),
+    /* Desenho da vela. Texto livre curto: a tela valida a lista, e um id
+     * desconhecido cai no desenho padrão em vez de quebrar a página. */
+    velaTipo: z.string().trim().max(24).nullable().optional().default(null),
     // honeypot anti-spam: humano não preenche
     website: z.string().max(0).optional().default(''),
   })
@@ -71,6 +74,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     nome: dados.nome.trim(),
     texto,
     vela: dados.vela,
+    velaTipo: dados.vela ? (dados.velaTipo ?? null) : null,
     status,
     aprovarToken,
     ipHash: ip,
@@ -81,6 +85,7 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
     nome: dados.nome.trim(),
     texto,
     vela: dados.vela,
+    velaTipo: dados.vela ? (dados.velaTipo ?? null) : null,
     criadoEmISO: new Date().toISOString(),
     status,
   }
