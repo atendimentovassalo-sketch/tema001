@@ -27,7 +27,10 @@ export const onRequestPost: PagesFunction<Env, string, AdminData> = async ({
   if (!ok) return erro('Memorial não encontrado.', 404)
 
   const origem = new URL(request.url).origin
-  return json({ ok: true, url: `${origem}/familia/${token}`, dias: DIAS }, 201)
+  /* `/memorial/familia/...` e não `/familia/...`: no domínio da funerária só
+   * alguns prefixos passam pelo Worker, e a raiz não é um deles — um link em
+   * /familia/ cairia no site institucional. Ver comentário no App.tsx. */
+  return json({ ok: true, url: `${origem}/memorial/familia/${token}`, dias: DIAS }, 201)
 }
 
 export const onRequestDelete: PagesFunction<Env, string, AdminData> = async ({

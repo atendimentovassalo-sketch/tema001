@@ -37,6 +37,15 @@ const App = () => (
         <Route path="/m/:slug" element={<MemorialPage />} />
         <Route path="/memorial/novo" element={<NovoMemorial />} />
         <Route path="/aprovar/:token" element={<AprovarHomenagem />} />
+        {/* Sob /memorial/ de propósito: no domínio da funerária, quem passa
+            pelo Worker são /obituario*, /m/*, /memorial/*, /admin*, /api/* e
+            /assets/*. Um caminho /familia/* na raiz cairia no site estático —
+            testado em 18/08/2026. Mexer na lista de rotas do Worker para abrir
+            um caminho novo é o tipo de alteração que derruba o site da cliente
+            se sair errada; usar um prefixo já roteado não custa nada. */}
+        <Route path="/memorial/familia/:token" element={<AreaFamilia />} />
+        {/* Compatibilidade: em hosts onde a raiz é roteada (pages.dev), o
+            caminho curto também funciona. */}
         <Route path="/familia/:token" element={<AreaFamilia />} />
         {/* Painel administrativo da funerária */}
         <Route path="/admin/login" element={<AdminLogin />} />
