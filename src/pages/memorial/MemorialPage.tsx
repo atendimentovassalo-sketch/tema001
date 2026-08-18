@@ -1,5 +1,5 @@
 /* Página pública do memorial. Front-end apenas: estado local + mock, sem backend. */
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useParams, useSearchParams, Link } from 'react-router-dom'
 import { toast } from 'sonner'
 import { fetchMemorial, fetchMemorialAdmin, enviarHomenagem } from './api'
@@ -30,6 +30,47 @@ const ROT: Record<string, string> = {
 /* Validação e estado do formulário: `useFormHomenagem`, escrito à mão.
  * As regras são as mesmas de antes — ver aquele arquivo para o porquê de não
  * usar biblioteca nesta página. */
+
+/** A barra fixa de "Deixar uma homenagem" só aparece quando ela serve para
+ *  alguma coisa: com as ações do herói ainda na tela ela repete, a um dedo de
+ *  distância, um botão idêntico que a pessoa está vendo — e come 71 px da
+ *  primeira dobra do celular, cobrindo justamente "Acender uma vela" e
+ *  "Compartilhar". Com o formulário na tela ela também sobra: a pessoa já
+ *  chegou onde a barra levaria.
+ *
+ *  Observa os dois blocos ao mesmo tempo; a barra é o que fica no meio. */
+function useBarraFixa(
+  heroi: React.RefObject<HTMLElement | null>,
+  formulario: React.RefObject<HTMLElement | null>,
+  /** Os dois alvos só existem depois que o memorial chega; sem isto o efeito
+   *  rodaria uma vez no esqueleto, não acharia nada e nunca mais rodaria. */
+  pronto: boolean,
+) {
+  const [mostrar, setMostrar] = useState(false)
+
+  useEffect(() => {
+    const alvos = [heroi.current, formulario.current].filter(
+      Boolean,
+    ) as Element[]
+    if (alvos.length === 0) return
+
+    /* O callback só recebe quem MUDOU de estado, por isso o conjunto: sem ele,
+     * o segundo alvo apagaria a resposta do primeiro. */
+    const naTela = new Set<Element>()
+    const obs = new IntersectionObserver((entradas) => {
+      for (const e of entradas) {
+        if (e.isIntersecting) naTela.add(e.target)
+        else naTela.delete(e.target)
+      }
+      setMostrar(naTela.size === 0)
+    })
+
+    alvos.forEach((a) => obs.observe(a))
+    return () => obs.disconnect()
+  }, [heroi, formulario, pronto])
+
+  return mostrar
+}
 
 /** Chama de vela em CSS puro, bruxuleando (respeita prefers-reduced-motion).
  *  Fica no contador do herói: ali o que se conta é o número, e a vela animada
@@ -85,6 +126,13 @@ function MemorialModerno({
     memorialOverride?.homenagens ?? [],
   )
   const [historiaAberta, setHistoriaAberta] = useState(false)
+  const acoesHeroiRef = useRef<HTMLDivElement>(null)
+  const formularioRef = useRef<HTMLElement>(null)
+  const mostrarBarraFixa = useBarraFixa(
+    acoesHeroiRef,
+    formularioRef,
+    !carregando && memorial != null,
+  )
 
   useEffect(() => {
     if (memorialOverride) {
@@ -290,7 +338,7 @@ function MemorialModerno({
             {memorial.epitafio && (
               <p className="mv3-epitafio">&ldquo;{memorial.epitafio}&rdquo;</p>
             )}
-            <div className="mv3-acoes">
+            <div className="mv3-acoes" ref={acoesHeroiRef}>
               <a className="mv3-btn mv3-btn--ouro" href="#homenagear">
                 Deixar uma homenagem
               </a>
@@ -453,7 +501,11 @@ function MemorialModerno({
         {/* livro de homenagens: composição (mensagem + vela) e o mural com o
           feed. Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
           Homenagem só-vela (sem mensagem) fica diferenciada. */}
-        <section id="homenagear" className="mv3-sec mv3-livro">
+        <section
+          id="homenagear"
+          className="mv3-sec mv3-livro"
+          ref={formularioRef}
+        >
           <div className="mv3-w">
             <span className="mv3-cap">Homenagens</span>
             <h2 className="mv3-h2">Deixe uma mensagem para a família</h2>
@@ -703,9 +755,14 @@ function MemorialModerno({
         )}
 
         {/* CTA fixo no mobile — o botão do herói some ao rolar e a homenagem
-          fica a milhares de pixels; a barra mantém a ação sempre à mão */}
+          fica a milhares de pixels; a barra mantém a ação sempre à mão. Só no
+          trecho em que ela serve: ver `useBarraFixa`. */}
         {!preview && (
-          <nav className="mv3-mobicta" aria-label="Ação rápida">
+          <nav
+            className={`mv3-mobicta${mostrarBarraFixa ? '' : ' mv3-mobicta--fora'}`}
+            aria-label="Ação rápida"
+            aria-hidden={!mostrarBarraFixa}
+          >
             <a className="mv3-btn mv3-btn--ouro" href="#homenagear">
               Deixar uma homenagem
             </a>

@@ -1312,13 +1312,19 @@
 /* ---- herói: retrato circular, claro, sem moldura escura ---- */
 .memorial-root.mv3 .mv3-hero {
   text-align: center;
-  padding-block: clamp(30px, 5vw, 50px) clamp(22px, 4vw, 34px);
+  padding-block: clamp(20px, 5vw, 50px) clamp(22px, 4vw, 34px);
 }
+/* RETRATO EM PÉ, NÃO REDONDO (18/08/2026).
+   As fotos que chegam são verticais — a da Marli é 800x1000. O círculo cortava
+   um retrato 4:5 em quadrado e depois arredondava: sobrava a cabeça encostada
+   na borda de cima e o corpo cortado embaixo. O 4:5 mostra a foto como ela foi
+   tirada, e um retrato emoldurado diz "fotografia de memória"; o círculo diz
+   "foto de perfil". */
 .memorial-root.mv3 .mv3-portrait {
-  width: clamp(148px, 42vw, 190px);
-  aspect-ratio: 1;
-  margin: 0 auto 22px;
-  border-radius: 50%;
+  width: clamp(146px, 40vw, 200px);
+  aspect-ratio: 4 / 5;
+  margin: 0 auto 18px;
+  border-radius: 14px;
   overflow: hidden;
   background: var(--linha);
   border: 1px solid var(--linha);
@@ -1982,7 +1988,12 @@
   margin-top: 0;
 }
 
-/* ---- CTA fixo mobile ---- */
+/* ---- CTA fixo mobile ----
+   Quem decide QUANDO a barra aparece é `useBarraFixa`, em MemorialPage.tsx: no
+   herói ela repetia um botão idêntico que estava na tela e cobria "Acender uma
+   vela"/"Compartilhar"; no formulário, a pessoa já chegou onde a barra levaria.
+   O espaço embaixo (padding-bottom em .memorial-root.mv3) fica reservado o
+   tempo todo — devolvê-lo ao rolar empurraria a página sob o dedo. */
 .memorial-root.mv3 .mv3-mobicta {
   display: none;
   position: fixed;
@@ -1994,6 +2005,20 @@
   background: color-mix(in srgb, var(--papel) 92%, transparent);
   backdrop-filter: blur(10px);
   border-top: 1px solid var(--linha);
+  transition:
+    transform 220ms ease,
+    opacity 220ms ease,
+    visibility 220ms;
+}
+/* visibility, e não só opacity: escondida, a barra também sai da ordem de
+   tabulação — botão invisível que recebe foco é armadilha de teclado. */
+.memorial-root.mv3 .mv3-mobicta--fora {
+  transform: translateY(110%);
+  opacity: 0;
+  visibility: hidden;
+}
+@media (prefers-reduced-motion: reduce) {
+  .memorial-root.mv3 .mv3-mobicta { transition: none; }
 }
 .memorial-root.mv3 .mv3-mobicta .mv3-btn {
   width: 100%;
