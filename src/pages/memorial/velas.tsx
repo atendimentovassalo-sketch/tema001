@@ -77,9 +77,11 @@ export function Vela({
   forma?: 'circulo' | 'placa'
   grande?: boolean
 }) {
-  /* O destaque usa a arte de 192 px; ela só existe na clássica, que é a única
-   * vela que aparece ali. */
-  const nome = grande ? 'branca-g' : arquivoDe(tipo)
+  /* O destaque usa a arte de 192 px, e segue o desenho escolhido: ver a vela
+   * grande mudar na hora em que se escolhe é o que deixa claro que a escolha
+   * vai junto com a homenagem. Só a vela escolhida é baixada — as outras
+   * quatro artes grandes só saem do servidor se a pessoa trocar. */
+  const nome = arquivoDe(tipo) + (grande ? '-g' : '')
 
   return (
     <picture>

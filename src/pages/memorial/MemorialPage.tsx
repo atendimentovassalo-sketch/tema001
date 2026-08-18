@@ -582,7 +582,7 @@ function MemorialModerno({
                 </span>
               </div>
               <div className="mv3-vela-destaque">
-                <Vela grande tamanho={88} />
+                <Vela grande tamanho={88} tipo={velaEscolhida} />
                 <p>
                   A vela fica acesa na página de {primeiroNome}, com o seu nome,
                   para quem visitar depois.
