@@ -1769,6 +1769,43 @@
 .memorial-root.mv3 .mv3-compor label:first-of-type {
   margin-top: 0;
 }
+/* ---- FORMULÁRIO PARA QUEM TEM 70 ANOS (18/08/2026) ----
+   Rótulo VISÍVEL em cima de cada campo. O placeholder sozinho some no primeiro
+   caractere digitado, e a partir daí ninguém sabe mais o que era aquele campo —
+   é o erro clássico de formulário, e pesa mais em quem enxerga menos. */
+.memorial-root.mv3 .mv3-compor .mv3-rot {
+  display: block;
+  font-family: var(--a);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+  margin: 18px 0 6px;
+}
+.memorial-root.mv3 .mv3-compor .mv3-rot:first-of-type { margin-top: 0; }
+.memorial-root.mv3 .mv3-op { font-weight: 400; opacity: 0.62; }
+
+/* A homenagem NÃO foi publicada — e a pessoa precisa saber disso, não deduzir.
+   Vermelho, no topo do formulário, com role=alert para o leitor de tela anunciar
+   sem esperar. O foco vai junto para o campo (ver MemorialPage). */
+.memorial-root.mv3 .mv3-falhou {
+  font-family: var(--a);
+  font-size: 0.98rem;
+  line-height: 1.5;
+  color: #7d2a22;
+  background: #fdf1ee;
+  border: 1px solid #e0b6ab;
+  border-left: 4px solid #a8402f;
+  border-radius: 10px;
+  padding: 13px 15px;
+  margin: 0 0 4px;
+}
+/* Campo em erro precisa se distinguir sem depender só da cor. */
+.memorial-root.mv3 .mv3-compor [aria-invalid='true'] {
+  border-color: #a8402f;
+  box-shadow: inset 0 0 0 1px #a8402f;
+}
+.memorial-root.mv3 .mv3-erro { font-size: 0.88rem; }
+
 /* Rótulo só para leitor de tela: o campo saiu de dentro do <label> quando a
    associação virou for/id (18/08), então o espaço entre os campos, que vinha da
    margem do label, passa a ser do próprio campo. O label fica com altura zero. */
@@ -1796,7 +1833,9 @@
 .memorial-root.mv3 .mv3-compor input[type='text'] {
   width: 100%;
   font-family: var(--g);
-  font-size: 1.04rem;
+  /* 1,12rem: o texto que a pessoa digita é o conteúdo dela, e este formulário é
+     lido por muita gente de 70 anos. */
+  font-size: 1.12rem;
   color: var(--ink);
   background: var(--papel);
   border: 1px solid var(--linha);
@@ -2209,43 +2248,6 @@
   color: #fff;
   font-size: 0.92rem;
   text-align: center;
-}
-
-/* ---- vela e mensagem lado a lado (18/08/2026) ----
-   Duas ações irmãs, dois cartões. No celular empilham, com a vela em cima: é a
-   ação mais barata, e quem chega pelo botão "Acender uma vela" do herói tem de
-   cair nela, não num formulário de texto. */
-.memorial-root.mv3 .mv3-dupla {
-  display: grid;
-  gap: 16px;
-  align-items: start;
-}
-@media (min-width: 860px) {
-  .memorial-root.mv3 .mv3-dupla {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-.memorial-root.mv3 .mv3-compor--vela {
-  border-color: var(--marca-d);
-  background: linear-gradient(180deg, #fffbf2, var(--vellum) 46%);
-}
-.memorial-root.mv3 .mv3-h3-acao {
-  font-family: var(--g);
-  font-size: 1.24rem;
-  font-weight: 500;
-  margin: 0;
-}
-.memorial-root.mv3 .mv3-sub-acao {
-  font-family: var(--a);
-  font-size: 0.9rem;
-  color: var(--muted, #565049);
-  margin: 4px 0 0;
-}
-/* O <legend> herda o desenho do rótulo da seção; dentro do fieldset ele precisa
-   voltar a ser um rótulo comum, sem o recuo que o navegador dá por padrão. */
-.memorial-root.mv3 .mv3-velas-escolha > .mv3-vela-rot {
-  padding: 0;
-  margin: 0 0 4px;
 }
 
 /* ---- velas animadas (18/08/2026) ----
