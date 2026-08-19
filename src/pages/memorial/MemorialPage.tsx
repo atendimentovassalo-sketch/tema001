@@ -374,28 +374,28 @@ function MemorialModerno({
               </a>
             </div>
 
-            {/* contador: velas · mensagens · visitas */}
+            {/* Contador: velas e mensagens. VISITAS SAIU DA PÁGINA PÚBLICA
+                (decisão do Felipe, 18/08, restaurando a v5): número baixo de
+                visitas transmite abandono à família, e visitas é métrica da
+                funerária — continua contada e continua visível no painel dela.
+
+                Os dois que ficaram viraram links para a ação correspondente: um
+                número que convida a agir vale mais que um número que só informa. */}
             <div className="mv3-contador">
-              <div className="mv3-cel-vela">
+              <a className="mv3-cel-vela" href="#vela">
                 {/* A chama fica NA LINHA do número, não acima: acima, ela
-                    empurrava "6 / VELAS ACESAS" para baixo e os três números do
+                    empurrava "6 / VELAS ACESAS" para baixo e os números do
                     contador não se alinhavam entre si. */}
                 <b className="num">
                   <Chama />
                   {totalVelas}
                 </b>
                 <span>{totalVelas === 1 ? 'vela acesa' : 'velas acesas'}</span>
-              </div>
-              <div>
+              </a>
+              <a href="#homenagear">
                 <b className="num">{totalMensagens}</b>
                 <span>{totalMensagens === 1 ? 'mensagem' : 'mensagens'}</span>
-              </div>
-              <div>
-                <b className="num">
-                  {memorial.visitas.toLocaleString('pt-BR')}
-                </b>
-                <span>{memorial.visitas === 1 ? 'visita' : 'visitas'}</span>
-              </div>
+              </a>
             </div>
           </div>
         </section>

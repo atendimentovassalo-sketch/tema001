@@ -1472,13 +1472,25 @@
   box-shadow: var(--card-shadow);
   overflow: hidden;
 }
-.memorial-root.mv3 .mv3-contador > div {
+.memorial-root.mv3 .mv3-contador > a {
   flex: 1;
   text-align: center;
   padding: 18px 8px;
   border-left: 1px solid var(--linha);
+  /* São links desde 18/08 (levam à vela e à mensagem), mas não devem parecer
+     texto clicável de artigo: quem manda no visual é o cartão inteiro. */
+  text-decoration: none;
+  color: inherit;
+  transition: background 140ms ease;
 }
-.memorial-root.mv3 .mv3-contador > div:first-child {
+.memorial-root.mv3 .mv3-contador > a:hover {
+  background: color-mix(in srgb, var(--marca) 6%, transparent);
+}
+.memorial-root.mv3 .mv3-contador > a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -3px;
+}
+.memorial-root.mv3 .mv3-contador > a:first-child {
   border-left: 0;
 }
 .memorial-root.mv3 .mv3-contador b {
@@ -1503,7 +1515,7 @@
 /* `> div > span` e nao `span`: a chama tambem e um <span>, mas mora dentro do
    <b> do numero. Sem o filho direto ela herdava a margem e a opacidade do
    rotulo — e eram esses 5 px de margem que desalinhavam a celula das velas. */
-.memorial-root.mv3 .mv3-contador > div > span {
+.memorial-root.mv3 .mv3-contador > a > span {
   font-family: var(--a);
   font-size: 0.6rem;
   font-weight: 600;
@@ -2076,9 +2088,9 @@
   .memorial-root.mv3 .mv3-btn { min-height: 46px; }
 
   /* o contador some 40 px sem perder nenhum dos três números */
-  .memorial-root.mv3 .mv3-contador > div { padding: 9px 6px; }
+  .memorial-root.mv3 .mv3-contador > a { padding: 9px 6px; }
   .memorial-root.mv3 .mv3-contador b { font-size: 1.38rem; }
-  .memorial-root.mv3 .mv3-contador > div > span { margin-top: 5px; }
+  .memorial-root.mv3 .mv3-contador > a > span { margin-top: 5px; }
 
   /* ---- fim da página ----
      Sobravam uns 200 px de nada entre a caixa de autorização e o rodapé: o
