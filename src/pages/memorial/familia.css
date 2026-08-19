@@ -103,6 +103,16 @@
 @media (max-width: 560px) {
   .fam-btn--ver { display: flex; width: 100%; }
 }
+/* Rótulo só para leitor de tela (18/08). O texto da seção já explica o campo
+   para quem enxerga; quem usa leitor de tela precisa do rótulo no campo. */
+.fam-rot-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
 .fam-ok { color: #2f5d3a; font-size: 0.92rem; }
 .fam-aviso {
   background: #fdf1ee;

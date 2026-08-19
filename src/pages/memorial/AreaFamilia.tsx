@@ -216,7 +216,11 @@ export default function AreaFamilia() {
 
         {podeSubir ? (
           <>
+            <label className="fam-rot-sr" htmlFor="fam-foto">
+              Escolher uma foto do celular
+            </label>
             <input
+              id="fam-foto"
               ref={arquivoRef}
               type="file"
               accept="image/jpeg,image/png,image/webp"
@@ -245,7 +249,11 @@ export default function AreaFamilia() {
         <p className="fam-dica">
           Se preferir deixar em branco, tudo bem também.
         </p>
+        <label className="fam-rot-sr" htmlFor="fam-historia">
+          A história de {memorial.nomeCompleto}
+        </label>
         <textarea
+          id="fam-historia"
           value={historia}
           onChange={(e) => setHistoria(e.target.value)}
           rows={9}

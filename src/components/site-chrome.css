@@ -1,6 +1,33 @@
 /* Cabecalho e rodape do site institucional, reaproveitados no app.
    Extraidos do funerariacatanduvas.com.br e escopados em .sfc para nao
    colidir com o CSS do memorial/painel. */
+
+/* Skip-link (18/08/2026). Fora da tela ate receber foco — a convencao — para
+   nao acrescentar elemento visivel a uma pagina que foi despoluida de proposito.
+   Ao aparecer, aparece POR CIMA de tudo (z-index alto): sob o cabecalho fixo ele
+   existiria sem ser visto, que e o mesmo que nao existir. */
+.sfc-pular {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+  padding: 12px 18px;
+  background: var(--ink, #1A1712);
+  color: var(--paper, #FAF8F3);
+  text-decoration: none;
+  border-radius: 0 0 6px 0;
+  font-size: 0.95rem;
+}
+.sfc-pular:focus,
+.sfc-pular:focus-visible {
+  left: 0;
+  outline: 2px solid var(--paper, #FAF8F3);
+  outline-offset: -4px;
+}
+/* O alvo recebe foco por tabIndex -1; sem isto o navegador desenha um anel em
+   volta da pagina inteira depois do salto. */
+.sfc #conteudo:focus { outline: none; }
+
 .sfc{--paper:#FAF8F3;    
   --p2:#F3F0E8;       
   --p3:#EAE6DA;       

@@ -219,6 +219,24 @@ function SiteFooterMinimo() {
 /** Casca completa: cabeçalho e rodapé do site em volta do conteúdo do app.
  *  minimal=true → versão íntima (memorial): topo só com o nome, rodapé discreto,
  *  e apenas o botão flutuante do WhatsApp (sem barra dupla nem menu). */
+/** Primeiro elemento focável da página: pula cabeçalho e vai ao conteúdo.
+ *
+ *  POR QUE (18/08/2026, achado pelo gate `verifica-memorial` no fechamento):
+ *  sem ele, quem navega por teclado ou leitor de tela atravessa o cabeçalho e o
+ *  botão flutuante do WhatsApp a cada página antes de chegar ao que veio ler —
+ *  numa nota de falecimento, isso é atravessar a marca da funerária para chegar
+ *  ao nome do falecido.
+ *
+ *  Fica escondido até receber foco: é a convenção, e evita mais um elemento na
+ *  tela de uma página que passou o dia sendo despoluída. */
+function PularParaConteudo() {
+  return (
+    <a className="sfc-pular" href="#conteudo">
+      Pular para o conteúdo
+    </a>
+  )
+}
+
 export function SiteShell({
   children,
   aqui,
@@ -231,8 +249,11 @@ export function SiteShell({
   if (minimal) {
     return (
       <div className="sfc">
+        <PularParaConteudo />
         <SiteHeaderMinimo />
-        {children}
+        <div id="conteudo" tabIndex={-1}>
+          {children}
+        </div>
         <SiteFooterMinimo />
         <a
           className="wa-float"
@@ -248,8 +269,14 @@ export function SiteShell({
   }
   return (
     <div className="sfc">
+      <PularParaConteudo />
       <SiteHeader aqui={aqui} />
-      {children}
+      {/* tabIndex -1 para o alvo receber o foco de verdade ao saltar; sem isso o
+          navegador rola até lá mas o foco fica onde estava, e a próxima tecla
+          volta para o cabeçalho. */}
+      <div id="conteudo" tabIndex={-1}>
+        {children}
+      </div>
       <SiteFooter />
       <SiteBarras />
     </div>

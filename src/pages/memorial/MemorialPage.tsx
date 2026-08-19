@@ -549,33 +549,55 @@ function MemorialModerno({
                   falta.&rdquo;
                 </em>
               </p>
-              <label>
+              {/* `for`/`id` explícitos, e não só o <label> por fora (18/08/2026,
+                  achado pelo gate no fechamento): a associação implícita funciona
+                  hoje, mas quebra em silêncio se o campo sair de dentro do label
+                  numa reorganização — e este formulário foi reorganizado duas
+                  vezes esta semana. `aria-describedby` liga o erro ao campo, para
+                  o leitor de tela anunciar o motivo junto, não solto no fim. */}
+              <label className="mv3-rot-sr" htmlFor="hom-texto">
                 <span className="sr">Sua mensagem</span>
-                <textarea
-                  placeholder="Escreva aqui uma lembrança, uma oração ou uma palavra de conforto…"
-                  value={valores.texto}
-                  onChange={(e) => campo('texto', e.target.value)}
-                  maxLength={600}
-                />
-                {erros.texto && <span className="mv3-erro">{erros.texto}</span>}
               </label>
-              <label>
+              <textarea
+                id="hom-texto"
+                placeholder="Escreva aqui uma lembrança, uma oração ou uma palavra de conforto…"
+                value={valores.texto}
+                onChange={(e) => campo('texto', e.target.value)}
+                maxLength={600}
+                aria-invalid={erros.texto ? true : undefined}
+                aria-describedby={erros.texto ? 'hom-texto-erro' : undefined}
+              />
+              {erros.texto && (
+                <span className="mv3-erro" id="hom-texto-erro">
+                  {erros.texto}
+                </span>
+              )}
+              <label className="mv3-rot-sr" htmlFor="hom-nome">
                 <span className="sr">Seu nome</span>
-                <input
-                  type="text"
-                  placeholder="Como você quer assinar"
-                  value={valores.nome}
-                  onChange={(e) => campo('nome', e.target.value)}
-                  maxLength={80}
-                />
-                {erros.nome && <span className="mv3-erro">{erros.nome}</span>}
               </label>
-              {/* honeypot invisível */}
+              <input
+                id="hom-nome"
+                type="text"
+                placeholder="Como você quer assinar"
+                value={valores.nome}
+                onChange={(e) => campo('nome', e.target.value)}
+                maxLength={80}
+                autoComplete="name"
+                aria-invalid={erros.nome ? true : undefined}
+                aria-describedby={erros.nome ? 'hom-nome-erro' : undefined}
+              />
+              {erros.nome && (
+                <span className="mv3-erro" id="hom-nome-erro">
+                  {erros.nome}
+                </span>
+              )}
+              {/* honeypot invisível — sem label de propósito: só robô preenche */}
               <input
                 type="text"
                 tabIndex={-1}
                 autoComplete="off"
                 aria-hidden="true"
+                title="Deixe este campo em branco"
                 style={{
                   position: 'absolute',
                   left: '-9999px',

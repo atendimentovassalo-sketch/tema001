@@ -1757,6 +1757,21 @@
 .memorial-root.mv3 .mv3-compor label:first-of-type {
   margin-top: 0;
 }
+/* Rótulo só para leitor de tela: o campo saiu de dentro do <label> quando a
+   associação virou for/id (18/08), então o espaço entre os campos, que vinha da
+   margem do label, passa a ser do próprio campo. O label fica com altura zero. */
+.memorial-root.mv3 .mv3-compor label.mv3-rot-sr {
+  display: block;
+  margin: 0;
+  height: 0;
+}
+.memorial-root.mv3 .mv3-compor label.mv3-rot-sr + textarea,
+.memorial-root.mv3 .mv3-compor label.mv3-rot-sr + input[type='text'] {
+  margin-top: 12px;
+}
+.memorial-root.mv3 .mv3-compor .mv3-dica + label.mv3-rot-sr + textarea {
+  margin-top: 0;
+}
 .memorial-root.mv3 .mv3-compor .sr {
   position: absolute;
   width: 1px;

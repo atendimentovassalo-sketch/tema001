@@ -134,9 +134,10 @@ export default function PreviaFamilia() {
         .
       </p>
       <div className="apf-campos">
-        <label>
+        <label htmlFor="apf-nome">
           Seu nome
           <input
+            id="apf-nome"
             value={nome}
             onChange={(e) => setNome(e.target.value)}
             maxLength={90}
@@ -144,9 +145,10 @@ export default function PreviaFamilia() {
             placeholder="Como você quer assinar"
           />
         </label>
-        <label>
+        <label htmlFor="apf-parentesco">
           Parentesco <span className="apf-op">(opcional)</span>
           <input
+            id="apf-parentesco"
             value={parentesco}
             onChange={(e) => setParentesco(e.target.value)}
             maxLength={60}
