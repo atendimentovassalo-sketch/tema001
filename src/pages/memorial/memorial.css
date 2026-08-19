@@ -2199,6 +2199,43 @@
   text-align: center;
 }
 
+/* ---- vela e mensagem lado a lado (18/08/2026) ----
+   Duas ações irmãs, dois cartões. No celular empilham, com a vela em cima: é a
+   ação mais barata, e quem chega pelo botão "Acender uma vela" do herói tem de
+   cair nela, não num formulário de texto. */
+.memorial-root.mv3 .mv3-dupla {
+  display: grid;
+  gap: 16px;
+  align-items: start;
+}
+@media (min-width: 860px) {
+  .memorial-root.mv3 .mv3-dupla {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.memorial-root.mv3 .mv3-compor--vela {
+  border-color: var(--marca-d);
+  background: linear-gradient(180deg, #fffbf2, var(--vellum) 46%);
+}
+.memorial-root.mv3 .mv3-h3-acao {
+  font-family: var(--g);
+  font-size: 1.24rem;
+  font-weight: 500;
+  margin: 0;
+}
+.memorial-root.mv3 .mv3-sub-acao {
+  font-family: var(--a);
+  font-size: 0.9rem;
+  color: var(--muted, #565049);
+  margin: 4px 0 0;
+}
+/* O <legend> herda o desenho do rótulo da seção; dentro do fieldset ele precisa
+   voltar a ser um rótulo comum, sem o recuo que o navegador dá por padrão. */
+.memorial-root.mv3 .mv3-velas-escolha > .mv3-vela-rot {
+  padding: 0;
+  margin: 0 0 4px;
+}
+
 /* ---- velas animadas (18/08/2026) ----
    A arte vem com fundo preto chapado, sem transparência. É isso que decide as
    duas formas: no medalhão o preto VIRA o disco, e no seletor o quadrado
@@ -2215,7 +2252,7 @@
   display: flex;
   align-items: center;
   gap: 16px;
-  margin: 12px 0 4px;
+  margin: 16px 0 4px;
 }
 /* O item do flex é o <picture>, não a <img> — `flex: none` na imagem não
    segurava nada, e no celular a vela encolhia de 88 para 43 px. Quem cede

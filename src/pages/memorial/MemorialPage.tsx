@@ -44,15 +44,15 @@ const ROT: Record<string, string> = {
  *  pessoa lê o mural a barra serve; enquanto ela escreve, não. */
 function useBarraFixa(
   heroi: React.RefObject<HTMLElement | null>,
-  formulario: React.RefObject<HTMLElement | null>,
-  /** Os dois alvos só existem depois que o memorial chega; sem isto o efeito
+  formularios: React.RefObject<HTMLElement | null>[],
+  /** Os alvos só existem depois que o memorial chega; sem isto o efeito
    *  rodaria uma vez no esqueleto, não acharia nada e nunca mais rodaria. */
   pronto: boolean,
 ) {
   const [mostrar, setMostrar] = useState(false)
 
   useEffect(() => {
-    const alvos = [heroi.current, formulario.current].filter(
+    const alvos = [heroi.current, ...formularios.map((f) => f.current)].filter(
       Boolean,
     ) as Element[]
     if (alvos.length === 0) return
@@ -70,7 +70,10 @@ function useBarraFixa(
 
     alvos.forEach((a) => obs.observe(a))
     return () => obs.disconnect()
-  }, [heroi, formulario, pronto])
+    /* `formularios` é literal novo a cada render; a lista de dependências usa o
+       tamanho, que é o que de fato muda. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [heroi, formularios.length, pronto])
 
   return mostrar
 }
@@ -139,10 +142,11 @@ function MemorialModerno({
   )
   const [historiaAberta, setHistoriaAberta] = useState(false)
   const acoesHeroiRef = useRef<HTMLDivElement>(null)
-  const formularioRef = useRef<HTMLFormElement>(null)
+  const formVelaRef = useRef<HTMLFormElement>(null)
+  const formMsgRef = useRef<HTMLFormElement>(null)
   const mostrarBarraFixa = useBarraFixa(
     acoesHeroiRef,
-    formularioRef,
+    [formVelaRef, formMsgRef],
     !carregando && memorial != null,
   )
 
@@ -187,13 +191,14 @@ function MemorialModerno({
     }
   }, [memorial])
 
-  const { valores, erros, enviando, setEnviando, campo, limpar, validar } =
-    useFormHomenagem(TIPO_VELA_PADRAO)
+  /* Duas ações irmãs, dois formulários, dois estados. Antes era um só, com a
+     vela como caixa de seleção dentro do formulário de mensagem — quem só queria
+     acender uma vela caía num formulário que pedia texto. Ver `useFormHomenagem`. */
+  const fVela = useFormHomenagem('vela', TIPO_VELA_PADRAO)
+  const fMsg = useFormHomenagem('mensagem', TIPO_VELA_PADRAO)
 
-  /* A escolha do desenho só aparece com a vela ligada, e o cartão selecionado
-     precisa saber qual é — daí os dois observados. */
-  const velaLigada = valores.vela
-  const velaEscolhida = valores.velaTipo
+  /** O cartão selecionado e o destaque grande precisam saber qual desenho é. */
+  const velaEscolhida = fVela.valores.velaTipo
 
   // Feed visível: toda homenagem com vela, e mensagens já aprovadas.
   const visiveis = useMemo(
@@ -242,13 +247,20 @@ function MemorialModerno({
   const textoZap = encodeURIComponent(montarTextoWhatsapp(memorial, f))
   const primeiroNome = memorial.apelido ?? memorial.nomeCompleto.split(' ')[0]
 
-  const onSubmit = async (ev: React.FormEvent) => {
+  /* Um envio só, os dois formulários. O que muda entre eles é o que vai no
+     corpo e o aviso que aparece depois — o resto (honeypot, prévia, inserção no
+     mural, tratamento de erro) é idêntico, e duplicar isso seria pedir para as
+     duas versões divergirem na primeira correção. */
+  const enviar = (modo: 'vela' | 'mensagem') => async (ev: React.FormEvent) => {
     ev.preventDefault()
-    const data = validar()
+    const form = modo === 'vela' ? fVela : fMsg
+    const data = form.validar()
     if (!data) return
     if (data.website) return // honeypot: bot detectado, descarta em silêncio
+
     const nome = data.nome.trim()
-    const texto = data.texto.trim()
+    const texto = modo === 'mensagem' ? data.texto.trim() : ''
+    const vela = modo === 'vela'
 
     // Na prévia (memorial ainda não salvo) insere só localmente para visualizar.
     if (preview) {
@@ -257,8 +269,8 @@ function MemorialModerno({
           id: `p-${Date.now()}`,
           nome,
           texto: texto || null,
-          vela: data.vela,
-          velaTipo: data.vela ? data.velaTipo : null,
+          vela,
+          velaTipo: vela ? data.velaTipo : null,
           criadoEmISO: new Date().toISOString(),
           status: 'aprovada',
         },
@@ -267,37 +279,35 @@ function MemorialModerno({
       toast.success(
         'Prévia — na página publicada a homenagem é registrada de verdade.',
       )
-      limpar()
+      form.limpar()
       return
     }
 
-    setEnviando(true)
+    form.setEnviando(true)
     try {
       const r = await enviarHomenagem({
         memorialSlug: memorial.slug,
         nome,
         texto: texto || undefined,
-        vela: data.vela,
-        velaTipo: data.vela ? data.velaTipo : null,
+        vela,
+        velaTipo: vela ? data.velaTipo : null,
       })
       // vela sempre entra no feed; mensagem moderada fica oculta até aprovar
       setHomenagens((prev) => [r.homenagem, ...prev])
 
-      if (r.moderada) {
+      if (vela) {
+        toast.success('Vela acesa', {
+          description: 'Obrigado por deixar sua luz.',
+        })
+      } else if (r.moderada) {
         toast.success('Mensagem enviada', {
           description:
             'Aparece assim que a família confirmar — costuma levar poucos minutos.',
         })
-      } else if (texto && data.vela) {
-        toast.success('Vela acesa e mensagem publicada')
-      } else if (texto) {
-        toast.success('Mensagem publicada')
       } else {
-        toast.success('Vela acesa', {
-          description: 'Obrigado por deixar sua luz.',
-        })
+        toast.success('Mensagem publicada')
       }
-      limpar()
+      form.limpar()
     } catch (err) {
       toast.error(
         err instanceof ApiError
@@ -305,7 +315,7 @@ function MemorialModerno({
           : 'Não foi possível enviar agora.',
       )
     } finally {
-      setEnviando(false)
+      form.setEnviando(false)
     }
   }
 
@@ -356,7 +366,7 @@ function MemorialModerno({
               <a className="mv3-btn mv3-btn--ouro" href="#homenagear">
                 Deixar uma homenagem
               </a>
-              <a className="mv3-btn mv3-btn--sage" href="#velas">
+              <a className="mv3-btn mv3-btn--sage" href="#vela">
                 Acender uma vela
               </a>
               <a className="mv3-btn mv3-btn--linha" href="#compartilhar">
@@ -523,7 +533,7 @@ function MemorialModerno({
         <section id="homenagear" className="mv3-sec mv3-livro">
           <div className="mv3-w">
             <span className="mv3-cap">Homenagens</span>
-            <h2 className="mv3-h2">Deixe uma mensagem para a família</h2>
+            <h2 className="mv3-h2">Deixe uma homenagem</h2>
             {visiveis.length > 0 && (
               <p className="mv3-contagem">
                 <b>{visiveis.length}</b>{' '}
@@ -533,113 +543,34 @@ function MemorialModerno({
               </p>
             )}
 
-            <form
-              className="mv3-compor"
-              onSubmit={onSubmit}
-              noValidate
-              ref={formularioRef}
-            >
-              {/* Recado curto e no topo: quem chega aqui muitas vezes trava no
-                  "não sei o que escrever". Frase de exemplo resolve, mas só se
-                  vier ANTES do campo — depois dele, ninguém lê. */}
-              <p className="mv3-dica">
-                Não sabe o que escrever? Uma frase basta —{' '}
-                <em>
-                  &ldquo;Meus sentimentos, {primeiroNome} vai fazer
-                  falta.&rdquo;
-                </em>
-              </p>
-              {/* `for`/`id` explícitos, e não só o <label> por fora (18/08/2026,
-                  achado pelo gate no fechamento): a associação implícita funciona
-                  hoje, mas quebra em silêncio se o campo sair de dentro do label
-                  numa reorganização — e este formulário foi reorganizado duas
-                  vezes esta semana. `aria-describedby` liga o erro ao campo, para
-                  o leitor de tela anunciar o motivo junto, não solto no fim. */}
-              <label className="mv3-rot-sr" htmlFor="hom-texto">
-                <span className="sr">Sua mensagem</span>
-              </label>
-              <textarea
-                id="hom-texto"
-                placeholder="Escreva aqui uma lembrança, uma oração ou uma palavra de conforto…"
-                value={valores.texto}
-                onChange={(e) => campo('texto', e.target.value)}
-                maxLength={600}
-                aria-invalid={erros.texto ? true : undefined}
-                aria-describedby={erros.texto ? 'hom-texto-erro' : undefined}
-              />
-              {erros.texto && (
-                <span className="mv3-erro" id="hom-texto-erro">
-                  {erros.texto}
-                </span>
-              )}
-              <label className="mv3-rot-sr" htmlFor="hom-nome">
-                <span className="sr">Seu nome</span>
-              </label>
-              <input
-                id="hom-nome"
-                type="text"
-                placeholder="Como você quer assinar"
-                value={valores.nome}
-                onChange={(e) => campo('nome', e.target.value)}
-                maxLength={80}
-                autoComplete="name"
-                aria-invalid={erros.nome ? true : undefined}
-                aria-describedby={erros.nome ? 'hom-nome-erro' : undefined}
-              />
-              {erros.nome && (
-                <span className="mv3-erro" id="hom-nome-erro">
-                  {erros.nome}
-                </span>
-              )}
-              {/* honeypot invisível — sem label de propósito: só robô preenche */}
-              <input
-                type="text"
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                title="Deixe este campo em branco"
-                style={{
-                  position: 'absolute',
-                  left: '-9999px',
-                  width: 1,
-                  height: 1,
-                }}
-                value={valores.website}
-                onChange={(e) => campo('website', e.target.value)}
-              />
-
-              <div id="velas" className="mv3-vela-rot">
-                Acender uma vela{' '}
-                <span style={{ opacity: 0.6, fontWeight: 400 }}>
-                  — gratuito, e aparece na hora
-                </span>
-              </div>
-              <div className="mv3-vela-destaque">
-                <Vela grande tamanho={88} tipo={velaEscolhida} />
-                <p>
-                  A vela fica acesa na página de {primeiroNome}, com o seu nome,
-                  para quem visitar depois.
+            {/* VELA E MENSAGEM SÃO IRMÃS — dois formulários, duas ações.
+                Restaura a decisão da v5, que a versão em React tinha perdido: a
+                vela virou caixa de seleção dentro do formulário de mensagem, e
+                quem só queria acender uma vela caía num formulário que pedia
+                texto. A vela vem primeiro por ser a ação mais barata. */}
+            <div className="mv3-dupla">
+              <form
+                id="vela"
+                className="mv3-compor mv3-compor--vela"
+                onSubmit={enviar('vela')}
+                noValidate
+                ref={formVelaRef}
+              >
+                <h3 className="mv3-h3-acao">Acender uma vela</h3>
+                <p className="mv3-sub-acao">
+                  Um gesto, sem precisar escrever nada.
                 </p>
-              </div>
-              <label className="mv3-vela-toggle">
-                <input
-                  type="checkbox"
-                  checked={valores.vela}
-                  onChange={(e) => campo('vela', e.target.checked)}
-                />
-                <span>
-                  <span className="tt">
-                    Acender uma vela em memória de {primeiroNome}
-                  </span>
-                  <span className="ds">
-                    Escolha abaixo o desenho, se quiser.
-                  </span>
-                </span>
-              </label>
 
-              {velaLigada && (
+                <div className="mv3-vela-destaque">
+                  <Vela grande tamanho={88} tipo={velaEscolhida} />
+                  <p>
+                    A vela fica acesa na página de {primeiroNome}, com o seu
+                    nome, para quem visitar depois.
+                  </p>
+                </div>
+
                 <fieldset className="mv3-velas-escolha">
-                  <legend className="sr">Desenho da vela</legend>
+                  <legend className="mv3-vela-rot">Escolha o desenho</legend>
                   {TIPOS_VELA.map((t) => (
                     <label
                       key={t.id}
@@ -651,36 +582,170 @@ function MemorialModerno({
                     >
                       <input
                         type="radio"
+                        name="desenho-da-vela"
                         value={t.id}
-                        checked={valores.velaTipo === t.id}
-                        onChange={() => campo('velaTipo', t.id)}
+                        checked={velaEscolhida === t.id}
+                        onChange={() => fVela.campo('velaTipo', t.id)}
                       />
                       <Vela tipo={t.id} tamanho={60} forma="placa" />
                       <span>{t.nome}</span>
                     </label>
                   ))}
                 </fieldset>
-              )}
 
-              <p className="mv3-nota-priv">
-                {memorial.moderarMensagens
-                  ? 'A mensagem aparece assim que a família confirmar — costuma levar poucos minutos. A vela é registrada na hora.'
-                  : 'Sua homenagem aparece na hora. Contamos com o respeito de todos neste momento.'}{' '}
-                Ao enviar, você concorda com a exibição da sua homenagem nesta
-                página, conforme a{' '}
-                <Link to="/privacidade">Política de Privacidade</Link>.
-              </p>
+                <label className="mv3-rot-sr" htmlFor="vela-nome">
+                  <span className="sr">Seu nome</span>
+                </label>
+                <input
+                  id="vela-nome"
+                  type="text"
+                  placeholder="Como você quer assinar"
+                  value={fVela.valores.nome}
+                  onChange={(e) => fVela.campo('nome', e.target.value)}
+                  maxLength={80}
+                  autoComplete="name"
+                  aria-invalid={fVela.erros.nome ? true : undefined}
+                  aria-describedby={
+                    fVela.erros.nome ? 'vela-nome-erro' : undefined
+                  }
+                />
+                {fVela.erros.nome && (
+                  <span className="mv3-erro" id="vela-nome-erro">
+                    {fVela.erros.nome}
+                  </span>
+                )}
 
-              <div className="mv3-enviar mv3-enviar--org">
-                <button
-                  className="mv3-btn mv3-btn--ouro"
-                  type="submit"
-                  disabled={enviando}
-                >
-                  Publicar homenagem
-                </button>
-              </div>
-            </form>
+                {/* honeypot invisível — sem label de propósito: só robô preenche */}
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  title="Deixe este campo em branco"
+                  style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    width: 1,
+                    height: 1,
+                  }}
+                  value={fVela.valores.website}
+                  onChange={(e) => fVela.campo('website', e.target.value)}
+                />
+
+                <div className="mv3-enviar mv3-enviar--org">
+                  <button
+                    className="mv3-btn mv3-btn--ouro"
+                    type="submit"
+                    disabled={fVela.enviando}
+                  >
+                    Acender a vela
+                  </button>
+                </div>
+                <p className="mv3-nota-priv">
+                  A vela é registrada na hora, com o seu nome ao lado dela.
+                </p>
+              </form>
+
+              <form
+                className="mv3-compor"
+                onSubmit={enviar('mensagem')}
+                noValidate
+                ref={formMsgRef}
+              >
+                <h3 className="mv3-h3-acao">Deixar uma mensagem</h3>
+                <p className="mv3-sub-acao">
+                  Uma lembrança, uma oração, uma palavra de conforto.
+                </p>
+
+                {/* Recado curto e no topo: quem chega aqui muitas vezes trava no
+                    "não sei o que escrever". Frase de exemplo resolve, mas só se
+                    vier ANTES do campo — depois dele, ninguém lê. */}
+                <p className="mv3-dica">
+                  Não sabe o que escrever? Uma frase basta —{' '}
+                  <em>
+                    &ldquo;Meus sentimentos, {primeiroNome} vai fazer
+                    falta.&rdquo;
+                  </em>
+                </p>
+
+                <label className="mv3-rot-sr" htmlFor="hom-texto">
+                  <span className="sr">Sua mensagem</span>
+                </label>
+                <textarea
+                  id="hom-texto"
+                  placeholder="Escreva aqui uma lembrança, uma oração ou uma palavra de conforto…"
+                  value={fMsg.valores.texto}
+                  onChange={(e) => fMsg.campo('texto', e.target.value)}
+                  maxLength={600}
+                  aria-invalid={fMsg.erros.texto ? true : undefined}
+                  aria-describedby={
+                    fMsg.erros.texto ? 'hom-texto-erro' : undefined
+                  }
+                />
+                {fMsg.erros.texto && (
+                  <span className="mv3-erro" id="hom-texto-erro">
+                    {fMsg.erros.texto}
+                  </span>
+                )}
+
+                <label className="mv3-rot-sr" htmlFor="hom-nome">
+                  <span className="sr">Seu nome</span>
+                </label>
+                <input
+                  id="hom-nome"
+                  type="text"
+                  placeholder="Como você quer assinar"
+                  value={fMsg.valores.nome}
+                  onChange={(e) => fMsg.campo('nome', e.target.value)}
+                  maxLength={80}
+                  autoComplete="name"
+                  aria-invalid={fMsg.erros.nome ? true : undefined}
+                  aria-describedby={
+                    fMsg.erros.nome ? 'hom-nome-erro' : undefined
+                  }
+                />
+                {fMsg.erros.nome && (
+                  <span className="mv3-erro" id="hom-nome-erro">
+                    {fMsg.erros.nome}
+                  </span>
+                )}
+
+                {/* honeypot invisível — sem label de propósito: só robô preenche */}
+                <input
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  aria-hidden="true"
+                  title="Deixe este campo em branco"
+                  style={{
+                    position: 'absolute',
+                    left: '-9999px',
+                    width: 1,
+                    height: 1,
+                  }}
+                  value={fMsg.valores.website}
+                  onChange={(e) => fMsg.campo('website', e.target.value)}
+                />
+
+                <div className="mv3-enviar mv3-enviar--org">
+                  <button
+                    className="mv3-btn mv3-btn--sage"
+                    type="submit"
+                    disabled={fMsg.enviando}
+                  >
+                    Publicar mensagem
+                  </button>
+                </div>
+                <p className="mv3-nota-priv">
+                  {memorial.moderarMensagens
+                    ? 'A mensagem aparece assim que a família confirmar — costuma levar poucos minutos.'
+                    : 'Sua mensagem aparece na hora. Contamos com o respeito de todos neste momento.'}{' '}
+                  Ao enviar, você concorda com a exibição da sua homenagem nesta
+                  página, conforme a{' '}
+                  <Link to="/privacidade">Política de Privacidade</Link>.
+                </p>
+              </form>
+            </div>
 
             <div className="mv3-mural">
               {visiveis.length === 0 && (
