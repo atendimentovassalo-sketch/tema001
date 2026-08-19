@@ -18,6 +18,7 @@ interface MemorialItem {
   falecimentoISO: string
   status: string
   visitas: number
+  familiaAprovouEmISO: string | null
   pendentes: number
 }
 interface Pendente {
@@ -180,6 +181,16 @@ export default function AdminPainel() {
                         >
                           {m.status === 'publicado' ? 'No ar' : 'Rascunho'}
                         </span>
+                        {/* Quem pôs no ar. A família aprovando pelo link dela
+                            publica na hora (decisão de 18/08); o painel tem de
+                            contar isso, senão a funerária vê a nota "no ar" sem
+                            saber quem a liberou. */}
+                        {m.familiaAprovouEmISO && (
+                          <span className="adm-nota-familia">
+                            liberada pela família em{' '}
+                            {ddmm(m.familiaAprovouEmISO)}
+                          </span>
+                        )}
                       </td>
                       <td className="num">
                         {m.visitas.toLocaleString('pt-BR')}

@@ -778,6 +778,9 @@ export interface MemorialAdminItem {
   falecimentoISO: string
   status: string
   visitas: number
+  /** Quando a família liberou a publicação pelo link dela. Nulo quando quem
+   *  publicou foi a própria funerária — que é a verdade, não uma lacuna. */
+  familiaAprovouEmISO: string | null
   pendentes: number
 }
 
@@ -787,7 +790,7 @@ export async function listMemoriaisAdmin(
 ): Promise<MemorialAdminItem[]> {
   const rows = await env.DB.prepare(
     `SELECT m.id, m.slug, m.nome_completo, m.foto_url, m.falecimento_iso,
-            m.status, m.visitas,
+            m.status, m.visitas, m.familia_aprovou_em,
             (SELECT count(*) FROM homenagem h
               WHERE h.memorial_id = m.id AND h.status = 'pendente') AS pendentes
      FROM memorial m WHERE m.tenant_id = ?
@@ -802,6 +805,7 @@ export async function listMemoriaisAdmin(
       falecimento_iso: string
       status: string
       visitas: number
+      familia_aprovou_em: string | null
       pendentes: number
     }>()
   return rows.results.map((r) => ({
@@ -812,6 +816,7 @@ export async function listMemoriaisAdmin(
     falecimentoISO: r.falecimento_iso,
     status: r.status,
     visitas: r.visitas,
+    familiaAprovouEmISO: r.familia_aprovou_em,
     pendentes: r.pendentes,
   }))
 }
