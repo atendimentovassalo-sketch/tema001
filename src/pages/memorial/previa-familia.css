@@ -1,0 +1,95 @@
+/* Bloco "aprovar e publicar" no fim da prévia da família (18/08/2026).
+   Fica no fim da página, não fixo no rodapé: o pedido é ver primeiro e aprovar
+   depois — botão flutuando desde o topo permite aprovar sem ter olhado. */
+.apf {
+  border: 1px solid var(--linha, #e4e0d6);
+  border-radius: 14px;
+  background: var(--vellum, #fffdf8);
+  padding: 22px 22px 24px;
+  margin: 8px 0 40px;
+}
+.apf h2 {
+  font-family: var(--g, Georgia, serif);
+  font-weight: 500;
+  font-size: 1.32rem;
+  margin: 0 0 8px;
+}
+.apf p {
+  margin: 0 0 14px;
+  line-height: 1.6;
+  color: var(--ink, #1a1712);
+}
+.apf-nota {
+  font-size: 0.9rem;
+  color: var(--muted, #5a544b);
+}
+.apf-op {
+  font-weight: 400;
+  opacity: 0.6;
+}
+.apf-campos {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+@media (max-width: 560px) {
+  .apf-campos {
+    grid-template-columns: 1fr;
+  }
+}
+.apf-campos label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--muted, #5a544b);
+}
+.apf-campos input {
+  font: inherit;
+  font-weight: 400;
+  color: var(--ink, #1a1712);
+  /* 46px: alvo de toque que o polegar acerta sem mirar. */
+  min-height: 46px;
+  padding: 0 12px;
+  border: 1px solid var(--linha, #e4e0d6);
+  border-radius: 8px;
+  background: #fff;
+}
+.apf-campos input:focus-visible {
+  outline: 2px solid var(--ink, #1a1712);
+  outline-offset: 1px;
+}
+.apf-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  font-weight: 600;
+  min-height: 50px;
+  padding: 0 24px;
+  border-radius: 999px;
+  border: 1px solid var(--marca, #8a6828);
+  background: var(--marca, #8a6828);
+  color: #fff;
+  text-decoration: none;
+  cursor: pointer;
+}
+.apf-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+@media (max-width: 560px) {
+  .apf-btn {
+    display: flex;
+    width: 100%;
+  }
+}
+.apf-erro {
+  color: #8a3a2f;
+  font-size: 0.92rem;
+}
+.apf--ok {
+  border-color: var(--marca, #8a6828);
+}

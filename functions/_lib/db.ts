@@ -1010,6 +1010,47 @@ export async function atualizarMemorial(
   return slug
 }
 
+/** A família aprovou: grava o aval, põe a nota no ar e registra QUANDO.
+ *
+ *  Decisão do Felipe em 18/08/2026: aprovar publica na hora. O argumento é o
+ *  do velório — a nota precisa circular, e esperar a funerária voltar ao painel
+ *  é tempo que ninguém tem. A funerária não perde o controle: vê o que
+ *  aconteceu (o painel marca a nota) e pode despublicar.
+ *
+ *  `publicado_em` só é escrito na primeira vez: republicar não reescreve a data
+ *  em que a nota foi ao ar. */
+export async function aprovarPelaFamilia(
+  env: Env,
+  memorialId: string,
+  autorizadoPor: string,
+): Promise<void> {
+  await env.DB.prepare(
+    `UPDATE memorial
+        SET autorizado_por = ?,
+            status = 'publicado',
+            publicado_em = COALESCE(publicado_em, datetime('now')),
+            familia_aprovou_em = datetime('now')
+      WHERE id = ?`,
+  )
+    .bind(autorizadoPor, memorialId)
+    .run()
+}
+
+/** E-mails de quem recebe aviso da funerária: usuários ativos do tenant.
+ *  O gestor do SaaS fica de fora — ele não atende esta família. */
+export async function emailsDaFuneraria(
+  env: Env,
+  tenantId: string,
+): Promise<string[]> {
+  const r = await env.DB.prepare(
+    `SELECT email FROM usuario
+      WHERE tenant_id = ? AND ativo = 1 AND papel != 'gestor'`,
+  )
+    .bind(tenantId)
+    .all<{ email: string }>()
+  return r.results.map((x) => x.email)
+}
+
 export async function publicarMemorial(
   env: Env,
   tenantId: string,

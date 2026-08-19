@@ -107,6 +107,7 @@ function MemorialModerno({
   memorialOverride,
   preview = false,
   faixa,
+  rodape,
 }: {
   /** Quando presente, renderiza este memorial em vez de buscar pela rota (usado na prévia). */
   memorialOverride?: Memorial
@@ -116,6 +117,9 @@ function MemorialModerno({
    *  volta para a edição; sem isto ela teria de recriar a página inteira só
    *  para pôr um aviso em cima. */
   faixa?: React.ReactNode
+  /** Bloco no fim da página. A prévia da família põe aqui o "aprovar e
+   *  publicar" — no fim de propósito: o pedido é ver primeiro, aprovar depois. */
+  rodape?: React.ReactNode
 } = {}) {
   const { slug } = useParams()
   /* `?previa=<id>` mostra a PÁGINA REAL de um memorial ainda em rascunho, para a
@@ -770,6 +774,8 @@ function MemorialModerno({
           </div>
         )}
 
+        {rodape && <div className="mv3-w">{rodape}</div>}
+
         {/* CTA fixo no mobile — o botão do herói some ao rolar e a homenagem
           fica a milhares de pixels; a barra mantém a ação sempre à mão. Só no
           trecho em que ela serve: ver `useBarraFixa`. */}
@@ -808,6 +814,7 @@ export default function MemorialPage(
     memorialOverride?: Memorial
     preview?: boolean
     faixa?: React.ReactNode
+    rodape?: React.ReactNode
   } = {},
 ) {
   return <MemorialModerno {...props} />
