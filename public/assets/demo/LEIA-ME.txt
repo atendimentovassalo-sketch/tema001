@@ -1,0 +1,8 @@
+Retrato do memorial de DEMONSTRAÇÃO (Funerária Modelo / Maria Aparecida Ribeiro).
+
+Pessoa fictícia. Imagem gerada por IA em 19/08/2026 para servir de demo pública do
+produto — a página de vendas precisa de uma nota completa para linkar, e nenhuma
+família real vira material de venda.
+
+Vive em /assets/ porque essa é rota do Worker no domínio das clientes; qualquer
+outro caminho daria 404 fora do pages.dev.
