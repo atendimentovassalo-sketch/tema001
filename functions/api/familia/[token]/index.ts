@@ -29,9 +29,17 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
    * informação. Vencido e inexistente respondem igual. */
   if (!acesso) return erro('Link inválido ou vencido.', 404)
 
-  const [homenagens, fotos] = await Promise.all([
+  const [homenagens, fotos, situacao] = await Promise.all([
     listHomenagensDoMemorial(env, acesso.memorialId),
     listFotosDoMemorial(env, acesso.memorialId),
+    /* A tela fala de outro jeito antes e depois de a nota ir ao ar — "escreva a
+     * história" e "a página está no ar" não são o mesmo recado. Sem isto, a
+     * área da família dizia a mesma coisa nos dois momentos. */
+    env.DB.prepare(
+      'SELECT status, autorizado_por FROM memorial WHERE id = ? LIMIT 1',
+    )
+      .bind(acesso.memorialId)
+      .first<{ status: string; autorizado_por: string | null }>(),
   ])
 
   return json({
@@ -39,6 +47,8 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
       nomeCompleto: acesso.nomeCompleto,
       slug: acesso.slug,
       historia: acesso.historia,
+      publicado: situacao?.status === 'publicado',
+      autorizadoPor: situacao?.autorizado_por ?? null,
     },
     homenagens,
     fotos,
@@ -47,7 +57,11 @@ export const onRequestGet: PagesFunction<Env> = async ({ env, params }) => {
   })
 }
 
-export const onRequestPut: PagesFunction<Env> = async ({ env, request, params }) => {
+export const onRequestPut: PagesFunction<Env> = async ({
+  env,
+  request,
+  params,
+}) => {
   const acesso = await getAcessoFamilia(env, String(params.token))
   if (!acesso) return erro('Link inválido ou vencido.', 404)
 

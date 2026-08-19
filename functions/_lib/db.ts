@@ -1334,6 +1334,9 @@ export interface LancamentoDTO {
   vencimento: string | null
   pagoEm: string | null
   criadoEmISO: string
+  /** "3 de 6" quando o lançamento é parcela; nulos quando é à vista. */
+  parcelaNum: number | null
+  parcelaDe: number | null
 }
 
 interface LancamentoRow {
@@ -1348,6 +1351,8 @@ interface LancamentoRow {
   vencimento: string | null
   pago_em: string | null
   criado_em: string
+  parcela_num: number | null
+  parcela_de: number | null
 }
 
 function toLancamentoDTO(r: LancamentoRow): LancamentoDTO {
@@ -1363,13 +1368,15 @@ function toLancamentoDTO(r: LancamentoRow): LancamentoDTO {
     vencimento: r.vencimento,
     pagoEm: r.pago_em,
     criadoEmISO: r.criado_em,
+    parcelaNum: r.parcela_num,
+    parcelaDe: r.parcela_de,
   }
 }
 
 const SELECT_LANCAMENTO = `
   SELECT l.id, l.cliente_id, c.nome AS cliente_nome, l.tipo, l.categoria,
          l.descricao, l.valor_centavos, l.competencia, l.vencimento,
-         l.pago_em, l.criado_em
+         l.pago_em, l.criado_em, l.parcela_num, l.parcela_de
     FROM lancamento l
     LEFT JOIN cliente c ON c.id = l.cliente_id AND c.tenant_id = l.tenant_id`
 
@@ -1439,6 +1446,70 @@ export interface LancamentoInput {
   competencia: string
   vencimento: string | null
   pagoEm: string | null
+}
+
+/** 'AAAA-MM' + n meses. Aritmética de mês, não de dia: somar 30 dias erra em
+ *  fevereiro e acumula erro ao longo de um parcelamento longo. */
+export function competenciaMais(competencia: string, meses: number): string {
+  const [a, m] = competencia.split('-').map(Number)
+  const total = a * 12 + (m - 1) + meses
+  return `${Math.floor(total / 12)}-${String((total % 12) + 1).padStart(2, '0')}`
+}
+
+/** Um lançamento parcelado: N linhas, uma por mês, ligadas pelo mesmo grupo.
+ *
+ *  Tudo em `batch`: ou as N parcelas entram, ou nenhuma entra. Meio
+ *  parcelamento gravado é pior que nenhum — a dona veria um valor que não
+ *  fecha e não teria como saber onde parou.
+ *
+ *  `pagoEm` vale só para a 1ª: quem registra "6x, a primeira já paga" está
+ *  dizendo isso, e não que as seis foram pagas hoje.
+ *
+ *  Devolve o id do grupo. */
+export async function inserirLancamentoParcelado(
+  env: Env,
+  tenantId: string,
+  d: LancamentoInput,
+  parcelas: number,
+): Promise<string> {
+  const grupo = crypto.randomUUID()
+  const stmts = Array.from({ length: parcelas }, (_, i) =>
+    env.DB.prepare(
+      `INSERT INTO lancamento
+         (id, tenant_id, cliente_id, tipo, categoria, descricao, valor_centavos,
+          competencia, vencimento, pago_em, parcela_grupo, parcela_num, parcela_de)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    ).bind(
+      crypto.randomUUID(),
+      tenantId,
+      d.clienteId,
+      d.tipo,
+      d.categoria,
+      d.descricao,
+      d.valorCentavos,
+      competenciaMais(d.competencia, i),
+      /* O vencimento anda junto com a competência; sem ele, "em aberto" e
+       * "atrasadas" não conseguiriam ordenar as parcelas futuras. */
+      d.vencimento ? somarMesesNaData(d.vencimento, i) : null,
+      i === 0 ? d.pagoEm : null,
+      grupo,
+      i + 1,
+      parcelas,
+    ),
+  )
+  await env.DB.batch(stmts)
+  return grupo
+}
+
+/** 'AAAA-MM-DD' + n meses, sem estourar o fim do mês (31/01 + 1 = 28/02). */
+function somarMesesNaData(data: string, meses: number): string {
+  const [a, m, dia] = data.split('-').map(Number)
+  const total = a * 12 + (m - 1) + meses
+  const ano = Math.floor(total / 12)
+  const mes = (total % 12) + 1
+  const ultimo = new Date(Date.UTC(ano, mes, 0)).getUTCDate()
+  const d = Math.min(dia, ultimo)
+  return `${ano}-${String(mes).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 }
 
 export async function inserirLancamento(

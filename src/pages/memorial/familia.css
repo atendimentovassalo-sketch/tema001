@@ -44,6 +44,9 @@
 .fam h2 { font-size: 1.12rem; margin: 0 0 6px; }
 .fam-sub { color: var(--muted); margin: 0 0 14px; }
 .fam-dica { color: var(--muted); font-size: 0.9rem; margin: 0 0 12px; }
+/* A linha do link é aviso de segurança, não parte da explicação — fica um
+   degrau abaixo para não competir com o que a pessoa veio fazer. */
+.fam-sub--miudo { font-size: 0.86rem; opacity: 0.78; margin-top: 4px; }
 .fam-ver { color: var(--sage); font-size: 0.92rem; }
 
 .fam-bloco {

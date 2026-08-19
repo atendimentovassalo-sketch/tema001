@@ -95,8 +95,10 @@ export default function PreviaFamilia() {
     <div className="apf apf--ok" role="status">
       <h2>A nota está no ar</h2>
       <p>
-        Liberada por <b>{aprovado}</b>. Qualquer pessoa com o endereço já
-        consegue abrir e deixar uma homenagem.
+        Liberada por <b>{aprovado}</b>.
+      </p>
+      <p>
+        Qualquer pessoa com o endereço já consegue abrir e deixar uma homenagem.
       </p>
       <a className="apf-btn" href={`/m/${memorial.slug}`}>
         Abrir a página publicada
@@ -108,21 +110,24 @@ export default function PreviaFamilia() {
     </div>
   ) : publicado ? (
     <div className="apf" role="status">
-      <h2>Esta nota já está no ar</h2>
+      <h2>Esta página já está no ar</h2>
+      <p>É assim que ela aparece para quem recebe o endereço.</p>
+      <p>Não precisa aprovar de novo.</p>
       <p className="apf-nota">
-        Não precisa aprovar de novo. Para mudar alguma coisa,{' '}
+        Para acrescentar foto ou mexer na história,{' '}
         <Link to={`/memorial/familia/${encodeURIComponent(token)}`}>
           volte para a edição
         </Link>
-        .
+        . A página muda junto.
       </p>
     </div>
   ) : (
     <div className="apf">
       <h2>Está tudo certo?</h2>
+      <p>Se a página acima está como deveria, é só liberar.</p>
+      <p>Ela vai ao ar na hora, e a funerária é avisada.</p>
       <p>
-        Se a página acima está como deveria, é só liberar. Ela vai ao ar na hora
-        e a funerária é avisada. Se ainda faltar alguma coisa,{' '}
+        Se ainda faltar alguma coisa,{' '}
         <Link to={`/memorial/familia/${encodeURIComponent(token)}`}>
           volte e continue editando
         </Link>

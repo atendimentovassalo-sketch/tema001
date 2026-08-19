@@ -359,6 +359,26 @@
   background: rgba(138, 104, 40, 0.14);
   color: var(--sage);
 }
+/* Etiqueta "3/6" e prévia do parcelamento (18/08/2026). */
+.ges-parcela {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 1px 7px;
+  border: 1px solid var(--linha, #e4e0d6);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--muted, #5a544b);
+  vertical-align: middle;
+}
+.ges-previa-parcelas {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted, #5a544b);
+}
+
 .adm-nota-familia {
   display: block;
   margin-top: 4px;

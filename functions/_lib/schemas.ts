@@ -121,6 +121,10 @@ export const lancamentoInputSchema = z.object({
   competencia,
   vencimento: dataISO.nullable().default(null),
   pagoEm: dataISO.nullable().default(null),
+  /* Parcelamento. `valorCentavos` é o valor DE CADA parcela, não o total — é
+   * como a dona pensa ("seis vezes de 500") e como o carnê é escrito. 60 é o
+   * teto: acima disso não é parcela, é plano, e plano tem lugar próprio. */
+  parcelas: z.number().int().min(1).max(60).default(1),
 })
 
 export const pagamentoInputSchema = z.object({

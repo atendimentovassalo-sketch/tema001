@@ -26,7 +26,13 @@ interface Foto {
   url: string
 }
 interface Dados {
-  memorial: { nomeCompleto: string; slug: string; historia: string | null }
+  memorial: {
+    nomeCompleto: string
+    slug: string
+    historia: string | null
+    publicado: boolean
+    autorizadoPor: string | null
+  }
   homenagens: Homenagem[]
   fotos: Foto[]
   maxFotos: number
@@ -139,9 +145,9 @@ export default function AreaFamilia() {
             envio.
           </p>
           <p className="fam-dica">
-            Peça um link novo à funerária que fez o atendimento. Nada do que já
-            foi escrito se perdeu.
+            Peça um link novo à funerária que fez o atendimento.
           </p>
+          <p className="fam-dica">Nada do que já foi escrito se perdeu.</p>
         </div>
       </div>
     )
@@ -159,10 +165,32 @@ export default function AreaFamilia() {
       <header className="fam-topo">
         <p className="fam-cap">Área da família</p>
         <h1>{memorial.nomeCompleto}</h1>
-        <p className="fam-sub">
-          Aqui você acrescenta as fotos, escreve a história e escolhe o que
-          aparece na página. No fim dá para ver como ficou. Só você e a
-          funerária têm este link.
+
+        {memorial.publicado ? (
+          <>
+            <p className="fam-sub">A página está no ar.</p>
+            <p className="fam-sub">
+              Quem receber o endereço já consegue abrir, ver as fotos e deixar
+              uma homenagem.
+            </p>
+            <p className="fam-sub">
+              O que você mudar aqui muda na página na mesma hora.
+            </p>
+          </>
+        ) : (
+          <>
+            <p className="fam-sub">A página ainda não está no ar.</p>
+            <p className="fam-sub">
+              Acrescente as fotos e escreva a história, no tempo que você tiver.
+            </p>
+            <p className="fam-sub">
+              No fim você vê como ficou e decide se pode publicar.
+            </p>
+          </>
+        )}
+
+        <p className="fam-sub fam-sub--miudo">
+          Só você e a funerária têm este link.
         </p>
       </header>
 
@@ -170,9 +198,8 @@ export default function AreaFamilia() {
 
       <section className="fam-bloco">
         <h2>Fotos</h2>
-        <p className="fam-dica">
-          Até {maxFotos} fotos. Elas aparecem na página para quem visitar.
-        </p>
+        <p className="fam-dica">Até {maxFotos} fotos.</p>
+        <p className="fam-dica">Elas aparecem na página para quem visitar.</p>
 
         {fotos.length > 0 && (
           <ul className="fam-galeria">
@@ -210,9 +237,13 @@ export default function AreaFamilia() {
 
       <section className="fam-bloco">
         <h2>A história</h2>
+        <p className="fam-dica">Do jeito que vier.</p>
         <p className="fam-dica">
-          Do jeito que vier. Uma lembrança, o que a pessoa gostava de fazer, uma
-          frase que ela repetia. Se preferir deixar em branco, tudo bem também.
+          Uma lembrança, o que a pessoa gostava de fazer, uma frase que ela
+          repetia.
+        </p>
+        <p className="fam-dica">
+          Se preferir deixar em branco, tudo bem também.
         </p>
         <textarea
           value={historia}
@@ -237,8 +268,10 @@ export default function AreaFamilia() {
         <section className="fam-bloco">
           <h2>Homenagens recebidas</h2>
           <p className="fam-dica">
-            Se alguma mensagem incomodar, você pode escondê-la da página. Ela
-            não é apagada — dá para mostrar de novo quando quiser.
+            Se alguma mensagem incomodar, você pode escondê-la da página.
+          </p>
+          <p className="fam-dica">
+            Ela não é apagada: dá para mostrar de novo quando quiser.
           </p>
           <ul className="fam-homenagens">
             {homenagens.map((h) => (
@@ -260,15 +293,44 @@ export default function AreaFamilia() {
       )}
 
       <section className="fam-bloco fam-final">
-        <h2>Ver como ficou</h2>
-        <p className="fam-dica">
-          A página abre exatamente como as pessoas vão vê-la — com as fotos e a
-          história que você acabou de escrever. Dá para voltar e mudar o que
-          quiser depois de olhar.
-        </p>
-        <a className="fam-btn fam-btn--ver" href={`${urlBase}/previa`}>
-          Ver a prévia da página
-        </a>
+        {memorial.publicado ? (
+          <>
+            <h2>A página no ar</h2>
+            <p className="fam-dica">
+              É esta página que as pessoas veem quando recebem o endereço.
+            </p>
+            {memorial.autorizadoPor && (
+              <p className="fam-dica">
+                A publicação foi liberada por <b>{memorial.autorizadoPor}</b>.
+              </p>
+            )}
+            <p className="fam-dica">
+              Se precisar tirar a página do ar, fale com a funerária.
+            </p>
+            <a
+              className="fam-btn fam-btn--ver"
+              href={`/m/${memorial.slug}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Abrir a página
+            </a>
+          </>
+        ) : (
+          <>
+            <h2>Ver como ficou</h2>
+            <p className="fam-dica">
+              A página abre exatamente como as pessoas vão vê-la.
+            </p>
+            <p className="fam-dica">
+              Depois de olhar, dá para voltar e mudar o que quiser.
+            </p>
+            <p className="fam-dica">É lá que fica o botão de publicar.</p>
+            <a className="fam-btn fam-btn--ver" href={`${urlBase}/previa`}>
+              Ver a prévia da página
+            </a>
+          </>
+        )}
       </section>
 
       <p className="fam-rodape">

@@ -39,6 +39,8 @@ interface Lancamento {
   competencia: string
   vencimento: string | null
   pagoEm: string | null
+  parcelaNum: number | null
+  parcelaDe: number | null
 }
 
 interface Resumo {
@@ -92,6 +94,11 @@ export default function AdminFinanceiro() {
     descricao: '',
     valor: '',
     jaPago: true,
+    /* Parcelado: `valor` passa a ser o de CADA mês. É como a dona fala ("seis
+     * vezes de quinhentos") e como o carnê é escrito — pedir o total e dividir
+     * dá dízima e centavo perdido. */
+    parcelado: false,
+    parcelas: '2',
   })
 
   useEffect(() => {
@@ -160,6 +167,12 @@ export default function AdminFinanceiro() {
     }
     setSalvando(true)
     try {
+      const parcelas = form.parcelado ? Number(form.parcelas) : 1
+      if (form.parcelado && (!Number.isInteger(parcelas) || parcelas < 2)) {
+        toast.error('Informe de 2 a 60 parcelas.')
+        setSalvando(false)
+        return
+      }
       await api.post('/api/admin/financeiro', {
         clienteId: form.clienteId || null,
         tipo: form.tipo,
@@ -169,8 +182,13 @@ export default function AdminFinanceiro() {
         competencia,
         vencimento: null,
         pagoEm: form.jaPago ? hojeISO() : null,
+        parcelas,
       })
-      toast.success('Lançamento registrado.')
+      toast.success(
+        parcelas > 1
+          ? `${parcelas} parcelas de ${formatarReais(centavos)} lançadas, uma por mês.`
+          : 'Lançamento registrado.',
+      )
       setForm({ ...form, descricao: '', valor: '', clienteId: '' })
       await recarregar()
     } catch (err) {
@@ -250,6 +268,20 @@ export default function AdminFinanceiro() {
       return !l.pagoEm && !!l.vencimento && l.vencimento < hoje
     return true
   })
+
+  /* Prévia em uma linha: quanto, em quantas vezes, de que mês a que mês. Sem
+     isto a dona só descobre onde as parcelas caíram depois de gravar 6 linhas. */
+  const resumoDoParcelamento = (() => {
+    const n = Number(form.parcelas)
+    const centavos = paraCentavos(form.valor)
+    if (!Number.isInteger(n) || n < 2) return 'Informe de 2 a 60 parcelas.'
+    if (centavos == null || centavos <= 0)
+      return `${n} parcelas — informe o valor de cada uma.`
+    const ultima = deslocarCompetencia(competencia, n - 1)
+    return `${n}x de ${formatarReais(centavos)} — total ${formatarReais(
+      centavos * n,
+    )}, de ${nomeCompetencia(competencia)} a ${nomeCompetencia(ultima)}.`
+  })()
 
   const saldo = resumo ? resumo.recebidoCentavos - resumo.saidasCentavos : 0
   const categorias =
@@ -394,14 +426,45 @@ export default function AdminFinanceiro() {
               </select>
             </label>
             <label className="ges-campo">
-              <span>Valor</span>
+              <span>{form.parcelado ? 'Valor de cada parcela' : 'Valor'}</span>
               <input
                 value={form.valor}
                 onChange={(e) => setForm({ ...form, valor: e.target.value })}
-                placeholder="Ex.: 6.000,00"
+                placeholder={form.parcelado ? 'Ex.: 500,00' : 'Ex.: 6.000,00'}
                 inputMode="decimal"
               />
             </label>
+            <label className="ges-campo">
+              <span>Pagamento</span>
+              <select
+                value={form.parcelado ? 'parcelado' : 'vista'}
+                onChange={(e) =>
+                  setForm({
+                    ...form,
+                    parcelado: e.target.value === 'parcelado',
+                  })
+                }
+              >
+                <option value="vista">À vista</option>
+                <option value="parcelado">Parcelado</option>
+              </select>
+            </label>
+            {form.parcelado && (
+              <label className="ges-campo">
+                <span>Nº de parcelas</span>
+                <input
+                  value={form.parcelas}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      parcelas: e.target.value.replace(/\D/g, '').slice(0, 2),
+                    })
+                  }
+                  inputMode="numeric"
+                  placeholder="6"
+                />
+              </label>
+            )}
             {form.tipo === 'entrada' && (
               <label className="ges-campo">
                 <span>Cliente (opcional)</span>
@@ -437,8 +500,13 @@ export default function AdminFinanceiro() {
                 checked={form.jaPago}
                 onChange={(e) => setForm({ ...form, jaPago: e.target.checked })}
               />
-              <span>Já foi pago</span>
+              <span>
+                {form.parcelado ? 'A 1ª parcela já foi paga' : 'Já foi pago'}
+              </span>
             </label>
+            {form.parcelado && (
+              <p className="ges-previa-parcelas">{resumoDoParcelamento}</p>
+            )}
             <div className="ges-form-acoes">
               <button className="adm-btn adm-btn-primario" disabled={salvando}>
                 {salvando ? 'Lançando…' : 'Lançar'}
@@ -471,6 +539,11 @@ export default function AdminFinanceiro() {
                   <div className="ges-lista-txt">
                     <strong>
                       {l.clienteNome ?? l.descricao ?? l.categoria}
+                      {l.parcelaDe ? (
+                        <span className="ges-parcela">
+                          {l.parcelaNum}/{l.parcelaDe}
+                        </span>
+                      ) : null}
                     </strong>
                     <span className="ges-meta">
                       {l.categoria} · {nomeCompetencia(l.competencia)}
@@ -517,6 +590,11 @@ export default function AdminFinanceiro() {
                   <div className="ges-lista-txt">
                     <strong>
                       {l.descricao ?? l.clienteNome ?? l.categoria}
+                      {l.parcelaDe ? (
+                        <span className="ges-parcela">
+                          {l.parcelaNum}/{l.parcelaDe}
+                        </span>
+                      ) : null}
                     </strong>
                     <span className="ges-meta">
                       {l.tipo === 'entrada' ? 'entrada' : 'saída'} ·{' '}

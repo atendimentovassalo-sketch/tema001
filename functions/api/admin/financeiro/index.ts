@@ -9,6 +9,7 @@ import {
   listLancamentos,
   listEmAberto,
   inserirLancamento,
+  inserirLancamentoParcelado,
   getResumoFinanceiro,
 } from '../../../_lib/db'
 import { lancamentoInputSchema, competenciaSchema } from '../../../_lib/schemas'
@@ -56,8 +57,33 @@ export const onRequestPost: PagesFunction<Env, string, AdminData> = async ({
   const parsed = lancamentoInputSchema.safeParse(body)
   if (!parsed.success) {
     const i = parsed.error.issues[0]
-    return erro(i?.message ?? 'Dados inválidos.', 422, { campo: i?.path.join('.') })
+    return erro(i?.message ?? 'Dados inválidos.', 422, {
+      campo: i?.path.join('.'),
+    })
   }
-  const id = await inserirLancamento(env, data.sessao.tenantId, parsed.data)
+  const { parcelas, ...lancamento } = parsed.data
+
+  if (parcelas > 1) {
+    try {
+      const grupo = await inserirLancamentoParcelado(
+        env,
+        data.sessao.tenantId,
+        lancamento,
+        parcelas,
+      )
+      return json({ ok: true, grupo, parcelas }, 201)
+    } catch {
+      /* O caso conhecido é a trava de uma mensalidade por cliente por mês: um
+       * parcelamento de mensalidade que caia num mês que já tem a sua esbarra
+       * ali. `batch` é tudo-ou-nada, então nada foi gravado — a mensagem
+       * precisa dizer isso, senão a dona lança de novo achando que faltou. */
+      return erro(
+        'Alguma das parcelas conflita com um lançamento que já existe (mensalidade do mesmo cliente no mesmo mês). Nada foi gravado.',
+        409,
+      )
+    }
+  }
+
+  const id = await inserirLancamento(env, data.sessao.tenantId, lancamento)
   return json({ ok: true, id }, 201)
 }
