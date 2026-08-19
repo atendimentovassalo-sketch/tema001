@@ -106,11 +106,16 @@ function partesCalendario(
 function MemorialModerno({
   memorialOverride,
   preview = false,
+  faixa,
 }: {
   /** Quando presente, renderiza este memorial em vez de buscar pela rota (usado na prévia). */
   memorialOverride?: Memorial
   /** Mostra a barra "Confirmar e publicar / Corrigir" no fim. */
   preview?: boolean
+  /** Faixa de aviso no topo. A prévia da família traz a sua, com o caminho de
+   *  volta para a edição; sem isto ela teria de recriar a página inteira só
+   *  para pôr um aviso em cima. */
+  faixa?: React.ReactNode
 } = {}) {
   const { slug } = useParams()
   /* `?previa=<id>` mostra a PÁGINA REAL de um memorial ainda em rascunho, para a
@@ -204,12 +209,14 @@ function MemorialModerno({
     return <div className="memorial-root mv3" style={{ minHeight: '100vh' }} />
   }
 
-  const faixaPrevia = previaId ? (
-    <div className="mv3-previa-faixa" role="status">
-      <strong>Pré-visualização</strong> — esta página ainda está como rascunho e
-      não está no ar. Ninguém além de você a enxerga.
-    </div>
-  ) : null
+  const faixaPrevia =
+    faixa ??
+    (previaId ? (
+      <div className="mv3-previa-faixa" role="status">
+        <strong>Pré-visualização</strong> — esta página ainda está como rascunho
+        e não está no ar. Ninguém além de você a enxerga.
+      </div>
+    ) : null)
 
   if (!memorial) {
     return (
@@ -797,7 +804,11 @@ function MemorialModerno({
  * mas deixa de ser importado — e portanto sai do bundle.
  * ------------------------------------------------------------------ */
 export default function MemorialPage(
-  props: { memorialOverride?: Memorial; preview?: boolean } = {},
+  props: {
+    memorialOverride?: Memorial
+    preview?: boolean
+    faixa?: React.ReactNode
+  } = {},
 ) {
   return <MemorialModerno {...props} />
 }

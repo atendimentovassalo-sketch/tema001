@@ -147,6 +147,11 @@ export default function AreaFamilia() {
     )
 
   const { memorial, homenagens, fotos, maxFotos } = dados
+  /* O mesmo componente responde em /memorial/familia/:token e em
+   * /familia/:token (ver App.tsx); a prévia tem de continuar no caminho por
+   * onde a pessoa entrou, senão cai fora da rota do Worker no domínio da
+   * funerária. */
+  const urlBase = location.pathname.replace(/\/$/, '')
   const podeSubir = fotos.length < maxFotos
 
   return (
@@ -155,45 +160,13 @@ export default function AreaFamilia() {
         <p className="fam-cap">Área da família</p>
         <h1>{memorial.nomeCompleto}</h1>
         <p className="fam-sub">
-          Aqui você pode escrever a história, acrescentar fotos e escolher o que
-          aparece na página. Só você e a funerária têm este link.
+          Aqui você acrescenta as fotos, escreve a história e escolhe o que
+          aparece na página. No fim dá para ver como ficou. Só você e a
+          funerária têm este link.
         </p>
-        <a
-          className="fam-ver"
-          href={`/m/${memorial.slug}`}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Ver a página como as pessoas veem →
-        </a>
       </header>
 
       {aviso && <p className="fam-aviso">{aviso}</p>}
-
-      <section className="fam-bloco">
-        <h2>A história</h2>
-        <p className="fam-dica">
-          Do jeito que vier. Uma lembrança, o que a pessoa gostava de fazer, uma
-          frase que ela repetia. Se preferir deixar em branco, tudo bem também.
-        </p>
-        <textarea
-          value={historia}
-          onChange={(e) => setHistoria(e.target.value)}
-          rows={9}
-          maxLength={8000}
-          placeholder="Escreva aqui…"
-        />
-        <div className="fam-acoes">
-          <button
-            className="fam-btn"
-            onClick={salvarHistoria}
-            disabled={salvando}
-          >
-            {salvando ? 'Salvando…' : 'Salvar'}
-          </button>
-          {salvo && <span className="fam-ok">Salvo.</span>}
-        </div>
-      </section>
 
       <section className="fam-bloco">
         <h2>Fotos</h2>
@@ -235,6 +208,31 @@ export default function AreaFamilia() {
         )}
       </section>
 
+      <section className="fam-bloco">
+        <h2>A história</h2>
+        <p className="fam-dica">
+          Do jeito que vier. Uma lembrança, o que a pessoa gostava de fazer, uma
+          frase que ela repetia. Se preferir deixar em branco, tudo bem também.
+        </p>
+        <textarea
+          value={historia}
+          onChange={(e) => setHistoria(e.target.value)}
+          rows={9}
+          maxLength={8000}
+          placeholder="Escreva aqui…"
+        />
+        <div className="fam-acoes">
+          <button
+            className="fam-btn"
+            onClick={salvarHistoria}
+            disabled={salvando}
+          >
+            {salvando ? 'Salvando…' : 'Salvar'}
+          </button>
+          {salvo && <span className="fam-ok">Salvo.</span>}
+        </div>
+      </section>
+
       {homenagens.length > 0 && (
         <section className="fam-bloco">
           <h2>Homenagens recebidas</h2>
@@ -260,6 +258,18 @@ export default function AreaFamilia() {
           </ul>
         </section>
       )}
+
+      <section className="fam-bloco fam-final">
+        <h2>Ver como ficou</h2>
+        <p className="fam-dica">
+          A página abre exatamente como as pessoas vão vê-la — com as fotos e a
+          história que você acabou de escrever. Dá para voltar e mudar o que
+          quiser depois de olhar.
+        </p>
+        <a className="fam-btn fam-btn--ver" href={`${urlBase}/previa`}>
+          Ver a prévia da página
+        </a>
+      </section>
 
       <p className="fam-rodape">
         Qualquer coisa que você queira mudar e não encontre aqui — uma data, o

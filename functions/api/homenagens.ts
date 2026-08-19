@@ -14,7 +14,12 @@ const schema = z
   .object({
     memorialSlug: z.string().trim().min(1).max(120),
     nome: z.string().trim().min(1, 'Diga como você quer assinar.').max(80),
-    texto: z.string().trim().max(600, 'Máximo de 600 caracteres.').optional().default(''),
+    texto: z
+      .string()
+      .trim()
+      .max(600, 'Máximo de 600 caracteres.')
+      .optional()
+      .default(''),
     vela: z.boolean().optional().default(true),
     /* Desenho da vela. Texto livre curto: a tela valida a lista, e um id
      * desconhecido cai no desenho padrão em vez de quebrar a página. */
@@ -83,7 +88,10 @@ export const onRequestPost: PagesFunction<Env> = async ({ env, request }) => {
   const criada: HomenagemDTO = {
     id,
     nome: dados.nome.trim(),
-    texto,
+    /* pendente vai sem texto: a página insere esta resposta direto no mural,
+     * sem recarregar, e devolver o texto publicaria o que ainda espera a
+     * família confirmar. O aviso de "aparece assim que confirmarem" é o toast. */
+    texto: status === 'aprovada' ? texto : null,
     vela: dados.vela,
     velaTipo: dados.vela ? (dados.velaTipo ?? null) : null,
     criadoEmISO: new Date().toISOString(),

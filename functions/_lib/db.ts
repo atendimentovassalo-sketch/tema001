@@ -215,6 +215,20 @@ function homenagemVisivelPublica(h: HomenagemRow): boolean {
   return !!h.vela || h.status === 'aprovada'
 }
 
+/* DEFEITO CORRIGIDO EM 18/08/2026 — o filtro acima decidia se a LINHA aparece,
+ * mas o DTO levava o `texto` junto. Uma homenagem pendente que viesse com vela
+ * passava pelo filtro (por causa da vela) e o mural publicava a mensagem que
+ * ainda esperava a família confirmar. Ou seja: com a moderação ligada, bastava
+ * marcar a vela para furá-la.
+ *
+ * A vela continua contando na hora — é isso que o filtro garante. O texto é que
+ * só existe depois de aprovado; até lá a homenagem aparece como "acendeu uma
+ * vela", que é exatamente o que ela é publicamente. */
+function toHomenagemPublicaDTO(h: HomenagemRow): HomenagemDTO {
+  const dto = toHomenagemDTO(h)
+  return dto.status === 'aprovada' ? dto : { ...dto, texto: null }
+}
+
 async function carregarRelacionados(
   env: Env,
   memorialIds: string[],
@@ -297,7 +311,7 @@ export async function listPublicados(
       rel.fotos.get(m.id) ?? [],
       (rel.homenagens.get(m.id) ?? [])
         .filter(homenagemVisivelPublica)
-        .map(toHomenagemDTO),
+        .map(toHomenagemPublicaDTO),
     ),
   )
 }
@@ -322,7 +336,7 @@ export async function getMemorialPublico(
     rel.fotos.get(m.id) ?? [],
     (rel.homenagens.get(m.id) ?? [])
       .filter(homenagemVisivelPublica)
-      .map(toHomenagemDTO),
+      .map(toHomenagemPublicaDTO),
   )
 }
 

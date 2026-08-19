@@ -87,6 +87,19 @@
   cursor: pointer;
 }
 .fam button:disabled { opacity: 0.55; cursor: default; }
+
+/* Passo final: ver a página. É um <a>, e precisa ficar em pé como bloco — o
+   .fam-btn genérico é inline e no celular ficaria do tamanho do texto. */
+.fam-btn--ver {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  margin-top: 4px;
+}
+@media (max-width: 560px) {
+  .fam-btn--ver { display: flex; width: 100%; }
+}
 .fam-ok { color: #2f5d3a; font-size: 0.92rem; }
 .fam-aviso {
   background: #fdf1ee;

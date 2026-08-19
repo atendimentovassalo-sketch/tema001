@@ -25,6 +25,7 @@ import Termos from './pages/legal/Termos'
 const NovoMemorial = lazy(() => import('./pages/memorial/NovoMemorial'))
 const AprovarHomenagem = lazy(() => import('./pages/memorial/AprovarHomenagem'))
 const AreaFamilia = lazy(() => import('./pages/memorial/AreaFamilia'))
+const PreviaFamilia = lazy(() => import('./pages/memorial/PreviaFamilia'))
 const AdminLogin = lazy(() => import('./pages/admin/Login'))
 const AdminPainel = lazy(() => import('./pages/admin/Painel'))
 const AdminConfig = lazy(() => import('./pages/admin/Configuracoes'))
@@ -47,36 +48,41 @@ const App = () => (
           para não fazer nada. */}
       <Sonner />
       <Suspense fallback={<div />}>
-      <Routes>
-        {/* Memorial (tema próprio) */}
-        <Route path="/funeraria" element={<HomeV2 />} />
-        <Route path="/obituario" element={<Obituario />} />
-        <Route path="/m/:slug" element={<MemorialPage />} />
-        <Route path="/memorial/novo" element={<NovoMemorial />} />
-        <Route path="/aprovar/:token" element={<AprovarHomenagem />} />
-        {/* Sob /memorial/ de propósito: no domínio da funerária, quem passa
+        <Routes>
+          {/* Memorial (tema próprio) */}
+          <Route path="/funeraria" element={<HomeV2 />} />
+          <Route path="/obituario" element={<Obituario />} />
+          <Route path="/m/:slug" element={<MemorialPage />} />
+          <Route path="/memorial/novo" element={<NovoMemorial />} />
+          <Route path="/aprovar/:token" element={<AprovarHomenagem />} />
+          {/* Sob /memorial/ de propósito: no domínio da funerária, quem passa
             pelo Worker são /obituario*, /m/*, /memorial/*, /admin*, /api/* e
             /assets/*. Um caminho /familia/* na raiz cairia no site estático —
             testado em 18/08/2026. Mexer na lista de rotas do Worker para abrir
             um caminho novo é o tipo de alteração que derruba o site da cliente
             se sair errada; usar um prefixo já roteado não custa nada. */}
-        <Route path="/memorial/familia/:token" element={<AreaFamilia />} />
-        {/* Compatibilidade: em hosts onde a raiz é roteada (pages.dev), o
+          <Route path="/memorial/familia/:token" element={<AreaFamilia />} />
+          <Route
+            path="/memorial/familia/:token/previa"
+            element={<PreviaFamilia />}
+          />
+          {/* Compatibilidade: em hosts onde a raiz é roteada (pages.dev), o
             caminho curto também funciona. */}
-        <Route path="/familia/:token" element={<AreaFamilia />} />
-        {/* Painel administrativo da funerária */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/recuperar" element={<AdminRecuperar />} />
-        <Route path="/admin" element={<AdminPainel />} />
-        <Route path="/admin/config" element={<AdminConfig />} />
-        <Route path="/admin/usuarios" element={<AdminUsuarios />} />
-        <Route path="/admin/clientes" element={<AdminClientes />} />
-        <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
-        {/* Páginas legais (LGPD) */}
-        <Route path="/privacidade" element={<Privacidade />} />
-        <Route path="/termos" element={<Termos />} />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          <Route path="/familia/:token" element={<AreaFamilia />} />
+          <Route path="/familia/:token/previa" element={<PreviaFamilia />} />
+          {/* Painel administrativo da funerária */}
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/recuperar" element={<AdminRecuperar />} />
+          <Route path="/admin" element={<AdminPainel />} />
+          <Route path="/admin/config" element={<AdminConfig />} />
+          <Route path="/admin/usuarios" element={<AdminUsuarios />} />
+          <Route path="/admin/clientes" element={<AdminClientes />} />
+          <Route path="/admin/financeiro" element={<AdminFinanceiro />} />
+          {/* Páginas legais (LGPD) */}
+          <Route path="/privacidade" element={<Privacidade />} />
+          <Route path="/termos" element={<Termos />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
       </Suspense>
     </TooltipProvider>
   </BrowserRouter>
