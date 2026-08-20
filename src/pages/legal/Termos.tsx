@@ -30,9 +30,14 @@ export default function Termos() {
   return (
     <LegalLayout titulo="Termos de uso" atualizadoEm="20 de agosto de 2026">
       {(f) => {
+        /* O nome da funerária NÃO entra no meio das frases, e isso é decisão,
+           não esquecimento: em português o artigo muda com o nome — "a Funerária
+           São Francisco", mas "o Grupo Memorial", "a Casa X". Sem saber o gênero
+           do nome cadastrado, qualquer artigo fixo erra em metade dos casos.
+           Quem é a funerária está dito no bloco de identificação, com precisão;
+           no corpo o documento fala na primeira pessoa do plural. */
         const contato = canalDeContato(f)
         const comarca = foro(f)
-        const nome = f?.nome ?? 'a funerária'
         const Canal = () => (
           <>
             {contato.prefixo}
@@ -132,7 +137,8 @@ export default function Termos() {
             </h2>
             <p>
               Textos, identidade visual, fotografias e código são protegidos por
-              direito autoral e pertencem a {nome} ou a quem os licenciou. Você
+              direito autoral e pertencem à funerária identificada acima ou a
+              quem os licenciou. Você
               pode <b>compartilhar os endereços das páginas livremente</b> — é
               para isso que as notas existem. Reproduzir, copiar ou adaptar o
               conteúdo para outros fins depende de autorização por escrito.
@@ -195,7 +201,10 @@ export default function Termos() {
             <p>
               Aplica-se a lei brasileira.
               {comarca
-                ? ` Fica eleito o foro da Comarca de ${comarca} para dirimir controvérsias, ressalvado o direito do consumidor de acionar o foro do seu domicílio.`
+                ? /* A vírgula depois da comarca não é estilo: o valor cadastrado
+                     costuma ser "Catanduvas, Estado do Paraná", e sem ela a frase
+                     saía "…Estado do Paraná para dirimir…", sem pausa. */
+                  ` Fica eleito o foro da Comarca de ${comarca}, para dirimir controvérsias, ressalvado o direito do consumidor de acionar o foro do seu domicílio.`
                 : ' A competência para dirimir controvérsias segue as regras legais aplicáveis, inclusive o direito do consumidor de acionar o foro do seu domicílio.'}
             </p>
 

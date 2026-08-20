@@ -32,8 +32,13 @@ export default function Privacidade() {
       atualizadoEm="20 de agosto de 2026"
     >
       {(f) => {
+        /* O nome da funerária NÃO entra no meio das frases, e isso é decisão,
+           não esquecimento: em português o artigo muda com o nome — "a Funerária
+           São Francisco", mas "o Grupo Memorial", "a Casa X". Sem saber o gênero
+           do nome cadastrado, qualquer artigo fixo erra em metade dos casos.
+           Quem é a funerária está dito no bloco de identificação, com precisão;
+           no corpo o documento fala na primeira pessoa do plural. */
         const contato = canalDeContato(f)
-        const nome = f?.nome ?? 'a funerária'
         const Canal = () => (
           <>
             {contato.prefixo}
@@ -48,9 +53,9 @@ export default function Privacidade() {
         return (
           <>
             <p>
-              Esta política explica quais dados pessoais {nome} trata, por que
-              trata, com quem compartilha e o que você pode exigir a qualquer
-              momento. Ela segue a Lei nº 13.709/2018 (LGPD).
+              Esta política explica quais dados pessoais tratamos, por que
+              tratamos, com quem compartilhamos e o que você pode exigir a
+              qualquer momento. Ela segue a Lei nº 13.709/2018 (LGPD).
             </p>
 
             <h2>
@@ -177,8 +182,9 @@ export default function Privacidade() {
               <b>operador</b> (art. 39 da LGPD): ele trata os dados
               exclusivamente por conta e segundo as instruções da funerária, não
               os utiliza para finalidade própria e não os compartilha com
-              terceiros. {nome} permanece a <b>controladora</b> — é a quem você
-              recorre para qualquer pedido sobre os seus dados.
+              terceiros. A funerária identificada acima permanece a{' '}
+              <b>controladora</b> — é a quem você recorre para qualquer pedido
+              sobre os seus dados.
             </p>
             <p className="legal-nota">
               Não vendemos, alugamos nem cedemos seus dados para publicidade de
