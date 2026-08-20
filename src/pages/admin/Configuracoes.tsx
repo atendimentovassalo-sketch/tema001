@@ -27,7 +27,7 @@ export default function AdminConfig() {
   useEffect(() => {
     if (usuario)
       fetchConfig()
-        .then(setCfg)
+        .then(({ config }) => setCfg(config))
         .catch(() => setCfg(null))
   }, [usuario])
 

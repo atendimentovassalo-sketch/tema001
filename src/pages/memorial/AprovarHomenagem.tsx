@@ -57,7 +57,7 @@ export default function AprovarHomenagem() {
 
   return (
     <div className="memorial-root">
-      <SiteHeader />
+      <SiteHeader f={info?.funeraria ?? null} />
 
       <div className="form" style={{ maxWidth: 560 }}>
         {estado === 'carregando' && <p className="dica">Carregando…</p>}

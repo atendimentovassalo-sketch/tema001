@@ -7,18 +7,26 @@ import {
   getHomenagemPorToken,
   getMemorialNomeSlug,
   definirStatusHomenagem,
+  getTenantPorHost,
+  toFunerariaDTO,
 } from '../../_lib/db'
 import { json, erro, lerJson } from '../../_lib/http'
 
 export const onRequestGet: PagesFunction<Env, 'token'> = async ({
   env,
   params,
+  request,
 }) => {
   const token = String(params.token)
   const h = await getHomenagemPorToken(env, token)
   if (!h) return erro('Link inválido ou já utilizado.', 404)
   const mem = await getMemorialNomeSlug(env, h.memorial_id)
+  /* Pelo host: quem abre este link é o responsável da família, no domínio da
+     funerária dele. Null (host desconhecido) deixa a casca sem marca — o que
+     é correto: melhor sem nome do que com o nome de outra funerária. */
+  const tenant = await getTenantPorHost(env, request)
   return json({
+    funeraria: tenant ? toFunerariaDTO(tenant) : null,
     homenagem: {
       id: h.id,
       nome: h.nome,

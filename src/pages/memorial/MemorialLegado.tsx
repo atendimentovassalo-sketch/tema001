@@ -223,7 +223,7 @@ export default function MemorialLegado({
   }
 
   return (
-    <SiteShell>
+    <SiteShell f={f}>
       <div
         className="memorial-root"
         style={{ ['--marca' as string]: f.corMarca }}

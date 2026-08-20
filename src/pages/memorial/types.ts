@@ -1,5 +1,13 @@
 /* Tipos do memorial — espelham o modelo de dados do produto (funerária multi-inquilino). */
 
+/** Um item do menu do site institucional da funerária: ou leva a um endereço
+ *  (`href`), ou abre um submenu (`itens`). */
+export interface ItemMenu {
+  rotulo: string
+  href?: string
+  itens?: { rotulo: string; href: string }[]
+}
+
 export interface Funeraria {
   id: string
   nome: string
@@ -12,6 +20,15 @@ export interface Funeraria {
   sobre: string | null
   corMarca: string
   whatsappTemplate: string | null
+  /** Contato público do rodapé. Null = a linha some. */
+  email: string | null
+  /** Menu do site institucional. Null = a funerária não tem site próprio, e o
+   *  cabeçalho fica só com o obituário. Ver migration 0015. */
+  siteMenu: ItemMenu[] | null
+  /** Horário de atendimento (texto livre, com quebras de linha). */
+  siteHorario: string | null
+  /** CNPJ / alvará / razão social (texto livre, com quebras de linha). */
+  siteLegal: string | null
 }
 
 export type TipoEvento = 'velorio' | 'cerimonia' | 'sepultamento'

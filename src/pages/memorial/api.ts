@@ -52,6 +52,9 @@ export function enviarHomenagem(
 export interface AprovacaoInfo {
   homenagem: Homenagem
   memorial: { nomeCompleto: string; slug: string } | null
+  /** A casca de site é dirigida pelo inquilino; null quando o host não
+   *  corresponde a nenhuma funerária (aí a casca fica sem marca). */
+  funeraria: Funeraria | null
 }
 
 export function fetchAprovacao(token: string): Promise<AprovacaoInfo> {
@@ -108,9 +111,13 @@ export interface ConfigTenant {
   diaInicioCiclo: number
 }
 
-export async function fetchConfig(): Promise<ConfigTenant> {
-  const r = await api.get<{ config: ConfigTenant }>('/api/admin/config')
-  return r.config
+export async function fetchConfig(): Promise<{
+  config: ConfigTenant
+  funeraria: Funeraria
+}> {
+  return api.get<{ config: ConfigTenant; funeraria: Funeraria }>(
+    '/api/admin/config',
+  )
 }
 
 export function salvarConfig(c: ConfigTenant): Promise<{ ok: true }> {

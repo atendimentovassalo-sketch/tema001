@@ -8,6 +8,7 @@ import type {
   FotoRow,
   HomenagemRow,
   FunerariaDTO,
+  ItemMenuDTO,
   ConfigDTO,
   EventoDTO,
   FotoDTO,
@@ -16,6 +17,26 @@ import type {
 } from './types'
 
 /* ---------- mapeadores ---------- */
+
+/** Le o menu do site institucional, que vive como JSON numa coluna TEXT.
+ *
+ *  Defensivo de proposito: um JSON torto na linha do inquilino nao pode
+ *  derrubar a pagina de memorial de uma familia. Na duvida devolve null — o
+ *  cabecalho cai no menu minimo em vez de quebrar. */
+function lerMenu(bruto: string | null | undefined): ItemMenuDTO[] | null {
+  if (!bruto) return null
+  try {
+    const v: unknown = JSON.parse(bruto)
+    if (!Array.isArray(v)) return null
+    const itens = v.filter(
+      (i): i is ItemMenuDTO =>
+        !!i && typeof (i as ItemMenuDTO).rotulo === 'string',
+    )
+    return itens.length ? itens : null
+  } catch {
+    return null
+  }
+}
 
 export function toFunerariaDTO(t: TenantRow): FunerariaDTO {
   return {
@@ -30,6 +51,11 @@ export function toFunerariaDTO(t: TenantRow): FunerariaDTO {
     sobre: t.sobre,
     corMarca: t.cor_marca,
     whatsappTemplate: t.whatsapp_template,
+    /* `?? null` cobre a janela entre o deploy do codigo e a migration 0015. */
+    email: t.email ?? null,
+    siteMenu: lerMenu(t.site_menu),
+    siteHorario: t.site_horario ?? null,
+    siteLegal: t.site_legal ?? null,
   }
 }
 

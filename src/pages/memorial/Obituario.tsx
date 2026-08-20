@@ -72,7 +72,7 @@ export default function Obituario() {
   }
 
   return (
-    <SiteShell aqui="obituario">
+    <SiteShell aqui="obituario" f={f}>
       <div
         className="memorial-root"
         style={{ ['--marca' as string]: f.corMarca }}

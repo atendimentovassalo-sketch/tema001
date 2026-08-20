@@ -20,6 +20,7 @@ import {
 import { TEMPLATE_WHATSAPP_PADRAO } from './share'
 import { useSessao } from '../admin/auth'
 import { idadeEm, iniciais } from './format'
+import type { Funeraria } from './types'
 import { recortar45 } from './image'
 import { SiteHeader } from '@/components/SiteChrome'
 import PreviaMemorial from './PreviaMemorial'
@@ -120,6 +121,9 @@ export default function NovoMemorial() {
   const { carregando: authCarregando, usuario } = useSessao()
 
   const [cfg, setCfg] = useState<ConfigTenant | null>(null)
+  /* A casca de site (cabeçalho) é dirigida pelo inquilino — vem no mesmo
+     GET da config para não custar uma segunda ida ao servidor. */
+  const [funeraria, setFuneraria] = useState<Funeraria | null>(null)
 
   const {
     register,
@@ -153,8 +157,9 @@ export default function NovoMemorial() {
   // pré-preenche os locais padrão (editáveis).
   useEffect(() => {
     fetchConfig()
-      .then((c) => {
+      .then(({ config: c, funeraria: fn }) => {
         setCfg(c)
+        setFuneraria(fn)
         if (!editId) {
           if (c.velorioLocalPadrao)
             setValue('velorioLocal', c.velorioLocalPadrao)
@@ -307,7 +312,7 @@ export default function NovoMemorial() {
 
   return (
     <div className="memorial-root">
-      <SiteHeader />
+      <SiteHeader f={funeraria} />
 
       <div className="edit-wrap">
         <div className="form">

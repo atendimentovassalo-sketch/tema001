@@ -33,6 +33,12 @@ export interface TenantRow {
   velorio_endereco_padrao: string | null
   sepultamento_local_padrao: string | null
   whatsapp_template: string | null
+  /* Migration 0015 — cabecalho/rodape por inquilino. Opcionais no tipo porque
+     a coluna pode nao existir ainda na janela entre o deploy e a migration. */
+  email?: string | null
+  site_menu?: string | null
+  site_horario?: string | null
+  site_legal?: string | null
 }
 
 export interface UsuarioRow {
@@ -101,6 +107,14 @@ export interface HomenagemRow {
 
 /* ----- Formato da API (camelCase, igual ao front) ----- */
 
+/** Um item do menu do site institucional. Ou leva a um endereco (`href`), ou
+ *  abre um submenu (`itens`) — nunca os dois. */
+export interface ItemMenuDTO {
+  rotulo: string
+  href?: string
+  itens?: { rotulo: string; href: string }[]
+}
+
 export interface FunerariaDTO {
   id: string
   nome: string
@@ -114,6 +128,15 @@ export interface FunerariaDTO {
   corMarca: string
   /** Modelo de mensagem do WhatsApp (com variáveis). Null = usa o padrão do app. */
   whatsappTemplate: string | null
+  /** Contato público do rodapé. Null = a linha some. */
+  email: string | null
+  /** Menu do site institucional. Null = a funerária não tem site próprio, e o
+   *  cabeçalho fica só com o obituário (nunca com links de outro inquilino). */
+  siteMenu: ItemMenuDTO[] | null
+  /** Horário de atendimento, texto livre com quebras de linha. */
+  siteHorario: string | null
+  /** CNPJ / alvará / razão social, texto livre com quebras de linha. */
+  siteLegal: string | null
 }
 
 /** Configuração editável da funerária (área admin). */

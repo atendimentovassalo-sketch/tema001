@@ -1,15 +1,65 @@
-/* Cabeçalho e rodapé do site institucional (funerariacatanduvas.com.br)
- * reaproveitados nas páginas do app — obituário, memorial e formulário.
- * Objetivo: quem navega não deve perceber que trocou de sistema.
+/* Cabeçalho e rodapé do site institucional reaproveitados nas páginas do app —
+ * obituário, memorial e formulário. Objetivo: quem navega não deve perceber
+ * que trocou de sistema.
+ *
+ * TUDO AQUI VEM DO INQUILINO (`f`), e isso não é preferência de estilo.
+ * Até 20/08/2026 o nome, o telefone, o e-mail, o endereço e as cidades da
+ * Funerária São Francisco estavam escritos neste arquivo. Como esta casca
+ * envolve TODA página de memorial e de obituário, a segunda funerária a entrar
+ * teria as páginas dela exibindo os dados da primeira — e uma família enlutada
+ * em outra cidade ligaria para a funerária errada. Os campos que faltavam
+ * (e-mail, menu, horário, dados jurídicos) vieram na migration 0015.
+ *
+ * `f` pode ser null: acontece quando o host não corresponde a nenhuma
+ * funerária. Aí a casca fica sem marca — melhor sem nome nenhum do que com o
+ * nome de outra casa.
+ *
  * Tudo escopado em .sfc; os links do site saem do SPA de propósito
  * (<a> comum, não <Link>), porque as páginas institucionais são estáticas. */
 import type { ReactNode } from 'react'
+import type { Funeraria, ItemMenu } from '@/pages/memorial/types'
 import './site-chrome.css'
 
-const TEL = '+5545991284521'
-const TEL_LEGIVEL = '(45) 99128-4521'
-const ZAP = 'https://wa.me/5545991284521'
-const EMAIL = 'atendimento@funerariacatanduvas.com.br'
+/** Menu de quem não tem site institucional: só o obituário, que é do app e
+ *  existe para todo inquilino. Nunca linkar /planos ou /cidade-x de outra
+ *  funerária — seriam 404 no domínio dela. */
+const MENU_MINIMO: ItemMenu[] = [{ rotulo: 'Obituários', href: '/obituario' }]
+
+function menuDe(f: Funeraria | null | undefined): ItemMenu[] {
+  return f?.siteMenu?.length ? f.siteMenu : MENU_MINIMO
+}
+
+/** Para onde a marca leva: a primeira entrada do menu (a home, quando existe
+ *  site institucional) ou o obituário. */
+function inicioDe(f: Funeraria | null | undefined): string {
+  const m = menuDe(f)
+  return m[0]?.href ?? m[0]?.itens?.[0]?.href ?? '/obituario'
+}
+
+function zapDe(f: Funeraria | null | undefined): string | null {
+  return f?.whatsapp ? `https://wa.me/${f.whatsapp}` : null
+}
+
+/** Menu achatado: o rodapé lista tudo em coluna, sem submenu. */
+function linksPlanos(f: Funeraria | null | undefined) {
+  const saida: { rotulo: string; href: string }[] = []
+  for (const i of menuDe(f)) {
+    if (i.href) saida.push({ rotulo: i.rotulo, href: i.href })
+    for (const sub of i.itens ?? []) saida.push(sub)
+  }
+  return saida
+}
+
+/** Texto livre com quebras de linha vira <br> — é assim que o horário e o
+ *  bloco jurídico chegam do banco. */
+function emLinhas(texto: string): ReactNode[] {
+  return texto.split('\n').map((linha, i) => (
+    <span key={i}>
+      {i > 0 && <br />}
+      {linha}
+    </span>
+  ))
+}
 
 function IconeWhatsapp() {
   return (
@@ -19,6 +69,23 @@ function IconeWhatsapp() {
         d="M16.04 3.2c-7.06 0-12.8 5.74-12.8 12.8 0 2.26.59 4.46 1.72 6.4L3.2 28.8l6.56-1.72a12.74 12.74 0 0 0 6.28 1.6h.01c7.05 0 12.79-5.74 12.79-12.8 0-3.42-1.33-6.63-3.75-9.05a12.71 12.71 0 0 0-9.05-3.63Zm0 23.31h-.01a10.6 10.6 0 0 1-5.4-1.48l-.39-.23-4.01 1.05 1.07-3.91-.25-.4a10.57 10.57 0 0 1-1.62-5.65c0-5.86 4.77-10.63 10.63-10.63 2.84 0 5.5 1.11 7.51 3.12a10.55 10.55 0 0 1 3.11 7.52c0 5.86-4.77 10.61-10.64 10.61Zm5.83-7.95c-.32-.16-1.89-.93-2.18-1.04-.29-.11-.5-.16-.71.16-.21.32-.82 1.04-1.01 1.25-.18.21-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.59-.95-.85-1.59-1.89-1.78-2.21-.18-.32-.02-.5.14-.66.15-.14.32-.37.48-.56.16-.19.21-.32.32-.53.11-.21.05-.4-.03-.56-.08-.16-.71-1.73-.98-2.36-.26-.62-.52-.54-.71-.55l-.61-.01c-.21 0-.56.08-.85.4-.29.32-1.11 1.09-1.11 2.65s1.14 3.07 1.3 3.29c.16.21 2.24 3.42 5.43 4.8.76.33 1.35.52 1.81.67.76.24 1.45.21 2 .13.61-.09 1.89-.77 2.15-1.52.27-.75.27-1.38.19-1.52-.08-.13-.29-.21-.61-.37Z"
       />
     </svg>
+  )
+}
+
+/** Botão flutuante do WhatsApp — some quando não há inquilino resolvido. */
+function BotaoZap({ f }: { f: Funeraria | null | undefined }) {
+  const zap = zapDe(f)
+  if (!zap) return null
+  return (
+    <a
+      className="wa-float"
+      href={zap}
+      target="_blank"
+      rel="noopener"
+      aria-label={`Falar no WhatsApp com ${f?.nome ?? 'a funerária'}`}
+    >
+      <IconeWhatsapp />
+    </a>
   )
 }
 
@@ -35,7 +102,13 @@ const NAV_CSS = `
 @media(max-width:1060px){.hdr .w{flex-wrap:wrap;justify-content:center;row-gap:10px}.hdr .nav{display:flex!important;flex-wrap:wrap;justify-content:center;gap:12px 18px;width:100%}}
 `
 
-export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
+export function SiteHeader({
+  f,
+  aqui,
+}: {
+  f: Funeraria | null | undefined
+  aqui?: 'obituario'
+}) {
   return (
     /* O wrapper `.sfc` NÃO é decoração: todo o CSS deste cabeçalho está escopado
      * em `.sfc .hdr`, e sem um ancestral com essa classe o cabeçalho sai CRU —
@@ -51,28 +124,36 @@ export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
       <style dangerouslySetInnerHTML={{ __html: NAV_CSS }} />
       <header className="hdr">
         <div className="w">
-          <a className="mark" href="/">
-            Funerária São Francisco
+          <a className="mark" href={inicioDe(f)}>
+            {f?.nome ?? ''}
           </a>
           <nav className="nav" aria-label="Navegação principal">
-            <a href="/">Home</a>
-            <a href="/planos">Planos</a>
-            <a
-              href="/obituario"
-              aria-current={aqui === 'obituario' ? 'page' : undefined}
-            >
-              Obituários
-            </a>
-            <details className="nav-areas">
-              <summary>Áreas atendidas</summary>
-              <div className="nav-areas-menu">
-                <a href="/cidade-catanduvas">Catanduvas</a>
-                <a href="/cidade-ibema">Ibema</a>
-                <a href="/cidade-tres-barras-do-parana">
-                  Três Barras do Paraná
+            {menuDe(f).map((item) =>
+              item.itens?.length ? (
+                <details className="nav-areas" key={item.rotulo}>
+                  <summary>{item.rotulo}</summary>
+                  <div className="nav-areas-menu">
+                    {item.itens.map((sub) => (
+                      <a href={sub.href} key={sub.href}>
+                        {sub.rotulo}
+                      </a>
+                    ))}
+                  </div>
+                </details>
+              ) : (
+                <a
+                  href={item.href}
+                  key={item.rotulo}
+                  aria-current={
+                    aqui === 'obituario' && item.href === '/obituario'
+                      ? 'page'
+                      : undefined
+                  }
+                >
+                  {item.rotulo}
                 </a>
-              </div>
-            </details>
+              ),
+            )}
           </nav>
         </div>
       </header>
@@ -80,53 +161,57 @@ export function SiteHeader({ aqui }: { aqui?: 'obituario' }) {
   )
 }
 
-export function SiteFooter() {
+export function SiteFooter({ f }: { f: Funeraria | null | undefined }) {
+  if (!f) return null
+  const zap = zapDe(f)
+  const navegar = linksPlanos(f)
   return (
     <footer className="site">
       <div className="w">
         <div className="cols">
           <div>
-            <p className="fm">Funerária São Francisco</p>
-            <p style={{ fontSize: '.92rem' }}>
-              Av. Adolfo Chagas, 401 — Centro
-              <br />
-              Catanduvas / PR · CEP 85470-000
-            </p>
-            <p style={{ marginTop: 18, fontSize: '.92rem' }}>
-              Atendimento presencial das 8h às 18h.
-              <br />
-              Plantão telefônico 24 horas, todos os dias.
-            </p>
+            <p className="fm">{f.nome}</p>
+            {f.endereco && (
+              <p style={{ fontSize: '.92rem' }}>{emLinhas(f.endereco)}</p>
+            )}
+            {f.siteHorario && (
+              <p style={{ marginTop: 18, fontSize: '.92rem' }}>
+                {emLinhas(f.siteHorario)}
+              </p>
+            )}
           </div>
           <div>
             <h2>Navegar</h2>
-            <a href="/">Home</a>
-            <a href="/planos">Planos</a>
-            <a href="/obituario">Obituários</a>
-            <a href="/cidade-catanduvas">Catanduvas</a>
-            <a href="/cidade-ibema">Ibema</a>
-            <a href="/cidade-tres-barras-do-parana">Três Barras do Paraná</a>
+            {navegar.map((l) => (
+              <a href={l.href} key={l.href}>
+                {l.rotulo}
+              </a>
+            ))}
           </div>
           <div>
             <h2>Contato</h2>
-            <a href={`tel:${TEL}`}>{TEL_LEGIVEL}</a>
-            <a href={ZAP}>WhatsApp</a>
-            <a href={`mailto:${EMAIL}`}>{EMAIL}</a>
-            <a href={`mailto:${EMAIL}`}>Ouvidoria</a>
+            {/* O tel: usa os dígitos do WhatsApp (já em formato internacional);
+                o rótulo mostra o telefone como a funerária o escreve. */}
+            {f.whatsapp && <a href={`tel:+${f.whatsapp}`}>{f.telefone}</a>}
+            {zap && <a href={zap}>WhatsApp</a>}
+            {f.email && (
+              <>
+                <a href={`mailto:${f.email}`}>{f.email}</a>
+                <a href={`mailto:${f.email}`}>Ouvidoria</a>
+              </>
+            )}
           </div>
-          <div>
-            <h2>Empresa</h2>
-            <p style={{ fontSize: '.92rem' }}>
-              CNPJ 79.036.497/0001-58
-              <br />
-              Alvará nº 105, de 1989
-              <br />
-              Carvalho &amp; Borak Ltda
-            </p>
-          </div>
+          {f.siteLegal && (
+            <div>
+              <h2>Empresa</h2>
+              <p style={{ fontSize: '.92rem' }}>{emLinhas(f.siteLegal)}</p>
+            </div>
+          )}
         </div>
         <div className="fbot">
-          <span>© 2026 Funerária São Francisco</span>
+          <span>
+            © {new Date().getFullYear()} {f.nome}
+          </span>
           <span>
             <a href="/privacidade">Política de privacidade</a> ·{' '}
             <a href="/termos">Termos de uso</a>
@@ -137,38 +222,36 @@ export function SiteFooter() {
   )
 }
 
-export function SiteBarras() {
-  return (
-    <>
-      <a
-        className="wa-float"
-        href={ZAP}
-        target="_blank"
-        rel="noopener"
-        aria-label="Falar com a Funerária São Francisco no WhatsApp"
-      >
-        <IconeWhatsapp />
-      </a>
-    </>
-  )
+export function SiteBarras({ f }: { f: Funeraria | null | undefined }) {
+  return <BotaoZap f={f} />
 }
 
 /* Cabeçalho mínimo: só o nome da casa, discreto, não fixo.
  * Usado no memorial — página íntima da família, sem nav/telefone/cidades. */
-function SiteHeaderMinimo() {
+function SiteHeaderMinimo({ f }: { f: Funeraria | null | undefined }) {
   return (
     <header className="hdr" style={{ position: 'static' }}>
       <div className="w" style={{ justifyContent: 'center' }}>
-        <a className="mark" href="/" style={{ textAlign: 'center' }}>
-          Funerária São Francisco
+        <a className="mark" href={inicioDe(f)} style={{ textAlign: 'center' }}>
+          {f?.nome ?? ''}
         </a>
       </div>
     </header>
   )
 }
 
+/** Linha de cidades do rodapé mínimo: as áreas atendidas quando a funerária as
+ *  declara, senão a cidade dela. */
+function areasDe(f: Funeraria | null | undefined): string {
+  const areas = menuDe(f)
+    .flatMap((i) => i.itens ?? [])
+    .map((s) => s.rotulo)
+  if (areas.length) return areas.join(' · ')
+  return f ? `${f.cidade} / ${f.uf}` : ''
+}
+
 /* Rodapé mínimo: uma assinatura discreta, sem colunas de marketing. */
-function SiteFooterMinimo() {
+function SiteFooterMinimo({ f }: { f: Funeraria | null | undefined }) {
   return (
     <footer
       style={{
@@ -186,7 +269,7 @@ function SiteFooterMinimo() {
           margin: 0,
         }}
       >
-        Funerária São Francisco
+        {f?.nome ?? ''}
       </p>
       <p
         style={{
@@ -195,7 +278,7 @@ function SiteFooterMinimo() {
           margin: '6px 0 0',
         }}
       >
-        Catanduvas · Ibema · Três Barras do Paraná
+        {areasDe(f)}
       </p>
       <p
         style={{
@@ -216,9 +299,6 @@ function SiteFooterMinimo() {
   )
 }
 
-/** Casca completa: cabeçalho e rodapé do site em volta do conteúdo do app.
- *  minimal=true → versão íntima (memorial): topo só com o nome, rodapé discreto,
- *  e apenas o botão flutuante do WhatsApp (sem barra dupla nem menu). */
 /** Primeiro elemento focável da página: pula cabeçalho e vai ao conteúdo.
  *
  *  POR QUE (18/08/2026, achado pelo gate `verifica-memorial` no fechamento):
@@ -237,12 +317,17 @@ function PularParaConteudo() {
   )
 }
 
+/** Casca completa: cabeçalho e rodapé do site em volta do conteúdo do app.
+ *  minimal=true → versão íntima (memorial): topo só com o nome, rodapé discreto,
+ *  e apenas o botão flutuante do WhatsApp (sem barra dupla nem menu). */
 export function SiteShell({
   children,
+  f,
   aqui,
   minimal,
 }: {
   children: ReactNode
+  f: Funeraria | null | undefined
   aqui?: 'obituario'
   minimal?: boolean
 }) {
@@ -250,35 +335,27 @@ export function SiteShell({
     return (
       <div className="sfc">
         <PularParaConteudo />
-        <SiteHeaderMinimo />
+        <SiteHeaderMinimo f={f} />
         <div id="conteudo" tabIndex={-1}>
           {children}
         </div>
-        <SiteFooterMinimo />
-        <a
-          className="wa-float"
-          href={ZAP}
-          target="_blank"
-          rel="noopener"
-          aria-label="Falar com a Funerária São Francisco no WhatsApp"
-        >
-          <IconeWhatsapp />
-        </a>
+        <SiteFooterMinimo f={f} />
+        <BotaoZap f={f} />
       </div>
     )
   }
   return (
     <div className="sfc">
       <PularParaConteudo />
-      <SiteHeader aqui={aqui} />
+      <SiteHeader f={f} aqui={aqui} />
       {/* tabIndex -1 para o alvo receber o foco de verdade ao saltar; sem isso o
           navegador rola até lá mas o foco fica onde estava, e a próxima tecla
           volta para o cabeçalho. */}
       <div id="conteudo" tabIndex={-1}>
         {children}
       </div>
-      <SiteFooter />
-      <SiteBarras />
+      <SiteFooter f={f} />
+      <SiteBarras f={f} />
     </div>
   )
 }
