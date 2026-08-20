@@ -62,7 +62,9 @@ export default function Privacidade() {
               <span className="legal-n">1.</span> Quem é o responsável pelos
               seus dados
             </h2>
-            <p>O controlador dos dados tratados neste site e no atendimento é:</p>
+            <p>
+              O controlador dos dados tratados neste site e no atendimento é:
+            </p>
             <BlocoIdentidade f={f} />
             <p>
               O contato para qualquer assunto de privacidade — inclusive o
@@ -85,8 +87,9 @@ export default function Privacidade() {
                 datas e cidades de nascimento e falecimento, fotografia, texto
                 biográfico e informações de velório e sepultamento da pessoa
                 falecida, além do nome de quem, pela família, autorizou a
-                publicação. Esses dados chegam até nós <b>pela própria família</b>
-                , no atendimento, e só vão ao ar com autorização dela.
+                publicação. Esses dados chegam até nós{' '}
+                <b>pela própria família</b>, no atendimento, e só vão ao ar com
+                autorização dela.
               </li>
               <li>
                 <b>Quando alguém acende uma vela ou deixa uma homenagem.</b> O
@@ -96,20 +99,23 @@ export default function Privacidade() {
               </li>
               <li>
                 <b>Quando você contrata um plano funerário ou é atendido.</b>{' '}
-                Nome, telefone, documento de identificação, endereço, o valor e o
-                dia de vencimento da mensalidade e o histórico do que foi pago ou
-                está em aberto. Esses dados ficam num cadastro interno, usado pela
-                equipe da funerária para administrar o contrato e a cobrança. Esse
-                cadastro <b>não é público</b> e não aparece em nenhuma página do
-                site.
+                Nome, telefone, documento de identificação, endereço, o valor e
+                o dia de vencimento da mensalidade e o histórico do que foi pago
+                ou está em aberto. Esses dados ficam num cadastro interno, usado
+                pela equipe da funerária para administrar o contrato e a
+                cobrança. Esse cadastro <b>não é público</b> e não aparece em
+                nenhuma página do site.
               </li>
               <li>
                 <b>Dados técnicos de navegação.</b> O provedor de hospedagem
                 registra dados de acesso para segurança e para manter o site no
-                ar. O site <b>não usa Google Analytics, pixel de rede social nem
-                qualquer ferramenta de publicidade ou rastreamento
-                comportamental</b>, e não carrega fontes, scripts ou imagens de
-                servidores de terceiros.
+                ar. O site{' '}
+                <b>
+                  não usa Google Analytics, pixel de rede social nem qualquer
+                  ferramenta de publicidade ou rastreamento comportamental
+                </b>
+                , e não carrega fontes, scripts ou imagens de servidores de
+                terceiros.
               </li>
             </ul>
 
@@ -196,20 +202,22 @@ export default function Privacidade() {
             </h2>
             <ul>
               <li>
-                Dados de atendimento e contratação: pelo prazo legal de guarda de
-                documentos fiscais e civis.
+                Dados de atendimento e contratação: pelo prazo legal de guarda
+                de documentos fiscais e civis.
               </li>
               <li>
                 Notas de falecimento e memoriais: enquanto a família desejar. A
                 pedido de familiar responsável, despublicamos ou apagamos — e a
                 exclusão remove também as fotografias armazenadas.
               </li>
-              <li>Velas e homenagens: enquanto o memorial estiver publicado.</li>
               <li>
-                Cadastro de plano funerário e histórico de pagamentos: enquanto o
-                contrato estiver ativo e, depois de encerrado, pelo prazo legal de
-                guarda contábil e fiscal. Encerrado esse prazo, o cadastro é
-                eliminado.
+                Velas e homenagens: enquanto o memorial estiver publicado.
+              </li>
+              <li>
+                Cadastro de plano funerário e histórico de pagamentos: enquanto
+                o contrato estiver ativo e, depois de encerrado, pelo prazo
+                legal de guarda contábil e fiscal. Encerrado esse prazo, o
+                cadastro é eliminado.
               </li>
               <li>
                 Registros técnicos de acesso: pelo prazo do provedor de
@@ -217,10 +225,10 @@ export default function Privacidade() {
               </li>
             </ul>
             <p className="legal-nota">
-              A LGPD protege pessoas naturais vivas. Dados da pessoa falecida são
-              publicados sob responsabilidade e autorização da família; ainda
-              assim, tratamos com respeito e removemos informações a pedido de
-              quem tenha legitimidade.
+              A LGPD protege pessoas naturais vivas. Dados da pessoa falecida
+              são publicados sob responsabilidade e autorização da família;
+              ainda assim, tratamos com respeito e removemos informações a
+              pedido de quem tenha legitimidade.
             </p>
 
             <h2>
@@ -228,11 +236,12 @@ export default function Privacidade() {
             </h2>
             <p>
               As páginas públicas deste site — obituário, notas de falecimento e
-              memoriais — <b>não usam cookies</b> de análise ou de publicidade. O
-              painel administrativo, restrito à equipe da funerária, usa um único
-              cookie estritamente necessário para manter a sessão de quem fez
-              login. Ele é <b>httpOnly</b>, viaja apenas por conexão segura, não
-              identifica visitantes e não acompanha ninguém por outros sites.
+              memoriais — <b>não usam cookies</b> de análise ou de publicidade.
+              O painel administrativo, restrito à equipe da funerária, usa um
+              único cookie estritamente necessário para manter a sessão de quem
+              fez login. Ele é <b>httpOnly</b>, viaja apenas por conexão segura,
+              não identifica visitantes e não acompanha ninguém por outros
+              sites.
             </p>
 
             <h2>
@@ -251,8 +260,8 @@ export default function Privacidade() {
               </li>
               <li>pedir a portabilidade dos dados;</li>
               <li>
-                revogar o consentimento e pedir a exclusão dos dados tratados com
-                base nele;
+                revogar o consentimento e pedir a exclusão dos dados tratados
+                com base nele;
               </li>
               <li>saber com quem compartilhamos seus dados;</li>
               <li>opor-se a um tratamento que considere irregular.</li>
@@ -269,11 +278,11 @@ export default function Privacidade() {
             <p>
               As senhas do painel são guardadas com derivação criptográfica
               (PBKDF2-SHA256) — nem a funerária nem o operador conseguem lê-las.
-              O site trafega inteiramente em HTTPS, o acesso ao painel é restrito
-              a pessoas autorizadas, e as homenagens passam por proteção contra
-              envio automatizado. Nenhum sistema é infalível: se ocorrer um
-              incidente com risco relevante, comunicaremos os titulares afetados
-              e a ANPD, como manda o art. 48 da LGPD.
+              O site trafega inteiramente em HTTPS, o acesso ao painel é
+              restrito a pessoas autorizadas, e as homenagens passam por
+              proteção contra envio automatizado. Nenhum sistema é infalível: se
+              ocorrer um incidente com risco relevante, comunicaremos os
+              titulares afetados e a ANPD, como manda o art. 48 da LGPD.
             </p>
 
             <h2>
@@ -284,8 +293,9 @@ export default function Privacidade() {
               Quando a nota de falecimento se refere a uma criança ou
               adolescente, ou quando eles aparecem em fotografias, o tratamento
               acontece no melhor interesse do menor e mediante autorização
-              expressa dos pais ou responsáveis. Mensagens de homenagem devem ser
-              enviadas por pessoas capazes ou sob responsabilidade de um adulto.
+              expressa dos pais ou responsáveis. Mensagens de homenagem devem
+              ser enviadas por pessoas capazes ou sob responsabilidade de um
+              adulto.
             </p>
 
             <h2>

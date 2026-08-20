@@ -9,9 +9,7 @@ import type { Funeraria } from '../memorial/types'
 export default function BlocoIdentidade({ f }: { f: Funeraria | null }) {
   if (!f) {
     return (
-      <p className="legal-identidade">
-        A funerária responsável por este site.
-      </p>
+      <p className="legal-identidade">A funerária responsável por este site.</p>
     )
   }
   /* "Razão social — nome fantasia X" só faz sentido quando as duas existem;
@@ -44,9 +42,7 @@ export default function BlocoIdentidade({ f }: { f: Funeraria | null }) {
           <br />
           {email && <a href={`mailto:${email}`}>{email}</a>}
           {email && f.telefone && ' · '}
-          {f.telefone && (
-            <a href={`tel:+${f.whatsapp}`}>{f.telefone}</a>
-          )}
+          {f.telefone && <a href={`tel:+${f.whatsapp}`}>{f.telefone}</a>}
         </>
       )}
     </p>

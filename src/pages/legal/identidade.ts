@@ -100,11 +100,9 @@ export function foro(f: Funeraria | null): string | null {
  *  que existir. Devolve null quando não há nada — aí a coluna some. */
 export function blocoEmpresa(f: Funeraria | null): string | null {
   if (!f) return null
-  const linhas = [
-    f.cnpj && `CNPJ ${f.cnpj}`,
-    f.alvara,
-    f.razaoSocial,
-  ].filter(Boolean) as string[]
+  const linhas = [f.cnpj && `CNPJ ${f.cnpj}`, f.alvara, f.razaoSocial].filter(
+    Boolean,
+  ) as string[]
   if (linhas.length) return linhas.join('\n')
   /* Inquilino antigo que ainda tem o texto livre da migration 0015. */
   return f.siteLegal

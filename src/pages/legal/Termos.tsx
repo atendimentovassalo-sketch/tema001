@@ -52,9 +52,9 @@ export default function Termos() {
         return (
           <>
             <p>
-              Estes termos valem para quem navega em <b>{dominio}</b>, consulta o
-              obituário, abre uma nota de falecimento ou deixa uma homenagem. Ao
-              usar o site, você concorda com eles.
+              Estes termos valem para quem navega em <b>{dominio}</b>, consulta
+              o obituário, abre uma nota de falecimento ou deixa uma homenagem.
+              Ao usar o site, você concorda com eles.
             </p>
 
             <h2>
@@ -72,9 +72,12 @@ export default function Termos() {
               homenagens dos visitantes.
             </p>
             <p>
-              O site <b>não fecha contrato, não processa pagamento e não
-              substitui o atendimento</b>. Em uma urgência, ligue: o telefone
-              funciona 24 horas.
+              O site{' '}
+              <b>
+                não fecha contrato, não processa pagamento e não substitui o
+                atendimento
+              </b>
+              . Em uma urgência, ligue: o telefone funciona 24 horas.
             </p>
 
             <h2>
@@ -128,8 +131,9 @@ export default function Termos() {
               As mensagens <b>podem passar por moderação</b> antes de aparecer,
               quando a família pede. Podemos <b>recusar ou remover</b> qualquer
               homenagem que descumpra estas regras, ou a pedido da família, sem
-              necessidade de aviso prévio. Ao enviar uma homenagem, você autoriza
-              a exibição do texto e do nome informado na página do memorial.
+              necessidade de aviso prévio. Ao enviar uma homenagem, você
+              autoriza a exibição do texto e do nome informado na página do
+              memorial.
             </p>
 
             <h2>
@@ -138,9 +142,9 @@ export default function Termos() {
             <p>
               Textos, identidade visual, fotografias e código são protegidos por
               direito autoral e pertencem à funerária identificada acima ou a
-              quem os licenciou. Você
-              pode <b>compartilhar os endereços das páginas livremente</b> — é
-              para isso que as notas existem. Reproduzir, copiar ou adaptar o
+              quem os licenciou. Você pode{' '}
+              <b>compartilhar os endereços das páginas livremente</b> — é para
+              isso que as notas existem. Reproduzir, copiar ou adaptar o
               conteúdo para outros fins depende de autorização por escrito.
             </p>
 
@@ -163,8 +167,8 @@ export default function Termos() {
               Trabalhamos para manter o site no ar e correto, mas ele pode ficar
               indisponível por manutenção ou falha de terceiros. Não respondemos
               por indisponibilidade momentânea nem por decisão tomada
-              exclusivamente com base em informação do site sem confirmação com a
-              funerária. Nada aqui limita a responsabilidade pelos serviços
+              exclusivamente com base em informação do site sem confirmação com
+              a funerária. Nada aqui limita a responsabilidade pelos serviços
               funerários efetivamente contratados, que seguem o contrato e o
               Código de Defesa do Consumidor.
             </p>
