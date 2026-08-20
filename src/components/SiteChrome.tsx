@@ -18,6 +18,7 @@
  * (<a> comum, não <Link>), porque as páginas institucionais são estáticas. */
 import type { ReactNode } from 'react'
 import type { Funeraria, ItemMenu } from '@/pages/memorial/types'
+import { blocoEmpresa } from '@/pages/legal/identidade'
 import './site-chrome.css'
 
 /** Menu de quem não tem site institucional: só o obituário, que é do app e
@@ -165,10 +166,14 @@ export function SiteFooter({ f }: { f: Funeraria | null | undefined }) {
   if (!f) return null
   const zap = zapDe(f)
   const navegar = linksPlanos(f)
+  /* CNPJ, alvará e razão social vêm dos campos estruturados (migration 0016),
+     os mesmos que nomeiam o controlador em /privacidade — um CNPJ só existe num
+     lugar. Sem eles a coluna "Empresa" some, e a grade vira 3 trilhas. */
+  const empresa = blocoEmpresa(f)
   return (
     <footer className="site">
       <div className="w">
-        <div className={f.siteLegal ? 'cols' : 'cols cols--3'}>
+        <div className={empresa ? 'cols' : 'cols cols--3'}>
           <div>
             <p className="fm">{f.nome}</p>
             {f.endereco && (
@@ -201,10 +206,10 @@ export function SiteFooter({ f }: { f: Funeraria | null | undefined }) {
               </>
             )}
           </div>
-          {f.siteLegal && (
+          {empresa && (
             <div>
               <h2>Empresa</h2>
-              <p style={{ fontSize: '.92rem' }}>{emLinhas(f.siteLegal)}</p>
+              <p style={{ fontSize: '.92rem' }}>{emLinhas(empresa)}</p>
             </div>
           )}
         </div>

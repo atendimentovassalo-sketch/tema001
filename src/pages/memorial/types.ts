@@ -27,8 +27,22 @@ export interface Funeraria {
   siteMenu: ItemMenu[] | null
   /** Horário de atendimento (texto livre, com quebras de linha). */
   siteHorario: string | null
-  /** CNPJ / alvará / razão social (texto livre, com quebras de linha). */
+  /** CNPJ / alvará / razão social (texto livre, com quebras de linha).
+   *  @deprecated desde a migration 0016 — o bloco "Empresa" do rodapé vem de
+   *  `razaoSocial` / `cnpj` / `alvara`. */
   siteLegal: string | null
+  /** Razão social do controlador dos dados, nomeada em /privacidade e /termos. */
+  razaoSocial: string | null
+  cnpj: string | null
+  /** Alvará de funcionamento — aparece no rodapé, não nos documentos. */
+  alvara: string | null
+  /** Contato do Encarregado (LGPD). Null = os documentos remetem ao e-mail
+   *  público, e na falta dele ao WhatsApp da funerária. */
+  dpoEmail: string | null
+  /** Comarca do foro eleito nos Termos. Null = a cláusula sai do documento. */
+  foroComarca: string | null
+  /** Logo da funerária. Null = o painel mostra o nome em tipo. */
+  logoUrl: string | null
 }
 
 export type TipoEvento = 'velorio' | 'cerimonia' | 'sepultamento'

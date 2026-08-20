@@ -559,6 +559,66 @@
   margin-right: 18px;
   flex: none;
 }
+/* Funerária sem logo subida: o nome ocupa a mesma placa carvão. Sem esta
+   regra o `<span>` viria como texto solto, do tamanho do corpo, e o painel
+   pareceria ter perdido o cabeçalho. */
+.adm-marca-texto {
+  display: inline-flex;
+  align-items: center;
+  background: var(--ink);
+  color: var(--papel, #FAF8F3);
+  font-family: var(--display, Fraunces, Georgia, serif);
+  font-size: 1.02rem;
+  line-height: 1.1;
+  padding: 12px 15px;
+  border-radius: 12px;
+  height: auto;
+  width: auto;
+  box-sizing: border-box;
+}
+.adm-lateral-marca .adm-marca-texto {
+  font-size: .92rem;
+  padding: 9px 12px;
+  border-radius: 9px;
+}
+
+/* Campo da logo: a prévia ao lado do seletor de arquivo, para o dono ver a
+   logo sobre a mesma placa escura em que ela vai aparecer. */
+.adm-logo-campo {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+.adm-logo-previa {
+  height: 46px;
+  width: auto;
+  display: block;
+  background: var(--ink);
+  padding: 10px 15px;
+  border-radius: 12px;
+  box-sizing: content-box;
+  flex: none;
+}
+.adm-logo-campo > div {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 240px;
+  flex: 1;
+}
+.adm-link {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: .86rem;
+  color: var(--bordo, #8A6828);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 .adm-marca img {
   height: 30px;
   width: auto;

@@ -1,8 +1,15 @@
 /* Moldura comum das páginas legais: topo + coluna de leitura + rodapé.
- * Busca a funerária só para nome/telefone no cabeçalho e rodapé. */
+ *
+ * O conteúdo é uma FUNÇÃO da funerária, e não elementos prontos: os documentos
+ * nomeiam o controlador dos dados, o CNPJ e o foro, e esses dados mudam por
+ * inquilino (ver `identidade.ts` e a migration 0016). Enquanto o inquilino não
+ * chegou, a página não é renderizada pela metade — as frases jurídicas seriam
+ * montadas com `null` e sairiam genéricas por um instante antes de trocar,
+ * numa página que as pessoas leem justamente para saber com quem estão
+ * lidando. */
 import { useEffect, useState, type ReactNode } from 'react'
 import { Link } from 'react-router-dom'
-import { fetchPublicados } from '../memorial/api'
+import { fetchFuneraria } from '../memorial/api'
 import type { Funeraria } from '../memorial/types'
 import '../memorial/memorial.css'
 import './legal.css'
@@ -14,22 +21,36 @@ export default function LegalLayout({
 }: {
   titulo: string
   atualizadoEm: string
-  children: ReactNode
+  children: (f: Funeraria | null) => ReactNode
 }) {
   const [f, setF] = useState<Funeraria | null>(null)
+  const [pronto, setPronto] = useState(false)
 
   useEffect(() => {
-    document.title = `${titulo} | Funerária`
-    fetchPublicados({ limite: 1 })
-      .then((r) => setF(r.funeraria))
-      .catch(() => {})
-  }, [titulo])
+    let vivo = true
+    fetchFuneraria()
+      .then((r) => {
+        if (!vivo) return
+        setF(r)
+        setPronto(true)
+      })
+      .catch(() => {
+        if (vivo) setPronto(true)
+      })
+    return () => {
+      vivo = false
+    }
+  }, [])
+
+  useEffect(() => {
+    document.title = f ? `${titulo} | ${f.nome}` : titulo
+  }, [titulo, f])
 
   return (
     <div className="memorial-root">
       <header className="topo">
         <div className="topo-in">
-          <a className="wm"  href="/">
+          <a className="wm" href="/">
             {f?.nome ?? 'Funerária'}
             {f && (
               <small>
@@ -38,7 +59,9 @@ export default function LegalLayout({
             )}
           </a>
           {f && (
-            <a className="tel" href={`tel:${f.telefone}`}>
+            /* tel: com os dígitos do WhatsApp (já em formato internacional); o
+               `f.telefone` é a grafia de leitura, não um número discável. */
+            <a className="tel" href={`tel:+${f.whatsapp}`}>
               <span>
                 <em>24 horas</em>
                 <span className="num">{f.telefone}</span>
@@ -51,8 +74,8 @@ export default function LegalLayout({
       <div className="legal-corpo">
         <p className="legal-atualizado">Atualizado em {atualizadoEm}</p>
         <h1>{titulo}</h1>
-        {children}
-        <a className="legal-voltar"  href="/">
+        {pronto ? children(f) : <p className="legal-atualizado">Carregando…</p>}
+        <a className="legal-voltar" href="/">
           ← Voltar ao site
         </a>
       </div>

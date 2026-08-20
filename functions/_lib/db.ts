@@ -56,6 +56,12 @@ export function toFunerariaDTO(t: TenantRow): FunerariaDTO {
     siteMenu: lerMenu(t.site_menu),
     siteHorario: t.site_horario ?? null,
     siteLegal: t.site_legal ?? null,
+    razaoSocial: t.razao_social ?? null,
+    cnpj: t.cnpj ?? null,
+    alvara: t.alvara ?? null,
+    dpoEmail: t.dpo_email ?? null,
+    foroComarca: t.foro_comarca ?? null,
+    logoUrl: t.logo_url ?? null,
   }
 }
 
@@ -194,6 +200,13 @@ export function toConfigDTO(t: TenantRow): ConfigDTO {
     velorioEnderecoPadrao: t.velorio_endereco_padrao,
     sepultamentoLocalPadrao: t.sepultamento_local_padrao,
     whatsappTemplate: t.whatsapp_template,
+    email: t.email ?? null,
+    razaoSocial: t.razao_social ?? null,
+    cnpj: t.cnpj ?? null,
+    alvara: t.alvara ?? null,
+    dpoEmail: t.dpo_email ?? null,
+    foroComarca: t.foro_comarca ?? null,
+    logoUrl: t.logo_url ?? null,
     /* Coluna acrescentada pela migration 0009: o `?? 1` cobre a janela entre o
      * deploy do código e a aplicação da migration, e tenants antigos. */
     diaInicioCiclo: (t as { dia_inicio_ciclo?: number }).dia_inicio_ciclo ?? 1,
@@ -209,7 +222,9 @@ export async function atualizarConfig(
     `UPDATE tenant SET nome = ?, cidade = ?, uf = ?, telefone = ?, whatsapp = ?,
       endereco = ?, desde = ?, sobre = ?, velorio_local_padrao = ?,
       velorio_endereco_padrao = ?, sepultamento_local_padrao = ?,
-      whatsapp_template = ?, dia_inicio_ciclo = ? WHERE id = ?`,
+      whatsapp_template = ?, dia_inicio_ciclo = ?,
+      email = ?, razao_social = ?, cnpj = ?, alvara = ?, dpo_email = ?,
+      foro_comarca = ?, logo_url = ? WHERE id = ?`,
   )
     .bind(
       c.nome,
@@ -225,6 +240,13 @@ export async function atualizarConfig(
       c.sepultamentoLocalPadrao,
       c.whatsappTemplate,
       c.diaInicioCiclo,
+      c.email,
+      c.razaoSocial,
+      c.cnpj,
+      c.alvara,
+      c.dpoEmail,
+      c.foroComarca,
+      c.logoUrl,
       tenantId,
     )
     .run()

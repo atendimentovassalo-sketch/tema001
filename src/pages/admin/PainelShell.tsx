@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { api } from '@/lib/api'
 import type { UsuarioAuth } from './auth'
+import { MarcaFuneraria, useFuneraria } from './marca'
 
 interface Secao {
   para: string
@@ -47,6 +48,7 @@ export default function PainelShell({
 }) {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const funeraria = useFuneraria()
   const [aberto, setAberto] = useState(false)
   const botaoRef = useRef<HTMLButtonElement>(null)
 
@@ -101,7 +103,7 @@ export default function PainelShell({
 
       <nav className="adm-lateral" id="adm-menu" aria-label="Seções do painel">
         <a className="adm-lateral-marca" href="/">
-          <img src="/logo.png" alt="" />
+          <MarcaFuneraria f={funeraria} classe="" descrever={false} />
           <span>
             Painel da funerária
             <small>{usuario.nome}</small>

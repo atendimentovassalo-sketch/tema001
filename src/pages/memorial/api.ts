@@ -107,8 +107,33 @@ export interface ConfigTenant {
   velorioEnderecoPadrao: string | null
   sepultamentoLocalPadrao: string | null
   whatsappTemplate: string | null
+  /* Identidade jurídica (migration 0016): alimenta /privacidade e /termos. */
+  email: string | null
+  /** Razão social do controlador dos dados, nomeada em /privacidade e /termos. */
+  razaoSocial: string | null
+  cnpj: string | null
+  /** Alvará de funcionamento — aparece no rodapé, não nos documentos. */
+  alvara: string | null
+  /** Contato do Encarregado (LGPD). Null = os documentos remetem ao e-mail
+   *  público, e na falta dele ao WhatsApp da funerária. */
+  dpoEmail: string | null
+  /** Comarca do foro eleito nos Termos. Null = a cláusula sai do documento. */
+  foroComarca: string | null
+  /** Logo da funerária. Null = o painel mostra o nome em tipo. */
+  logoUrl: string | null
   /* Dia em que começa o mês financeiro da funerária (1..28). Ver migration 0009. */
   diaInicioCiclo: number
+}
+
+/** Quem é a funerária deste domínio. Para as telas que não têm memorial nem
+ *  sessão: as páginas legais e o login do painel. */
+export async function fetchFuneraria(): Promise<Funeraria | null> {
+  try {
+    const r = await api.get<{ funeraria: Funeraria | null }>('/api/funeraria')
+    return r.funeraria
+  } catch {
+    return null
+  }
 }
 
 export async function fetchConfig(): Promise<{

@@ -1,13 +1,23 @@
-/* Termos de Uso. Campos entre destaque são preenchidos pela funerária. */
+/* Termos de Uso.
+ *
+ * Quem mantém o site e qual o foro eleito vêm do INQUILINO — ver
+ * `identidade.ts` e a migration 0016. A cláusula de foro SOME quando a comarca
+ * não foi declarada: errar a comarca é pior do que não eleger foro, porque sem
+ * eleição vale a regra geral da lei, que já protege o consumidor. */
 import LegalLayout from './LegalLayout'
+import { mantenedor, canalDeContato, foro } from './identidade'
 
 export default function Termos() {
   return (
     <LegalLayout titulo="Termos de Uso" atualizadoEm="agosto de 2026">
+      {(f) => {
+        const contato = canalDeContato(f)
+        const comarca = foro(f)
+        return (
+          <>
       <p>
         Estes Termos regem o uso deste site de memorial e obituário, mantido por{' '}
-        Carvalho &amp; Borak Ltda (Funerária São Francisco), CNPJ
-        79.036.497/0001-58. Ao acessar ou usar o site, você concorda com estas
+        {mantenedor(f)}. Ao acessar ou usar o site, você concorda com estas
         condições.
       </p>
 
@@ -98,17 +108,27 @@ export default function Termos() {
       </h2>
       <p>
         Podemos atualizar estes Termos; a data no topo indica a última revisão.
-        Dúvidas podem ser enviadas para equipeavassaladora@gmail.com.
+        Dúvidas podem ser enviadas por{' '}
+        {contato.href ? (
+          <a href={contato.href}>{contato.texto}</a>
+        ) : (
+          contato.texto
+        )}
+        .
       </p>
 
       <h2>
         <span className="legal-n">10.</span> Lei aplicável e foro
       </h2>
       <p>
-        Aplica-se a legislação brasileira. Fica eleito o foro da comarca de
-        Catanduvas, Estado do Paraná, salvo disposição legal em contrário que
-        favoreça o consumidor.
+        Aplica-se a legislação brasileira.
+        {comarca
+          ? ` Fica eleito o foro da comarca de ${comarca}, salvo disposição legal em contrário que favoreça o consumidor.`
+          : ' A competência para dirimir controvérsias segue as regras legais aplicáveis, inclusive as de proteção ao consumidor.'}
       </p>
+          </>
+        )
+      }}
     </LegalLayout>
   )
 }

@@ -1,10 +1,19 @@
-/* Política de Privacidade (LGPD). Os campos entre destaque são preenchidos
- * pela funerária antes de ir ao ar (razão social, CNPJ, contato do DPO). */
+/* Política de Privacidade (LGPD).
+ *
+ * Quem responde pelos dados vem do INQUILINO, não do código: esta página é
+ * servida no domínio de cada funerária, e até 20/08/2026 declarava a Carvalho
+ * & Borak Ltda como controladora em todos eles. As frases são montadas em
+ * `identidade.ts`, que nunca imprime lacuna nem inventa dado. */
 import LegalLayout from './LegalLayout'
+import { controlador, canalDeContato } from './identidade'
 
 export default function Privacidade() {
   return (
     <LegalLayout titulo="Política de Privacidade" atualizadoEm="agosto de 2026">
+      {(f) => {
+        const contato = canalDeContato(f)
+        return (
+          <>
       <p>
         Esta Política explica como tratamos dados pessoais neste site de
         memorial e obituário, em conformidade com a Lei nº 13.709/2018 (Lei
@@ -16,11 +25,14 @@ export default function Privacidade() {
         <span className="legal-n">1.</span> Quem é o controlador
       </h2>
       <p>
-        O controlador dos dados é Carvalho &amp; Borak Ltda (Funerária São
-        Francisco), inscrita no CNPJ sob nº 79.036.497/0001-58, com sede na
-        Avenida Adolfo Chagas, 401 — Centro, Catanduvas/PR, CEP 85.470-000. Para
-        assuntos de privacidade, fale com o Encarregado (DPO) pelo e-mail{' '}
-        equipeavassaladora@gmail.com.
+        O controlador dos dados é {controlador(f)}. Para assuntos de
+        privacidade, fale com o Encarregado (DPO) por{' '}
+        {contato.href ? (
+          <a href={contato.href}>{contato.texto}</a>
+        ) : (
+          contato.texto
+        )}
+        .
       </p>
 
       <h2>
@@ -111,8 +123,13 @@ export default function Privacidade() {
         Nos termos da LGPD, você pode solicitar confirmação de tratamento,
         acesso, correção, anonimização, portabilidade, informação sobre
         compartilhamento e a exclusão de dados tratados com base no
-        consentimento, além de revogar o consentimento. Para exercer, escreva
-        para equipeavassaladora@gmail.com.
+        consentimento, além de revogar o consentimento. Para exercer, use{' '}
+        {contato.href ? (
+          <a href={contato.href}>{contato.texto}</a>
+        ) : (
+          contato.texto
+        )}
+        .
       </p>
 
       <h2>
@@ -140,7 +157,9 @@ export default function Privacidade() {
         Podemos atualizar esta Política. A data no topo indica a última revisão.
         Mudanças relevantes serão sinalizadas no site.
       </p>
-
+          </>
+        )
+      }}
     </LegalLayout>
   )
 }

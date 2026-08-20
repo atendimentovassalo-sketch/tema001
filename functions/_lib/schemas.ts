@@ -57,6 +57,16 @@ export const configInputSchema = z.object({
   velorioEnderecoPadrao: z.string().trim().max(200).nullable().default(null),
   sepultamentoLocalPadrao: z.string().trim().max(160).nullable().default(null),
   whatsappTemplate: z.string().trim().max(1000).nullable().default(null),
+  /* Identidade jurídica (migration 0016). Tudo opcional: um campo em branco faz
+     a frase do documento sair sem ele, o que é preferível a exigir do dono da
+     funerária um dado que ele pode não ter à mão no primeiro acesso. */
+  email: z.string().trim().toLowerCase().email('E-mail inválido.').max(160).nullable().default(null),
+  razaoSocial: z.string().trim().max(160).nullable().default(null),
+  cnpj: z.string().trim().max(24).nullable().default(null),
+  alvara: z.string().trim().max(120).nullable().default(null),
+  dpoEmail: z.string().trim().toLowerCase().email('E-mail do encarregado inválido.').max(160).nullable().default(null),
+  foroComarca: z.string().trim().max(120).nullable().default(null),
+  logoUrl: z.string().trim().max(300).nullable().default(null),
   // 1..28: ver migration 0009 (fevereiro).
   diaInicioCiclo: z.number().int().min(1).max(28).default(1),
 })

@@ -4,7 +4,12 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import { ApiError } from '@/lib/api'
-import { fetchConfig, salvarConfig, type ConfigTenant } from '../memorial/api'
+import {
+  fetchConfig,
+  salvarConfig,
+  uploadFoto,
+  type ConfigTenant,
+} from '../memorial/api'
 import { TEMPLATE_WHATSAPP_PADRAO, VARIAVEIS_WHATSAPP } from '../memorial/share'
 import { useSessao } from './auth'
 import PainelShell from './PainelShell'
@@ -15,6 +20,7 @@ export default function AdminConfig() {
   const { carregando, usuario } = useSessao()
   const [cfg, setCfg] = useState<ConfigTenant | null>(null)
   const [salvando, setSalvando] = useState(false)
+  const [subindoLogo, setSubindoLogo] = useState(false)
 
   useEffect(() => {
     document.title = 'Configurações — Painel'
@@ -33,6 +39,26 @@ export default function AdminConfig() {
 
   function set<K extends keyof ConfigTenant>(k: K, v: ConfigTenant[K]) {
     setCfg((c) => (c ? { ...c, [k]: v } : c))
+  }
+
+  /* A logo reaproveita o mesmo upload das fotos de memorial: mesma checagem de
+     assinatura binária no servidor, mesmo R2. O que muda é onde o caminho é
+     guardado — aqui ele só entra no formulário, e vale quando salvar. */
+  async function enviarLogo(e: React.ChangeEvent<HTMLInputElement>) {
+    const arquivo = e.target.files?.[0]
+    e.target.value = ''
+    if (!arquivo) return
+    setSubindoLogo(true)
+    try {
+      set('logoUrl', await uploadFoto(arquivo))
+      toast.success('Logo enviada — salve para aplicar')
+    } catch (err) {
+      toast.error(
+        err instanceof ApiError ? err.message : 'Não foi possível enviar.',
+      )
+    } finally {
+      setSubindoLogo(false)
+    }
   }
 
   async function salvar(e: React.FormEvent) {
@@ -163,6 +189,125 @@ export default function AdminConfig() {
                 rows={3}
               />
             </label>
+          </section>
+
+          <section className="adm-bloco">
+            <h2>Identidade jurídica e marca</h2>
+            <p className="adm-sub">
+              Isto aqui não é enfeite de cadastro: são os dados que a{' '}
+              <a href="/privacidade" target="_blank" rel="noopener">
+                Política de Privacidade
+              </a>{' '}
+              e os{' '}
+              <a href="/termos" target="_blank" rel="noopener">
+                Termos de Uso
+              </a>{' '}
+              publicam no seu site. Campo em branco sai da frase — nada é
+              inventado, e nada aparece como lacuna.
+            </p>
+
+            <label>
+              <span className="adm-rot">Logo</span>
+              <div className="adm-logo-campo">
+                {cfg.logoUrl ? (
+                  <img className="adm-logo-previa" src={cfg.logoUrl} alt="" />
+                ) : (
+                  <span className="adm-logo-previa adm-marca-texto">
+                    {cfg.nome}
+                  </span>
+                )}
+                <div>
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={enviarLogo}
+                    disabled={subindoLogo}
+                  />
+                  {cfg.logoUrl && (
+                    <button
+                      type="button"
+                      className="adm-link"
+                      onClick={() => set('logoUrl', null)}
+                    >
+                      Remover a logo
+                    </button>
+                  )}
+                  <span className="adm-dica">
+                    PNG com fundo transparente funciona melhor: a logo é
+                    exibida sobre uma placa escura. Sem logo, o painel mostra o
+                    nome da funerária.
+                  </span>
+                </div>
+              </div>
+            </label>
+
+            <div className="adm-par">
+              <label>
+                <span className="adm-rot">E-mail público</span>
+                <input
+                  type="email"
+                  value={cfg.email ?? ''}
+                  onChange={(e) => set('email', e.target.value || null)}
+                  placeholder="atendimento@suafuneraria.com.br"
+                />
+                <span className="adm-dica">Aparece no rodapé do site.</span>
+              </label>
+              <label>
+                <span className="adm-rot">E-mail do Encarregado (LGPD)</span>
+                <input
+                  type="email"
+                  value={cfg.dpoEmail ?? ''}
+                  onChange={(e) => set('dpoEmail', e.target.value || null)}
+                  placeholder="Se vazio, usa o e-mail público"
+                />
+                <span className="adm-dica">
+                  Quem responde pedidos de acesso e remoção de dados.
+                </span>
+              </label>
+            </div>
+
+            <div className="adm-par">
+              <label>
+                <span className="adm-rot">Razão social</span>
+                <input
+                  value={cfg.razaoSocial ?? ''}
+                  onChange={(e) => set('razaoSocial', e.target.value || null)}
+                  placeholder="Ex.: Fulano & Beltrano Ltda"
+                />
+              </label>
+              <label>
+                <span className="adm-rot">CNPJ</span>
+                <input
+                  value={cfg.cnpj ?? ''}
+                  onChange={(e) => set('cnpj', e.target.value || null)}
+                  placeholder="00.000.000/0001-00"
+                />
+              </label>
+            </div>
+
+            <div className="adm-par">
+              <label>
+                <span className="adm-rot">Alvará</span>
+                <input
+                  value={cfg.alvara ?? ''}
+                  onChange={(e) => set('alvara', e.target.value || null)}
+                  placeholder="Ex.: Alvará nº 105, de 1989"
+                />
+                <span className="adm-dica">Só aparece no rodapé.</span>
+              </label>
+              <label>
+                <span className="adm-rot">Comarca do foro</span>
+                <input
+                  value={cfg.foroComarca ?? ''}
+                  onChange={(e) => set('foroComarca', e.target.value || null)}
+                  placeholder="Ex.: Catanduvas, Estado do Paraná"
+                />
+                <span className="adm-dica">
+                  Em branco, os Termos não elegem foro — e vale a regra geral da
+                  lei, que já protege o consumidor. Melhor vazio do que errado.
+                </span>
+              </label>
+            </div>
           </section>
 
           <section className="adm-bloco">

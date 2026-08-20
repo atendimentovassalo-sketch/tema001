@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams, Link } from 'react-router-dom'
 import { api, ApiError } from '@/lib/api'
 import { useSessao } from './auth'
+import { MarcaFuneraria, useFuneraria } from './marca'
 import './admin.css'
 
 export default function AdminLogin() {
@@ -12,6 +13,7 @@ export default function AdminLogin() {
   const primeiroAcesso = !!convite
 
   const { carregando, usuario } = useSessao()
+  const funeraria = useFuneraria()
   const [email, setEmail] = useState('')
   const [senha, setSenha] = useState('')
   const [enviando, setEnviando] = useState(false)
@@ -48,11 +50,7 @@ export default function AdminLogin() {
   return (
     <div className="adm adm-login-wrap">
       <div className="adm-login">
-        <img
-          className="adm-logo"
-          src="/logo.png"
-          alt="Funerária São Francisco — Catanduvas/PR"
-        />
+        <MarcaFuneraria f={funeraria} classe="adm-logo" />
         <div className="adm-brand">
           Painel da funerária
           <small>Área restrita</small>

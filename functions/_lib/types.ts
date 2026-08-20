@@ -39,6 +39,13 @@ export interface TenantRow {
   site_menu?: string | null
   site_horario?: string | null
   site_legal?: string | null
+  /* Migration 0016 — identidade jurídica e logo. */
+  razao_social?: string | null
+  cnpj?: string | null
+  alvara?: string | null
+  dpo_email?: string | null
+  foro_comarca?: string | null
+  logo_url?: string | null
 }
 
 export interface UsuarioRow {
@@ -135,8 +142,26 @@ export interface FunerariaDTO {
   siteMenu: ItemMenuDTO[] | null
   /** Horário de atendimento, texto livre com quebras de linha. */
   siteHorario: string | null
-  /** CNPJ / alvará / razão social, texto livre com quebras de linha. */
+  /** CNPJ / alvará / razão social, texto livre com quebras de linha.
+   *  @deprecated desde a migration 0016 — o bloco "Empresa" do rodapé é montado
+   *  a partir de `razaoSocial` / `cnpj` / `alvara`. Mantido só para inquilinos
+   *  antigos que ainda tenham a coluna preenchida. */
   siteLegal: string | null
+  /* --- identidade jurídica: as páginas /privacidade e /termos são montadas a
+     partir daqui. Ver migration 0016. --- */
+  /** Razão social do controlador dos dados. */
+  razaoSocial: string | null
+  cnpj: string | null
+  /** Alvará de funcionamento — só decoração de rodapé, não entra nos documentos. */
+  alvara: string | null
+  /** Contato do Encarregado (LGPD). Null = os documentos remetem ao e-mail
+   *  público, e na falta dele ao WhatsApp da funerária. */
+  dpoEmail: string | null
+  /** Comarca do foro eleito nos Termos, ex.: "Catanduvas, Estado do Paraná".
+   *  Null = a cláusula de foro sai do documento (não se inventa foro). */
+  foroComarca: string | null
+  /** Logo da funerária (caminho do R2 ou estático). Null = usa o nome em tipo. */
+  logoUrl: string | null
 }
 
 /** Configuração editável da funerária (área admin). */
@@ -153,6 +178,15 @@ export interface ConfigDTO {
   velorioEnderecoPadrao: string | null
   sepultamentoLocalPadrao: string | null
   whatsappTemplate: string | null
+  /* Identidade jurídica (migration 0016): alimenta /privacidade e /termos. É
+     configuração da funerária, e por isso mora aqui e não só no DTO público. */
+  email: string | null
+  razaoSocial: string | null
+  cnpj: string | null
+  alvara: string | null
+  dpoEmail: string | null
+  foroComarca: string | null
+  logoUrl: string | null
   /* Dia em que começa o mês financeiro da funerária (1..28). Ver migration 0009.
    * Fica só aqui, e não no DTO público: é configuração interna. */
   diaInicioCiclo: number
