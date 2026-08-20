@@ -5,7 +5,7 @@
  * & Borak Ltda como controladora em todos eles. As frases são montadas em
  * `identidade.ts`, que nunca imprime lacuna nem inventa dado. */
 import LegalLayout from './LegalLayout'
-import { controlador, canalDeContato } from './identidade'
+import { controlador, enderecoSede, canalDeContato } from './identidade'
 
 export default function Privacidade() {
   return (
@@ -25,13 +25,15 @@ export default function Privacidade() {
         <span className="legal-n">1.</span> Quem é o controlador
       </h2>
       <p>
-        O controlador dos dados é {controlador(f)}. Para assuntos de
-        privacidade, fale com o Encarregado (DPO) por{' '}
-        {contato.href ? (
-          <a href={contato.href}>{contato.texto}</a>
-        ) : (
-          contato.texto
-        )}
+        O controlador dos dados é {controlador(f)}.
+        {enderecoSede(f) && ` Endereço: ${enderecoSede(f)}.`} Para assuntos de
+        privacidade, fale com o Encarregado (DPO) {contato.prefixo}
+        {contato.texto &&
+          (contato.href ? (
+            <a href={contato.href}>{contato.texto}</a>
+          ) : (
+            contato.texto
+          ))}
         .
       </p>
 
@@ -123,12 +125,14 @@ export default function Privacidade() {
         Nos termos da LGPD, você pode solicitar confirmação de tratamento,
         acesso, correção, anonimização, portabilidade, informação sobre
         compartilhamento e a exclusão de dados tratados com base no
-        consentimento, além de revogar o consentimento. Para exercer, use{' '}
-        {contato.href ? (
-          <a href={contato.href}>{contato.texto}</a>
-        ) : (
-          contato.texto
-        )}
+        consentimento, além de revogar o consentimento. Para exercer, entre em
+        contato {contato.prefixo}
+        {contato.texto &&
+          (contato.href ? (
+            <a href={contato.href}>{contato.texto}</a>
+          ) : (
+            contato.texto
+          ))}
         .
       </p>
 

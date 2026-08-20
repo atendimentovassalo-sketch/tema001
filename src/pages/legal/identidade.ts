@@ -29,7 +29,7 @@ export function nomeDe(f: Funeraria | null): string {
  * Quem responde pelo site. Sai em uma de quatro formas, conforme o que a
  * funerária preencheu:
  *   "Carvalho & Borak Ltda (Funerária São Francisco), inscrita no CNPJ sob
- *    nº 79.036.497/0001-58, com sede na Av. …"
+ *    nº 79.036.497/0001-58"
  *   "Funerária São Francisco, inscrita no CNPJ sob nº …"
  *   "Carvalho & Borak Ltda (Funerária Modelo)"
  *   "a funerária responsável por este site"
@@ -37,11 +37,17 @@ export function nomeDe(f: Funeraria | null): string {
 export function controlador(f: Funeraria | null): string {
   if (!f) return nomeDe(null)
   const quem = f.razaoSocial ? `${f.razaoSocial} (${f.nome})` : f.nome
-  return frase(
-    quem,
-    f.cnpj && `, inscrita no CNPJ sob nº ${f.cnpj}`,
-    f.endereco && `, com sede em ${f.endereco}`,
-  )
+  /* O endereço NÃO entra aqui, e não é descuido: ele é texto livre que começa
+     ora com "Avenida", ora com "Rua", ora com "Praça" — nenhuma preposição
+     serve para todos ("com sede em Avenida" está errado, "na Rua" idem quando
+     vier "Sítio"). Sai em frase própria, com dois-pontos. Ver `enderecoSede`. */
+  return frase(quem, f.cnpj && `, inscrita no CNPJ sob nº ${f.cnpj}`)
+}
+
+/** O endereço da sede como frase independente, para fugir do problema de
+ *  concordância acima. Null quando a funerária não declarou endereço. */
+export function enderecoSede(f: Funeraria | null): string | null {
+  return f?.endereco ?? null
 }
 
 /** Versão curta, para a abertura dos Termos (sem endereço). */
@@ -58,18 +64,29 @@ export function mantenedor(f: Funeraria | null): string {
  * prometer "escreva para" quando o canal é uma conversa.
  */
 export function canalDeContato(f: Funeraria | null): {
-  texto: string
+  /** Já vem com a preposição contraída — "pelo e-mail ", "pelos canais…". Sem
+   *  isso a frase saía "fale com o Encarregado (DPO) por os canais". */
+  prefixo: string
+  /** A parte clicável, quando existe. Null quando o canal é uma descrição. */
+  texto: string | null
   href: string | null
 } {
   const email = f?.dpoEmail ?? f?.email ?? null
-  if (email) return { texto: email, href: `mailto:${email}` }
+  if (email) {
+    return { prefixo: 'pelo e-mail ', texto: email, href: `mailto:${email}` }
+  }
   if (f?.whatsapp) {
     return {
-      texto: 'o WhatsApp da funerária',
+      prefixo: 'pelo ',
+      texto: 'WhatsApp da funerária',
       href: `https://wa.me/${f.whatsapp}`,
     }
   }
-  return { texto: 'os canais de atendimento da funerária', href: null }
+  return {
+    prefixo: 'pelos canais de atendimento da funerária',
+    texto: null,
+    href: null,
+  }
 }
 
 /** Cláusula de foro: só existe se a comarca foi declarada. Foro não se deduz

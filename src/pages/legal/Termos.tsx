@@ -108,12 +108,13 @@ export default function Termos() {
       </h2>
       <p>
         Podemos atualizar estes Termos; a data no topo indica a última revisão.
-        Dúvidas podem ser enviadas por{' '}
-        {contato.href ? (
-          <a href={contato.href}>{contato.texto}</a>
-        ) : (
-          contato.texto
-        )}
+        Dúvidas podem ser enviadas {contato.prefixo}
+        {contato.texto &&
+          (contato.href ? (
+            <a href={contato.href}>{contato.texto}</a>
+          ) : (
+            contato.texto
+          ))}
         .
       </p>
 
