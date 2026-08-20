@@ -61,6 +61,19 @@
   line-height: 1.6;
   color: var(--muted, #565049);
 }
+/* Bloco de identificação (quem responde, CNPJ, endereço, contatos). Fica em
+   linhas curtas e não em parágrafo corrido: quem procura o CNPJ numa política
+   de privacidade está procurando um dado, não lendo um texto. */
+.legal-corpo .legal-identidade {
+  margin-top: 14px;
+  padding-left: 16px;
+  border-left: 1px solid var(--linha);
+  line-height: 1.75;
+}
+.legal-corpo .legal-identidade b {
+  font-weight: 600;
+}
+
 .legal-corpo .legal-ph {
   background: rgba(181, 98, 63, 0.12);
   border-radius: 2px;
