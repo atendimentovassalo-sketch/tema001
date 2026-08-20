@@ -24,6 +24,37 @@
 # deploy com uma lista incompleta removeria as que faltassem — ou seja, tiraria o
 # site da cliente do ar. Rotas continuam sendo gerenciadas no painel até alguém
 # ter tempo de conferir a lista inteira e trazê-la para cá com segurança.
+#
+# CONFIRMADO NA DOCUMENTAÇÃO (20/08/2026), e não mais por dedução:
+#   "If you change your routes in the dashboard, Wrangler will override them in
+#    the next deploy with the routes you have set in your Wrangler configuration
+#    file."  — developers.cloudflare.com/workers/wrangler/configuration/
+# A lista do arquivo é AUTORITATIVA, não aditiva. Vale também para
+# `wrangler deploy --route`: a flag define a lista, não acrescenta a ela.
+#
+# ─────────────────────────────────────────────────────────────────────────────
+# PENDENTE (20/08/2026): rotas das páginas legais
+# ─────────────────────────────────────────────────────────────────────────────
+# `/privacidade` e `/termos` do app já são montadas por inquilino (migration
+# 0016), mas não passam por aqui — logo, ninguém as vê. Para ligá-las, ADICIONAR
+# NO PAINEL (Workers & Pages → proxy-obituario → Settings → Domains & Routes),
+# uma por vez, sem tocar nas existentes:
+#
+#     novomodelo.com.br/privacidade
+#     novomodelo.com.br/termos
+#
+# E o mesmo par para o domínio de cada funerária nova, no onboarding.
+#
+# NÃO adicionar para funerariacatanduvas.com.br. Medido em 20/08/2026: o site
+# estático da cliente já serve as duas, e são MELHORES que as do app —
+# privacidade com 1.197 palavras, datada de 4 de agosto de 2026, citando o
+# art. 41 da LGPD e nomeando o encarregado; termos com 756 palavras, com foro e
+# alvará. As do app são genéricas. Rotear lá seria trocar o documento jurídico
+# publicado da cliente por um pior.
+#
+# O Worker NÃO precisa de mudança de código para isso: qualquer caminho roteado
+# é encaminhado ao Pages, e o HTML que não casa com /obituario|m|memorial/<slug>
+# recebe o `og:` genérico do tenant. Só falta a rota existir.
 
 name = "proxy-obituario"
 main = "worker.js"
