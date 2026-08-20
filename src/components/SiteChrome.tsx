@@ -168,7 +168,7 @@ export function SiteFooter({ f }: { f: Funeraria | null | undefined }) {
   return (
     <footer className="site">
       <div className="w">
-        <div className="cols">
+        <div className={f.siteLegal ? 'cols' : 'cols cols--3'}>
           <div>
             <p className="fm">{f.nome}</p>
             {f.endereco && (

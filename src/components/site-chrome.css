@@ -86,6 +86,9 @@
 .sfc .btn:hover{background:var(--bordo)}
 .sfc footer.site{background:var(--ink);color:var(--mutedD);padding-block:76px 34px;border:0}
 .sfc footer.site .cols{display:grid;grid-template-columns:1.7fr 1fr 1fr 1.1fr;gap:48px}
+/* Funerária que não declarou CNPJ/alvará não tem a coluna "Empresa": são 3.
+   Sem esta regra a quarta trilha ficava vazia e o rodapé parecia quebrado. */
+.sfc footer.site .cols--3{grid-template-columns:1.7fr 1fr 1fr}
 .sfc footer.site h2{font-family:var(--display);font-style:italic;font-size:1.02rem;letter-spacing:0;
   text-transform:none;color:var(--paper);font-weight:400;margin-bottom:20px;opacity:.72}
 .sfc footer.site a{display:block;margin-bottom:12px;text-decoration:none;font-size:.92rem}
