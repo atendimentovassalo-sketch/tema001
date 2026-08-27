@@ -19,11 +19,14 @@ VALUES (
   '#B5623F'
 );
 
--- Admin sem senha ainda: define no 1º acesso (Fase 3). O convite_token abaixo
--- é só de DEV (tenant de demonstração); clientes reais recebem token aleatório.
+-- Admin sem senha ainda: define no 1º acesso.
+-- ATENCAO: seed EXCLUSIVO DE DEV (tenant 't-demo'). NUNCA rode em produção.
+-- convite_token guardado como HASH sha256 (a app faz hash do token no lookup).
+-- Token de DEV em claro: 'convite-demo-inicial' (use em /admin/login?convite=...).
+-- Validade curta de propósito; clientes reais recebem token aleatório de uso único.
 INSERT INTO usuario (id, tenant_id, nome, email, papel, ativo, convite_token, convite_expira)
 VALUES ('u-admin', 't-demo', 'Administrador', 'admin@funerariademonstracao.com.br',
-  'admin', 1, 'convite-demo-inicial', datetime('now', '+3650 days'));
+  'admin', 1, 'ff0f0d5c0b3ceccbed1ef7251733bf097d8c904a3f737de939d95c04594df4fc', datetime('now', '+7 days'));
 
 -- ---- Dona Nair -----------------------------------------------------------
 INSERT INTO memorial (id, tenant_id, slug, nome_completo, apelido, foto_url,

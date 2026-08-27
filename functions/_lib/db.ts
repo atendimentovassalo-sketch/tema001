@@ -14,6 +14,13 @@ import type {
   HomenagemDTO,
   MemorialDTO,
 } from './types'
+import { sha256Hex } from './http'
+
+/** Hash (SHA-256) de um token: nunca guardamos o valor cru no banco, só o
+ *  hash. O cliente recebe o token; um vazamento do D1 não sequestra sessões. */
+async function hashToken(token: string): Promise<string> {
+  return sha256Hex(token)
+}
 
 /* ---------- mapeadores ---------- */
 
@@ -396,7 +403,7 @@ export async function inserirHomenagem(
       h.texto,
       h.vela ? 1 : 0,
       h.status,
-      h.aprovarToken,
+      h.aprovarToken ? await hashToken(h.aprovarToken) : null,
       h.ipHash,
     )
     .run()
@@ -410,7 +417,7 @@ export async function getHomenagemPorToken(
     (await env.DB.prepare(
       `SELECT * FROM homenagem WHERE aprovar_token = ? LIMIT 1`,
     )
-      .bind(token)
+      .bind(await hashToken(token))
       .first<HomenagemRow>()) ?? null
   )
 }
@@ -464,7 +471,7 @@ export async function getUsuarioPorConvite(
     (await env.DB.prepare(
       `SELECT * FROM usuario WHERE convite_token = ? AND ativo = 1 LIMIT 1`,
     )
-      .bind(token)
+      .bind(await hashToken(token))
       .first<UsuarioRow>()) ?? null
   )
 }
@@ -481,6 +488,8 @@ export async function definirSenhaUsuario(
   )
     .bind(hash, salt, id)
     .run()
+  // trocar a senha derruba todas as sessões abertas do usuário (segurança)
+  await env.DB.prepare(`DELETE FROM sessao WHERE usuario_id = ?`).bind(id).run()
 }
 
 /** Gera/atualiza o token de convite para recuperação de senha. */
@@ -493,7 +502,7 @@ export async function definirConviteRecuperacao(
   await env.DB.prepare(
     `UPDATE usuario SET convite_token = ?, convite_expira = ? WHERE id = ?`,
   )
-    .bind(token, expiraISO, id)
+    .bind(await hashToken(token), expiraISO, id)
     .run()
 }
 
@@ -515,7 +524,7 @@ export async function inserirSessao(
   await env.DB.prepare(
     `INSERT INTO sessao (id, usuario_id, tenant_id, expira_em) VALUES (?, ?, ?, ?)`,
   )
-    .bind(token, usuarioId, tenantId, expiraISO)
+    .bind(await hashToken(token), usuarioId, tenantId, expiraISO)
     .run()
 }
 
@@ -537,13 +546,13 @@ export async function getSessaoComUsuario(
      FROM sessao s JOIN usuario u ON u.id = s.usuario_id
      WHERE s.id = ? AND s.expira_em > datetime('now') AND u.ativo = 1 LIMIT 1`,
   )
-    .bind(token)
+    .bind(await hashToken(token))
     .first<SessaoUsuario>()
   return row ?? null
 }
 
 export async function deletarSessao(env: Env, token: string): Promise<void> {
-  await env.DB.prepare(`DELETE FROM sessao WHERE id = ?`).bind(token).run()
+  await env.DB.prepare(`DELETE FROM sessao WHERE id = ?`).bind(await hashToken(token)).run()
 }
 
 /* ----- administração de usuários da funerária ----- */
@@ -651,7 +660,7 @@ export async function criarUsuario(
       dados.nome,
       dados.email.toLowerCase(),
       dados.papel,
-      dados.conviteToken,
+      await hashToken(dados.conviteToken),
       dados.conviteExpiraISO,
     )
     .run()
@@ -1042,4 +1051,35 @@ export async function getHomenagemDoTenant(
       .bind(tenantId, id)
       .first<{ id: string }>()) ?? null
   )
+}
+
+/* ===================== RATE-LIMIT DE AUTENTICAÇÃO ===================== */
+
+/** Registra uma tentativa (login/recuperação) por hash de IP. */
+export async function registrarTentativaAuth(
+  env: Env,
+  ipHashValor: string,
+  tipo: 'login' | 'recuperar',
+): Promise<void> {
+  await env.DB.prepare(
+    `INSERT INTO tentativa_auth (id, ip_hash, tipo) VALUES (?, ?, ?)`,
+  )
+    .bind(crypto.randomUUID(), ipHashValor, tipo)
+    .run()
+}
+
+/** Quantas tentativas este IP fez nos últimos N segundos (para lockout). */
+export async function contarTentativasAuthRecentes(
+  env: Env,
+  ipHashValor: string,
+  tipo: 'login' | 'recuperar',
+  segundos: number,
+): Promise<number> {
+  const row = await env.DB.prepare(
+    `SELECT count(*) AS n FROM tentativa_auth
+     WHERE ip_hash = ? AND tipo = ? AND criado_em > datetime('now', ?)`,
+  )
+    .bind(ipHashValor, tipo, `-${segundos} seconds`)
+    .first<{ n: number }>()
+  return row?.n ?? 0
 }

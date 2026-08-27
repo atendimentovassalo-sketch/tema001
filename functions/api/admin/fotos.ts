@@ -11,6 +11,20 @@ const TIPOS: Record<string, string> = {
 }
 const MAX_BYTES = 6 * 1024 * 1024 // 6 MB
 
+/** Confere os primeiros bytes (magic bytes) — o content-type do cliente não
+ *  é confiável; isto garante que o arquivo é mesmo a imagem declarada. */
+function assinaturaValida(tipo: string, b: Uint8Array): boolean {
+  if (tipo === 'image/jpeg') return b[0] === 0xff && b[1] === 0xd8 && b[2] === 0xff
+  if (tipo === 'image/png')
+    return b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4e && b[3] === 0x47
+  if (tipo === 'image/webp')
+    return (
+      b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46 &&
+      b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50
+    )
+  return false
+}
+
 export const onRequestPost: PagesFunction<Env, string, AdminData> = async ({
   env,
   request,
@@ -22,6 +36,9 @@ export const onRequestPost: PagesFunction<Env, string, AdminData> = async ({
   const buf = await request.arrayBuffer()
   if (buf.byteLength === 0) return erro('Arquivo vazio.', 400)
   if (buf.byteLength > MAX_BYTES) return erro('Imagem grande demais (máx. 6 MB).', 413)
+
+  if (!assinaturaValida(tipo, new Uint8Array(buf.slice(0, 12))))
+    return erro('Arquivo não é uma imagem válida.', 415)
 
   const nome = `${crypto.randomUUID()}.${ext}`
   await env.PHOTOS.put(nome, buf, {

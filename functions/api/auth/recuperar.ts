@@ -7,9 +7,11 @@ import {
   getUsuarioPorEmail,
   getTenantPorId,
   definirConviteRecuperacao,
+  registrarTentativaAuth,
+  contarTentativasAuthRecentes,
 } from '../../_lib/db'
 import { enviarEmail, emailRecuperacao } from '../../_lib/email'
-import { json, erro, lerJson, tokenAleatorio } from '../../_lib/http'
+import { json, erro, lerJson, tokenAleatorio, ipHash } from '../../_lib/http'
 
 const schema = z.object({ email: z.string().trim().email().max(160) })
 
@@ -28,6 +30,14 @@ export const onRequestPost: PagesFunction<Env> = async ({
   // resposta sempre neutra (anti-enumeração de e-mails)
   const neutra = json({ ok: true })
   if (!parsed.success) return neutra
+
+  // rate-limit por IP: no máx. 5 pedidos por hora (anti-bombing de e-mail)
+  const ip = await ipHash(request)
+  if (ip) {
+    const recentes = await contarTentativasAuthRecentes(env, ip, 'recuperar', 3600)
+    if (recentes >= 5) return neutra
+    await registrarTentativaAuth(env, ip, 'recuperar')
+  }
 
   const u = await getUsuarioPorEmail(env, parsed.data.email)
   if (!u) return neutra

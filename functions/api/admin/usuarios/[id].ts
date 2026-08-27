@@ -24,6 +24,8 @@ export const onRequestPut: PagesFunction<Env, string, AdminData> = async ({
   data,
   waitUntil,
 }) => {
+  if (data.sessao.papel !== 'admin')
+    return erro('Apenas administradores podem gerenciar usuários.', 403)
   const id = String(params.id)
   const alvo = await getUsuarioDoTenant(env, data.sessao.tenantId, id)
   if (!alvo) return erro('Usuário não encontrado.', 404)
@@ -79,6 +81,8 @@ export const onRequestDelete: PagesFunction<Env, string, AdminData> = async ({
   params,
   data,
 }) => {
+  if (data.sessao.papel !== 'admin')
+    return erro('Apenas administradores podem gerenciar usuários.', 403)
   const id = String(params.id)
   if (id === data.sessao.usuarioId) {
     return erro('Você não pode remover o seu próprio acesso.', 409)

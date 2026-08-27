@@ -29,6 +29,9 @@ export const onRequestPost: PagesFunction<Env, string, AdminData> = async ({
   data,
   waitUntil,
 }) => {
+  if (data.sessao.papel !== 'admin')
+    return erro('Apenas administradores podem gerenciar usuários.', 403)
+
   let body: unknown
   try {
     body = await lerJson(request, 4096)
