@@ -7,6 +7,8 @@ export function json(data: unknown, status = 200, headers: HeadersInit = {}): Re
     headers: {
       'content-type': 'application/json; charset=utf-8',
       'cache-control': 'no-store',
+      'x-content-type-options': 'nosniff',
+      'strict-transport-security': 'max-age=31536000; includeSubDomains; preload',
       ...headers,
     },
   })

@@ -139,9 +139,10 @@ export async function getTenant(
 
 /**
  * Resolve o tenant pelo domínio público da requisição.
- * Prefere o host reencaminhado pelo Worker-proxy (header `x-tenant-host`); cai
- * para `x-forwarded-host`, depois o `Host`, depois o host da URL. Normaliza
- * (minúsculas, sem `www.`, sem porta).
+ * Prefere o host reencaminhado pelo Worker-proxy (header `x-tenant-host`),
+ * MAS apenas se autenticado por `x-proxy-auth` === `PROXY_SEGREDO`.
+ * Sem autenticação, cai para `Host` e depois o host da URL.
+ * Normaliza (minúsculas, sem `www.`, sem porta).
  *
  * Fallback de transição: se NÃO houver correspondência e existir só 1 tenant,
  * devolve-o (mantém compatibilidade enquanto os domínios não estão preenchidos).
@@ -151,9 +152,13 @@ export async function getTenantPorHost(
   env: Env,
   request: Request,
 ): Promise<TenantRow | null> {
+  // Valida se o header x-tenant-host vem do proxy autorizado
+  const proxyAutenticado =
+    env.PROXY_SEGREDO &&
+    request.headers.get('x-proxy-auth') === env.PROXY_SEGREDO
+
   const host = (
-    request.headers.get('x-tenant-host') ??
-    request.headers.get('x-forwarded-host') ??
+    proxyAutenticado ? request.headers.get('x-tenant-host') : null ??
     request.headers.get('host') ??
     new URL(request.url).hostname
   )
