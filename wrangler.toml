@@ -15,3 +15,22 @@ migrations_dir = "migrations"
 [[r2_buckets]]
 binding = "PHOTOS"
 bucket_name = "funeraria-fotos"
+
+# Configuração de Preview para DAST StackHawk (Fase 1)
+# Usa D1 de teste + R2 de teste (descartáveis após scan)
+[env.preview]
+name = "tema001-preview"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "funeraria-db-test"
+database_id = "6109926f-4a37-482b-a506-7ad3a55fcca6"
+migrations_dir = "migrations"
+
+[[env.preview.r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "funeraria-fotos-test"
+
+# Desabilita e-mail em preview (scanner não deve disparar e-mails reais)
+[env.preview.env]
+RESEND_API_KEY = ""

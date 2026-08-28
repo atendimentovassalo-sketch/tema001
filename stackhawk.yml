@@ -1,0 +1,22 @@
+app:
+  applicationId: "SERA_PREENCHIDO"
+  env: Preview
+  host: ${APP_HOST}
+  authentication:
+    usernamePassword:
+      type: JSON
+      loginPath: /api/auth/login
+      usernameField: email
+      passwordField: senha
+      scanUsername: admin@funerariademonstracao.com.br
+      scanPassword: ${SCAN_PASSWORD}
+    cookieAuthorization:
+      cookieNames:
+        - sessao
+    testPath:
+      type: HEADER
+      path: /api/admin/config
+      success: ".*200.*"
+      fail: ".*401.*"
+  excludePaths:
+    - /api/auth/logout
