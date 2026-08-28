@@ -549,6 +549,8 @@ export async function definirSenhaUsuario(
   )
     .bind(hash, salt, id)
     .run()
+  // trocar a senha derruba todas as sessões abertas do usuário (segurança)
+  await env.DB.prepare(`DELETE FROM sessao WHERE usuario_id = ?`).bind(id).run()
 }
 
 /** Gera/atualiza o token de convite para recuperação de senha. */
