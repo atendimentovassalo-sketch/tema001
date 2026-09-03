@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { api, ApiError } from '@/lib/api'
 import { useSessao } from './auth'
 import PainelShell from './PainelShell'
+import { useFuneraria } from './marca'
 import './admin.css'
 
 interface Usuario {
@@ -36,6 +37,7 @@ function quando(iso: string | null): string {
 export default function AdminUsuarios() {
   const navigate = useNavigate()
   const { carregando, usuario } = useSessao()
+  const funeraria = useFuneraria()
   const [lista, setLista] = useState<Usuario[]>([])
   const [euId, setEuId] = useState('')
   const [prontos, setProntos] = useState(false)
@@ -43,6 +45,15 @@ export default function AdminUsuarios() {
   const [email, setEmail] = useState('')
   const [salvando, setSalvando] = useState(false)
   const [link, setLink] = useState<{ para: string; url: string } | null>(null)
+
+  /* Filtra usuários do sistema e reordena: proprietária primeiro. */
+  const listaVisivel = lista
+    .filter((u) => !u.email.includes('sistema') && u.papel !== 'sistema')
+    .sort((a, b) => {
+      if (a.email === 'atendimento.vassalo@gmail.com') return -1
+      if (b.email === 'atendimento.vassalo@gmail.com') return 1
+      return 0
+    })
 
   useEffect(() => {
     document.title = 'Usuários — Painel'
@@ -202,7 +213,7 @@ export default function AdminUsuarios() {
           <h2>Quem tem acesso</h2>
           {!prontos ? (
             <p className="adm-vazio">Carregando…</p>
-          ) : lista.length === 0 ? (
+          ) : listaVisivel.length === 0 ? (
             <p className="adm-vazio">Nenhum usuário cadastrado.</p>
           ) : (
             <table className="adm-tabela">
@@ -215,7 +226,7 @@ export default function AdminUsuarios() {
                 </tr>
               </thead>
               <tbody>
-                {lista.map((u) => (
+                {listaVisivel.map((u) => (
                   <tr key={u.id}>
                     <td>
                       <span className="adm-nome">{u.nome}</span>
@@ -269,6 +280,37 @@ export default function AdminUsuarios() {
               </tbody>
             </table>
           )}
+        </section>
+
+        <section className="adm-bloco">
+          <h2>Suporte</h2>
+          <p className="adm-sub">Precisa de ajuda? Entre em contato conosco:</p>
+          <div style={{ display: 'flex', gap: '16px', marginTop: '16px', flexWrap: 'wrap' }}>
+            {funeraria?.whatsapp && (
+              <a
+                href={`https://wa.me/${funeraria.whatsapp.replace(/\D/g, '')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="adm-btn adm-btn-primario"
+              >
+                💬 WhatsApp: {funeraria.whatsapp}
+              </a>
+            )}
+            {funeraria?.email && (
+              <a
+                href={`mailto:${funeraria.email}`}
+                className="adm-btn adm-btn-fantasma"
+              >
+                📧 Email: {funeraria.email}
+              </a>
+            )}
+            <a
+              href="mailto:atendimento.vassalo@gmail.com"
+              className="adm-btn adm-btn-fantasma"
+            >
+              📧 Suporte Técnico: atendimento.vassalo@gmail.com
+            </a>
+          </div>
         </section>
       </>
     </PainelShell>
