@@ -102,13 +102,13 @@ export default function PainelShell({
       )}
 
       <nav className="adm-lateral" id="adm-menu" aria-label="Seções do painel">
-        <a className="adm-lateral-marca" href="/">
+        <Link className="adm-lateral-marca" to="/admin">
           <MarcaFuneraria f={funeraria} classe="" descrever={false} />
           <span>
             Painel da funerária
             <small>{usuario.nome}</small>
           </span>
-        </a>
+        </Link>
 
         {/* A ação principal fica no menu, e não só na tela de memoriais:
             publicar nota é o que a funerária abre o painel para fazer, e

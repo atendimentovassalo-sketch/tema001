@@ -46,9 +46,9 @@ export default function AdminUsuarios() {
   const [salvando, setSalvando] = useState(false)
   const [link, setLink] = useState<{ para: string; url: string } | null>(null)
 
-  /* Filtra usuários do sistema e reordena: proprietária primeiro. */
+  /* Filtra usuários do sistema, gestor do SaaS e reordena: proprietária primeiro. */
   const listaVisivel = lista
-    .filter((u) => !u.email.includes('sistema') && u.papel !== 'sistema')
+    .filter((u) => !u.email.includes('sistema') && u.papel !== 'sistema' && u.email !== 'equipeavassaladora@gmail.com')
     .sort((a, b) => {
       if (a.email === 'atendimento.vassalo@gmail.com') return -1
       if (b.email === 'atendimento.vassalo@gmail.com') return 1
