@@ -541,13 +541,11 @@ function MemorialModerno({
           </section>
         )}
 
-        {/* livro de homenagens: composição (mensagem + vela) e o mural com o
-          feed. Avatar = vela acesa quando a pessoa acendeu; senão, iniciais.
-          Homenagem só-vela (sem mensagem) fica diferenciada. */}
-        <section id="homenagear" className="mv3-sec mv3-livro">
+        {/* mural de homenagens: mostra as homenagens já deixadas */}
+        <section id="homenagens" className="mv3-sec mv3-livro">
           <div className="mv3-w">
             <span className="mv3-cap">Homenagens</span>
-            <h2 className="mv3-h2">Deixe uma homenagem</h2>
+            <h2 className="mv3-h2">Homenagens recebidas</h2>
             {visiveis.length > 0 && (
               <p className="mv3-contagem">
                 <b>{visiveis.length}</b>{' '}
@@ -556,6 +554,76 @@ function MemorialModerno({
                   : 'pessoas já deixaram uma homenagem'}
               </p>
             )}
+
+            <div className="mv3-mural">
+              {visiveis.length === 0 && (
+                <p className="mv3-vazio">
+                  Ainda não há homenagens. Seja o primeiro a deixar uma palavra
+                  ou acender uma vela.
+                </p>
+              )}
+              {visiveis.slice(0, 12).map((h) => {
+                const soVela = h.vela && !h.texto
+                return (
+                  <div
+                    className={`mv3-msg${h.vela ? ' vela' : ''}${soVela ? ' so-vela' : ''}`}
+                    key={h.id}
+                  >
+                    <div className="mv3-av">
+                      {h.vela ? (
+                        <Vela tipo={h.velaTipo} tamanho={44} />
+                      ) : (
+                        iniciais(h.nome) || '·'
+                      )}
+                    </div>
+                    <div>
+                      <span className="mv3-msg-quem">{h.nome}</span>
+                      <span className="mv3-msg-quando">
+                        {tempoRelativo(h.criadoEmISO)}
+                      </span>
+                      {h.texto ? (
+                        <p className="mv3-msg-txt">{h.texto}</p>
+                      ) : (
+                        <p className="mv3-msg-txt acendeu">acendeu uma vela</p>
+                      )}
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* compartilhar */}
+        <section id="compartilhar" className="mv3-sec">
+          <div className="mv3-w">
+            <span className="mv3-cap">Compartilhar</span>
+            <h2 className="mv3-h2">Compartilhe a notícia</h2>
+            <div className="mv3-duo">
+              <a
+                className="mv3-btn mv3-btn--sage"
+                href={`https://wa.me/?text=${textoZap}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Enviar pelo WhatsApp
+              </a>
+              <button
+                className="mv3-btn mv3-btn--linha"
+                type="button"
+                onClick={copiarLink}
+              >
+                Copiar link
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* formulário para deixar uma homenagem */}
+        <section id="homenagear" className="mv3-sec mv3-livro">
+          <div className="mv3-w">
+            <span className="mv3-cap">Deixar homenagem</span>
+            <h2 className="mv3-h2">Deixe uma homenagem</h2>
 
             {/* UM FORMULÁRIO, PENSADO PARA QUEM TEM 70 ANOS (18/08/2026).
                 Chegou a ser dois (vela e mensagem separadas, como a v5 pedia) e
@@ -723,68 +791,6 @@ function MemorialModerno({
                 </button>
               </div>
             </form>
-
-            <div className="mv3-mural">
-              {visiveis.length === 0 && (
-                <p className="mv3-vazio">
-                  Ainda não há homenagens. Seja o primeiro a deixar uma palavra
-                  ou acender uma vela.
-                </p>
-              )}
-              {visiveis.slice(0, 12).map((h) => {
-                const soVela = h.vela && !h.texto
-                return (
-                  <div
-                    className={`mv3-msg${h.vela ? ' vela' : ''}${soVela ? ' so-vela' : ''}`}
-                    key={h.id}
-                  >
-                    <div className="mv3-av">
-                      {h.vela ? (
-                        <Vela tipo={h.velaTipo} tamanho={44} />
-                      ) : (
-                        iniciais(h.nome) || '·'
-                      )}
-                    </div>
-                    <div>
-                      <span className="mv3-msg-quem">{h.nome}</span>
-                      <span className="mv3-msg-quando">
-                        {tempoRelativo(h.criadoEmISO)}
-                      </span>
-                      {h.texto ? (
-                        <p className="mv3-msg-txt">{h.texto}</p>
-                      ) : (
-                        <p className="mv3-msg-txt acendeu">acendeu uma vela</p>
-                      )}
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* compartilhar */}
-        <section id="compartilhar" className="mv3-sec">
-          <div className="mv3-w">
-            <span className="mv3-cap">Compartilhar</span>
-            <h2 className="mv3-h2">Compartilhe a notícia</h2>
-            <div className="mv3-duo">
-              <a
-                className="mv3-btn mv3-btn--sage"
-                href={`https://wa.me/?text=${textoZap}`}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Enviar pelo WhatsApp
-              </a>
-              <button
-                className="mv3-btn mv3-btn--linha"
-                type="button"
-                onClick={copiarLink}
-              >
-                Copiar link
-              </button>
-            </div>
           </div>
         </section>
 
