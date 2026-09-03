@@ -364,11 +364,11 @@
   color: var(--muted);
 }
 .adm-col-acoes {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 4px;
+  text-align: right;
   white-space: nowrap;
+}
+.adm-col-acoes .adm-link {
+  margin-left: 6px;
 }
 .adm-link {
   background: none;
