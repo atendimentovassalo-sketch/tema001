@@ -364,7 +364,10 @@
   color: var(--muted);
 }
 .adm-col-acoes {
-  text-align: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
   white-space: nowrap;
 }
 .adm-link {
@@ -410,7 +413,7 @@
     padding: 6px 0;
   }
   .adm-col-acoes {
-    text-align: left;
+    justify-content: flex-start;
     border-top: 1px solid var(--line-soft);
     padding-top: 10px;
   }
