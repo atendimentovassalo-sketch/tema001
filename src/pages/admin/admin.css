@@ -393,6 +393,10 @@
   text-align: right;
   white-space: nowrap;
 }
+.adm-col-acoes .adm-link {
+  display: inline-block;
+  margin-left: 6px;
+}
 .adm-link {
   background: none;
   border: 0;
