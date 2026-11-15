@@ -40,3 +40,6 @@ scratchpad/
 # Lixo/artefatos locais e dossiês binários (não versionar)
 _lixo_git/
 *.pdf
+
+# Repositórios de referência clonados (grandes, com .git próprio)
+/referencias/
